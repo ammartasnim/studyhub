@@ -1,23 +1,33 @@
 package com.dsi.studyhub.services.impl;
 
+import com.dsi.studyhub.dtos.CommunityRequestDTO;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.services.CommunityService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CommunityServiceImpl implements CommunityService {
-    
-    @Autowired
-    private CommunityRepository communityRepository;
+
+    private final CommunityRepository communityRepository;
+
+    public CommunityServiceImpl(CommunityRepository communityRepository) {
+        this.communityRepository = communityRepository;
+    }
     
     @Override
-    public Community createCommunity(Community community) {
-        return communityRepository.save(community);
+    public Community createCommunity(CommunityRequestDTO community) {
+        Community newCommunity = new Community();
+        newCommunity.setTitle(community.getTitle());
+        newCommunity.setDescription(community.getDescription());
+        newCommunity.setNbrMembers(1);
+        newCommunity.setPosts(null);
+
+        return communityRepository.save(newCommunity);
     }
     
     @Override
@@ -26,8 +36,8 @@ public class CommunityServiceImpl implements CommunityService {
     }
     
     @Override
-    public List<Community> getAllCommunities() {
-        return communityRepository.findAll();
+    public Page<Community> getAllCommunities(String title, String description, Integer minMembers, Pageable pageable) {
+        return communityRepository.findAllWithFilters(title, description, minMembers, pageable);
     }
     
     @Override
@@ -45,13 +55,13 @@ public class CommunityServiceImpl implements CommunityService {
             if (community.getNbrMembers() > 0) {
                 comm.setNbrMembers(community.getNbrMembers());
             }
-            if (community.getPost() != null) {
-                comm.setPost(community.getPost());
+            if (community.getPosts() != null) {
+                comm.setPosts(community.getPosts());
             }
             return communityRepository.save(comm);
         }
         
-        return null;
+        throw new IllegalArgumentException("Community not found with id: " + id);
     }
     
     @Override

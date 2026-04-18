@@ -20,8 +20,8 @@ public class Community {
     private String title;
     private String description;
     private int nbrMembers;
-    @OneToMany()
-    private List <Post> post ;
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 
 
 
