@@ -1,5 +1,6 @@
 package com.dsi.studyhub.entities;
 
+import com.dsi.studyhub.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
