@@ -16,7 +16,7 @@ import lombok.Setter;
 @DiscriminatorValue("CLIENT")
 public class Client extends User {
 
-    private String pfp;
+    private String pfp; //URL
 
     @Column(nullable = false)
     private String firstName;
