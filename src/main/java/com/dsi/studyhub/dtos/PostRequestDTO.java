@@ -1,7 +1,5 @@
 package com.dsi.studyhub.dtos;
 
-import com.dsi.studyhub.entities.PostStatus;
-
 import java.util.List;
 
 public class PostRequestDTO {
