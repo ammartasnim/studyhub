@@ -28,6 +28,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostResponseDTO> getAllPosts() {
         List<Post> posts= postRepository.findAll();
+        return null;
     }
 
 }
