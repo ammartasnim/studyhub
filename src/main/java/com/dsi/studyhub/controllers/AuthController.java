@@ -16,13 +16,11 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // POST /api/auth/register → registerClient() from your diagram
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.registerClient(request));
     }
 
-    // POST /api/auth/login → login() from your diagram
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));

@@ -23,12 +23,12 @@ public class Post {
     private List<String> imgs;
     private PostStatus status=PostStatus.Pending;
 
-    @ManyToOne
-    @JoinColumn(name = "community_id")
-    private Community community;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+//    @ManyToOne
+//    @JoinColumn(name = "community_id")
+//    private Community community;
+//
+//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+//    private List<Comment> comments;
 
 
 }
