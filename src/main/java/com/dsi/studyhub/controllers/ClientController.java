@@ -1,6 +1,5 @@
 package com.dsi.studyhub.controllers;
 
-import com.dsi.studyhub.entities.Client;
 import com.dsi.studyhub.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

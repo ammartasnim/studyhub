@@ -3,7 +3,6 @@ package com.dsi.studyhub.services;
 import com.dsi.studyhub.dtos.AuthResponse;
 import com.dsi.studyhub.dtos.LoginRequest;
 import com.dsi.studyhub.dtos.RegisterRequest;
-import com.dsi.studyhub.entities.Client;
 import com.dsi.studyhub.enums.UserRole;
 import com.dsi.studyhub.repositories.ClientRepository;
 import com.dsi.studyhub.repositories.UserRepository;

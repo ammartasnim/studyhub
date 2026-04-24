@@ -1,6 +1,5 @@
 package com.dsi.studyhub.services;
 
-import com.dsi.studyhub.entities.Client;
 import com.dsi.studyhub.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
