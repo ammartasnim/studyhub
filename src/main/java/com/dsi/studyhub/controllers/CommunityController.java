@@ -1,12 +1,11 @@
 package com.dsi.studyhub.controllers;
 
-import com.dsi.studyhub.dtos.CommunityRequestDTO;
-import com.dsi.studyhub.dtos.CommunityResponseDTO;
+import com.dsi.studyhub.dtos.CommunityReqDto;
+import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.mappers.CommunityMapper;
 import com.dsi.studyhub.services.CommunityService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,13 +35,13 @@ public class CommunityController {
     }
 
     @PostMapping
-    public ResponseEntity<CommunityResponseDTO> createCommunity(@Valid @RequestBody CommunityRequestDTO requestDTO) {
+    public ResponseEntity<CommunityResDto> createCommunity(@Valid @RequestBody CommunityReqDto requestDTO) {
         Community savedCommunity = communityService.createCommunity(requestDTO);
-        return ResponseEntity.ok(communityMapper.toResponseDTO(savedCommunity));
+        return ResponseEntity.ok(communityMapper.toDto(savedCommunity));
     }
 
     @GetMapping
-    public ResponseEntity<List<CommunityResponseDTO>> getAllCommunities(
+    public ResponseEntity<List<CommunityResDto>> getAllCommunities(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Integer minMembers,
@@ -54,28 +53,28 @@ public class CommunityController {
         Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        List<CommunityResponseDTO> communities = communityService
+        List<CommunityResDto> communities = communityService
                 .getAllCommunities(title, description, minMembers, pageable)
                 .stream()
-                .map(communityMapper::toResponseDTO)
+                .map(communityMapper::toDto)
                 .toList();
 
         return ResponseEntity.ok(communities);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommunityResponseDTO> getCommunityById(@PathVariable Long id) {
+    public ResponseEntity<CommunityResDto> getCommunityById(@PathVariable Long id) {
         return communityService.getCommunityById(id)
-                .map(communityMapper::toResponseDTO)
+                .map(communityMapper::toDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommunityResponseDTO> updateCommunity(@PathVariable Long id,
-                                                                 @Valid @RequestBody CommunityRequestDTO requestDTO) {
+    public ResponseEntity<CommunityResDto> updateCommunity(@PathVariable Long id,
+                                                            @Valid @RequestBody CommunityReqDto requestDTO) {
         Community updatedCommunity = communityService.updateCommunity(id, requestDTO);
-        return ResponseEntity.ok(communityMapper.toResponseDTO(updatedCommunity));
+        return ResponseEntity.ok(communityMapper.toDto(updatedCommunity));
     }
 
     @DeleteMapping("/{id}")

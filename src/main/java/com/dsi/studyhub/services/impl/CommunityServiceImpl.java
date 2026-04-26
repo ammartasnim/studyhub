@@ -1,7 +1,8 @@
 package com.dsi.studyhub.services.impl;
 
-import com.dsi.studyhub.dtos.CommunityRequestDTO;
+import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.entities.Community;
+import com.dsi.studyhub.mappers.CommunityMapper;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.services.CommunityService;
 import org.springframework.data.domain.Pageable;
@@ -14,21 +15,19 @@ import java.util.Optional;
 public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityRepository communityRepository;
+    private final CommunityMapper communityMapper;
 
-    public CommunityServiceImpl(CommunityRepository communityRepository) {
+    public CommunityServiceImpl(CommunityRepository communityRepository, CommunityMapper communityMapper) {
         this.communityRepository = communityRepository;
+        this.communityMapper = communityMapper;
     }
     
     @Override
-    public Community createCommunity(CommunityRequestDTO community) {
-        Community newCommunity = new Community();
-        newCommunity.setTitle(community.getTitle());
-        newCommunity.setDescription(community.getDescription());
-        int members = community.getNbrMembers() > 0 ? community.getNbrMembers() : 1;
+    public Community createCommunity(CommunityReqDto community) {
+        Community newCommunity = communityMapper.toEntity(community);
+        int members = community.nbrMembers() != null && community.nbrMembers() > 0 ? community.nbrMembers() : 1;
         newCommunity.setNbrMembers(members);
-
         newCommunity.setPosts(null);
-
         return communityRepository.save(newCommunity);
     }
     
@@ -44,20 +43,14 @@ public class CommunityServiceImpl implements CommunityService {
     }
     
     @Override
-    public Community updateCommunity(Long id, com.dsi.studyhub.dtos.CommunityRequestDTO communityDto) {
+    public Community updateCommunity(Long id, CommunityReqDto communityDto) {
         Optional<Community> existingCommunity = communityRepository.findById(id);
 
         if (existingCommunity.isPresent()) {
             Community comm = existingCommunity.get();
-            // Use mapper-like update logic here to respect omitted fields
-            if (communityDto.getTitle() != null) {
-                comm.setTitle(communityDto.getTitle());
-            }
-            if (communityDto.getDescription() != null) {
-                comm.setDescription(communityDto.getDescription());
-            }
-            if (communityDto.getNbrMembers() > 0) {
-                comm.setNbrMembers(communityDto.getNbrMembers());
+            communityMapper.partialUpdate(communityDto, comm);
+            if (communityDto.nbrMembers() != null && communityDto.nbrMembers() <= 0) {
+                comm.setNbrMembers(1);
             }
             return communityRepository.save(comm);
         }

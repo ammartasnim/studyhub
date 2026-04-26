@@ -1,8 +1,8 @@
 package com.dsi.studyhub.mappers;
 
-import com.dsi.studyhub.dtos.CommunityReqDto;
-import com.dsi.studyhub.dtos.CommunityResDto;
-import com.dsi.studyhub.entities.Community;
+import com.dsi.studyhub.dtos.UserReqDto;
+import com.dsi.studyhub.dtos.UserResDto;
+import com.dsi.studyhub.entities.User;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
@@ -11,12 +11,11 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface CommunityMapper {
+public interface UserMapper {
+    User toEntity(UserReqDto dto);
 
-    Community toEntity(CommunityReqDto dto);
-
-    CommunityResDto toDto(Community community);
+    UserResDto toDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdate(CommunityReqDto dto, @MappingTarget Community community);
+    void partialUpdate(UserReqDto dto, @MappingTarget User user);
 }

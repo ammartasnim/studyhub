@@ -1,8 +1,8 @@
 package com.dsi.studyhub.services;
 
-import com.dsi.studyhub.dtos.AuthResponse;
-import com.dsi.studyhub.dtos.LoginRequest;
-import com.dsi.studyhub.dtos.RegisterRequest;
+import com.dsi.studyhub.dtos.AuthResDto;
+import com.dsi.studyhub.dtos.LoginReqDto;
+import com.dsi.studyhub.dtos.RegisterReqDto;
 import com.dsi.studyhub.entities.Badge;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.BadgeType;
@@ -32,23 +32,22 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
 
 
-    public AuthResponse registerUser(RegisterRequest request) {
+    public AuthResDto registerUser(RegisterReqDto request) {
 
-        if (userRepository.existsByEmail(request.getEmail()))
+        if (userRepository.existsByEmail(request.email()))
             throw new RuntimeException("Email already in use");
 
-        if (userRepository.existsByUsername(request.getUsername()))
+        if (userRepository.existsByUsername(request.username()))
             throw new RuntimeException("Username already taken");
 
         User user = new User();
-//        client.setId(UUID.randomUUID());
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPhone(request.getPhone());
-        user.setPfp(request.getPfp());
+        user.setUsername(request.username());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setEmail(request.email());
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setPhone(request.phone());
+        user.setPfp(request.pfp());
         user.setRole(UserRole.Client);
         user.setBanned(false);
         user.setXpPts(0);
@@ -62,22 +61,22 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         String token = jwtService.generateToken(user);
-        return new AuthResponse(token, savedUser.getId(), savedUser.getUsername(), savedUser.getRole());
+        return new AuthResDto(token, savedUser.getId(), savedUser.getUsername(), savedUser.getRole());
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResDto login(LoginReqDto request) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
 
-        var user = userRepository.findByUsername(request.getUsername())
+        var user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRole());
+        return new AuthResDto(token, user.getId(), user.getUsername(), user.getRole());
     }
 }
