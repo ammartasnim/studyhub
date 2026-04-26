@@ -8,7 +8,7 @@ import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.mappers.CommentMapper;
 import com.dsi.studyhub.repositories.CommentRepository;
 import com.dsi.studyhub.repositories.PostRepository;
-import com.dsi.studyhub.repositories.UserRepository;
+import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommentService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +24,14 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private PostRepository postRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private CommentMapper commentMapper;
+    @Autowired
+    private AuthenticatedUserService authenticatedUserService;
 
     @Override
     @Transactional
     public CommentResDto createComment(CommentReqDto request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = authenticatedUserService.getAuthenticatedUser();
         Post post = postRepository.findById(request.postId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 

@@ -6,15 +6,12 @@ import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.BadgeType;
 import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
-import com.dsi.studyhub.exceptions.UnauthorizedException;
 import com.dsi.studyhub.mappers.CommunityMapper;
 import com.dsi.studyhub.repositories.CommunityRepository;
-import com.dsi.studyhub.repositories.UserRepository;
+import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommunityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -24,19 +21,19 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityRepository communityRepository;
     private final CommunityMapper communityMapper;
-    private final UserRepository userRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public CommunityServiceImpl(CommunityRepository communityRepository,
                                 CommunityMapper communityMapper,
-                                UserRepository userRepository) {
+                                AuthenticatedUserService authenticatedUserService) {
         this.communityRepository = communityRepository;
         this.communityMapper = communityMapper;
-        this.userRepository = userRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
     
     @Override
     public Community createCommunity(CommunityReqDto community) {
-        User moderator = getAuthenticatedUser();
+        User moderator = authenticatedUserService.getAuthenticatedUser();
         boolean hasExplorerBadge = moderator.getBadges().stream()
                 .anyMatch(badge -> badge.getType() == BadgeType.EXPLORER);
 
@@ -81,18 +78,6 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public void deleteCommunity(Long id) {
         communityRepository.deleteById(id);
-    }
-
-    private User getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new UnauthorizedException("Authentication is required");
-        }
-
-        String username = authentication.getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UnauthorizedException("Authenticated user not found"));
     }
 }
 

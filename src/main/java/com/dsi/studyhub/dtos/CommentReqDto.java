@@ -7,5 +7,5 @@ import java.io.Serializable;
 /**
  * DTO for {@link com.dsi.studyhub.entities.Comment}
  */
-public record CommentReqDto(Long postId, Long userId, @NotBlank String content) implements Serializable {
+public record CommentReqDto(Long postId, @NotBlank String content) implements Serializable {
 }
