@@ -52,6 +52,12 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "moderator", orphanRemoval = true)
     private List<Community> communities = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "users_posts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private Set<Post> likes = new LinkedHashSet<>();
+
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 

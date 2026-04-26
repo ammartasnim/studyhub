@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -20,7 +22,14 @@ public class Post {
     private Long id;
     private String title;
     private String content;
+
+    @ElementCollection
+    @CollectionTable(name = "post_imgs", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "img_url")
     private List<String> imgs;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PostStatus status=PostStatus.Pending;
 
     @ManyToOne
@@ -34,5 +43,8 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+
+    @ManyToMany(mappedBy = "likes")
+    private Set<User> likes = new LinkedHashSet<>();
 
 }
