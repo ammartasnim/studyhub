@@ -2,6 +2,7 @@ package com.dsi.studyhub.services.impl;
 
 import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.entities.Community;
+import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.mappers.CommunityMapper;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.services.CommunityService;
@@ -55,7 +56,7 @@ public class CommunityServiceImpl implements CommunityService {
             return communityRepository.save(comm);
         }
 
-        throw new IllegalArgumentException("Community not found with id: " + id);
+        throw new ResourceNotFoundException("Community not found with id: " + id);
     }
     
     @Override

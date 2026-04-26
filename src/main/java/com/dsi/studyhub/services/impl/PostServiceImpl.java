@@ -3,6 +3,7 @@ package com.dsi.studyhub.services.impl;
 import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
+import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.services.PostService;
@@ -23,7 +24,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post createPost(PostReqDto postRequestDTO) {
         Community community = communityRepository.findById(postRequestDTO.communityId())
-                .orElseThrow(() -> new IllegalArgumentException("Community not found with id: " + postRequestDTO.communityId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + postRequestDTO.communityId()));
 
         Post post = new Post();
         post.setTitle(postRequestDTO.title());

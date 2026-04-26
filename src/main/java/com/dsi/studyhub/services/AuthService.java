@@ -7,6 +7,7 @@ import com.dsi.studyhub.entities.Badge;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.BadgeType;
 import com.dsi.studyhub.enums.UserRole;
+import com.dsi.studyhub.exceptions.ConflictException;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,10 @@ public class AuthService {
     public AuthResDto registerUser(RegisterReqDto request) {
 
         if (userRepository.existsByEmail(request.email()))
-            throw new RuntimeException("Email already in use");
+            throw new ConflictException("Email already in use");
 
         if (userRepository.existsByUsername(request.username()))
-            throw new RuntimeException("Username already taken");
+            throw new ConflictException("Username already taken");
 
         User user = new User();
         user.setUsername(request.username());
