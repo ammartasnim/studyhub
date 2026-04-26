@@ -4,10 +4,10 @@ import com.dsi.studyhub.dtos.CommunityRequestDTO;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.services.CommunityService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,7 +24,9 @@ public class CommunityServiceImpl implements CommunityService {
         Community newCommunity = new Community();
         newCommunity.setTitle(community.getTitle());
         newCommunity.setDescription(community.getDescription());
-        newCommunity.setNbrMembers(1);
+        int members = community.getNbrMembers() > 0 ? community.getNbrMembers() : 1;
+        newCommunity.setNbrMembers(members);
+
         newCommunity.setPosts(null);
 
         return communityRepository.save(newCommunity);
@@ -36,31 +38,30 @@ public class CommunityServiceImpl implements CommunityService {
     }
     
     @Override
-    public Page<Community> getAllCommunities(String title, String description, Integer minMembers, Pageable pageable) {
-        return communityRepository.findAllWithFilters(title, description, minMembers, pageable);
+    public List<Community> getAllCommunities(String title, String description, Integer minMembers, Pageable pageable) {
+        // Delegate to repository query that handles optional filters and paging
+        return communityRepository.findByFilters(title, description, minMembers, pageable).getContent();
     }
     
     @Override
-    public Community updateCommunity(Long id, Community community) {
+    public Community updateCommunity(Long id, com.dsi.studyhub.dtos.CommunityRequestDTO communityDto) {
         Optional<Community> existingCommunity = communityRepository.findById(id);
-        
+
         if (existingCommunity.isPresent()) {
             Community comm = existingCommunity.get();
-            if (community.getTitle() != null) {
-                comm.setTitle(community.getTitle());
+            // Use mapper-like update logic here to respect omitted fields
+            if (communityDto.getTitle() != null) {
+                comm.setTitle(communityDto.getTitle());
             }
-            if (community.getDescription() != null) {
-                comm.setDescription(community.getDescription());
+            if (communityDto.getDescription() != null) {
+                comm.setDescription(communityDto.getDescription());
             }
-            if (community.getNbrMembers() > 0) {
-                comm.setNbrMembers(community.getNbrMembers());
-            }
-            if (community.getPosts() != null) {
-                comm.setPosts(community.getPosts());
+            if (communityDto.getNbrMembers() > 0) {
+                comm.setNbrMembers(communityDto.getNbrMembers());
             }
             return communityRepository.save(comm);
         }
-        
+
         throw new IllegalArgumentException("Community not found with id: " + id);
     }
     

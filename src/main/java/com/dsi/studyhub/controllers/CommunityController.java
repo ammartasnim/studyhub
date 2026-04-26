@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +42,7 @@ public class CommunityController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CommunityResponseDTO>> getAllCommunities(
+    public ResponseEntity<List<CommunityResponseDTO>> getAllCommunities(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Integer minMembers,
@@ -52,9 +54,11 @@ public class CommunityController {
         Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<CommunityResponseDTO> communities = communityService
+        List<CommunityResponseDTO> communities = communityService
                 .getAllCommunities(title, description, minMembers, pageable)
-                .map(communityMapper::toResponseDTO);
+                .stream()
+                .map(communityMapper::toResponseDTO)
+                .toList();
 
         return ResponseEntity.ok(communities);
     }
@@ -70,7 +74,7 @@ public class CommunityController {
     @PutMapping("/{id}")
     public ResponseEntity<CommunityResponseDTO> updateCommunity(@PathVariable Long id,
                                                                  @Valid @RequestBody CommunityRequestDTO requestDTO) {
-        Community updatedCommunity = communityService.updateCommunity(id, communityMapper.toEntity(requestDTO));
+        Community updatedCommunity = communityService.updateCommunity(id, requestDTO);
         return ResponseEntity.ok(communityMapper.toResponseDTO(updatedCommunity));
     }
 

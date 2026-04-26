@@ -1,7 +1,7 @@
 package com.dsi.studyhub.services.impl;
 
-import com.dsi.studyhub.dtos.PostRequestDTO;
-import com.dsi.studyhub.dtos.PostResponseDTO;
+import com.dsi.studyhub.dtos.PostReqDto;
+import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
@@ -21,14 +21,25 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponseDTO createPost(PostRequestDTO postRequestDTO) {
-        return null;
+    public Post createPost(PostReqDto postRequestDTO) {
+        Community community = communityRepository.findById(postRequestDTO.communityId())
+                .orElseThrow(() -> new IllegalArgumentException("Community not found with id: " + postRequestDTO.communityId()));
+
+        Post post = new Post();
+        post.setTitle(postRequestDTO.title());
+        post.setContent(postRequestDTO.content());
+        post.setImgs(postRequestDTO.imgs());
+        post.setCommunity(community);
+
+        return postRepository.save(post);
     }
 
     @Override
-    public List<PostResponseDTO> getAllPosts() {
-        List<Post> posts= postRepository.findAll();
-        return null;
+    public List<Post> getAllPosts(String title) {
+        if (title != null && !title.isEmpty()) {
+            return postRepository.findByTitle(title);
+        }
+        return postRepository.findAll();
     }
 
 }

@@ -24,5 +24,8 @@ public class Community {
     private List<Post> posts;
 
 
+    @ManyToOne
+    @JoinColumn(name = "moderator_id")
+    private User moderator;
 
 }

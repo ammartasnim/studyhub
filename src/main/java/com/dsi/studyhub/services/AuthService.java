@@ -3,7 +3,9 @@ package com.dsi.studyhub.services;
 import com.dsi.studyhub.dtos.AuthResponse;
 import com.dsi.studyhub.dtos.LoginRequest;
 import com.dsi.studyhub.dtos.RegisterRequest;
+import com.dsi.studyhub.entities.Badge;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.BadgeType;
 import com.dsi.studyhub.enums.UserRole;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.security.JwtService;
@@ -13,8 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -51,6 +51,13 @@ public class AuthService {
         user.setPfp(request.getPfp());
         user.setRole(UserRole.Client);
         user.setBanned(false);
+        user.setXpPts(0);
+
+        Badge beginnerBadge = new Badge();
+        beginnerBadge.setUser(user);
+        beginnerBadge.setType(BadgeType.BEGINNER);
+
+        user.getBadges().add(beginnerBadge);
 
         User savedUser = userRepository.save(user);
 

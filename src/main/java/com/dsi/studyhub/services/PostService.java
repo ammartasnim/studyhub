@@ -1,11 +1,11 @@
 package com.dsi.studyhub.services;
 
-import com.dsi.studyhub.dtos.PostRequestDTO;
-import com.dsi.studyhub.dtos.PostResponseDTO;
+import com.dsi.studyhub.dtos.PostReqDto;
+import com.dsi.studyhub.entities.Post;
 
 import java.util.List;
 
 public interface PostService {
-    PostResponseDTO createPost(PostRequestDTO postRequestDTO);
-    List<PostResponseDTO> getAllPosts();
+    Post createPost(PostReqDto postRequestDTO);
+    List<Post> getAllPosts(String title);
 }

@@ -7,22 +7,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 @Repository
 public interface CommunityRepository extends JpaRepository<Community, Long> {
 
-    @Query("""
-            SELECT c
-            FROM Community c
-            WHERE (:title IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')))
-              AND (:description IS NULL OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%')))
-              AND (:minMembers IS NULL OR c.nbrMembers >= :minMembers)
-            """)
-    Page<Community> findAllWithFilters(
-            @Param("title") String title,
-            @Param("description") String description,
-            @Param("minMembers") Integer minMembers,
-            Pageable pageable
-    );
+    List<Community> findByTitleContainingIgnoreCase(String title);
+
+    List<Community> findByDescriptionContainingIgnoreCase(String description);
+
+    // Fix: correct Spring Data keyword is GreaterThanEqual (not GreaterThanOrEqual)
+    List<Community> findByNbrMembersGreaterThanEqual(Integer minMembers);
+
+    // Combined, pageable-aware filter method. Parameters are optional (can be null).
+    @Query("SELECT c FROM Community c WHERE " +
+            "(:title IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:description IS NULL OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%'))) AND " +
+            "(:minMembers IS NULL OR c.nbrMembers >= :minMembers)")
+    Page<Community> findByFilters(@Param("title") String title,
+                                  @Param("description") String description,
+                                  @Param("minMembers") Integer minMembers,
+                                  Pageable pageable);
 }
 
