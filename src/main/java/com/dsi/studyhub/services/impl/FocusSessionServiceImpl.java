@@ -4,12 +4,15 @@ import com.dsi.studyhub.dtos.FocusSessionReqDto;
 import com.dsi.studyhub.dtos.FocusSessionResDto;
 import com.dsi.studyhub.entities.FocusSession;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.mappers.FocusSessionMapper;
 import com.dsi.studyhub.repositories.FocusSessionRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.FocusSessionService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,8 +21,11 @@ public class FocusSessionServiceImpl implements FocusSessionService {
     private FocusSessionRepository focusSessionRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private FocusSessionMapper focusSessionMapper;
 
     @Override
+    @Transactional
     public FocusSessionResDto saveSession(FocusSessionReqDto request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -30,16 +36,28 @@ public class FocusSessionServiceImpl implements FocusSessionService {
         session.setUser(user);
 
         FocusSession saved = focusSessionRepository.save(session);
-        return mapToResponse(saved);
+        user.setXpPts(user.getXpPts() + 10);
+        userRepository.save(user);
+        return focusSessionMapper.toDto(saved);
     }
 
     @Override
     public List<FocusSessionResDto> getSessionsByUserId(Long userId) {
-        return List.of();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<FocusSession> sessions = focusSessionRepository.findByUserId(userId);
+        List<FocusSessionResDto> dtos = new ArrayList<>();
+        for (FocusSession s : sessions) {
+            dtos.add(focusSessionMapper.toDto(s)); }
+        return dtos;
     }
 
     @Override
     public void deleteSession(Long id) {
-
+        if (!focusSessionRepository.existsById(id)) {
+            throw new RuntimeException("FocusSession not found");
+        }
+        focusSessionRepository.deleteById(id);
     }
 }
