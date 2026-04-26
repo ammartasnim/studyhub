@@ -9,6 +9,7 @@ public record CommunityResDto(
         Long id,
         String title,
         String description,
-        int nbrMembers
+        int nbrMembers,
+        Long moderatorId
 ) implements Serializable {
 }

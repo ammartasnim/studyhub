@@ -4,6 +4,7 @@ import com.dsi.studyhub.dtos.FocusSessionReqDto;
 import com.dsi.studyhub.dtos.FocusSessionResDto;
 import com.dsi.studyhub.entities.FocusSession;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.mappers.FocusSessionMapper;
 import com.dsi.studyhub.repositories.FocusSessionRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.FocusSessionService;
@@ -18,6 +19,8 @@ public class FocusSessionServiceImpl implements FocusSessionService {
     private FocusSessionRepository focusSessionRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private FocusSessionMapper focusSessionMapper;
 
     @Override
     public FocusSessionResDto saveSession(FocusSessionReqDto request) {
@@ -30,7 +33,7 @@ public class FocusSessionServiceImpl implements FocusSessionService {
         session.setUser(user);
 
         FocusSession saved = focusSessionRepository.save(session);
-        return mapToResponse(saved);
+        return focusSessionMapper.toDto(saved);
     }
 
     @Override

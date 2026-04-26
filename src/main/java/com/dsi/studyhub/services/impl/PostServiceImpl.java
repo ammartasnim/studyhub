@@ -7,9 +7,9 @@ import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.services.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -36,11 +36,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getAllPosts(String title) {
+    public Page<Post> getAllPosts(String title, Pageable pageable) {
         if (title != null && !title.isEmpty()) {
-            return postRepository.findByTitle(title);
+            return postRepository.findByTitle(title, pageable);
         }
-        return postRepository.findAll();
+        return postRepository.findAll(pageable);
     }
 
 }

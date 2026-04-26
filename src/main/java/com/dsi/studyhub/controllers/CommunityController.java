@@ -6,6 +6,8 @@ import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.mappers.CommunityMapper;
 import com.dsi.studyhub.services.CommunityService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.util.List;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +42,7 @@ public class CommunityController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommunityResDto>> getAllCommunities(
+    public ResponseEntity<Page<CommunityResDto>> getAllCommunities(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Integer minMembers,
@@ -52,14 +53,13 @@ public class CommunityController {
     ) {
         Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-
-        List<CommunityResDto> communities = communityService
-                .getAllCommunities(title, description, minMembers, pageable)
-                .stream()
-                .map(communityMapper::toDto)
-                .toList();
-
-        return ResponseEntity.ok(communities);
+        Page<Community> communitiesPage = communityService.getAllCommunities(title, description, minMembers, pageable);
+        Page<CommunityResDto> response = new PageImpl<>(
+                communitiesPage.getContent().stream().map(communityMapper::toDto).toList(),
+                communitiesPage.getPageable(),
+                communitiesPage.getTotalElements()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
