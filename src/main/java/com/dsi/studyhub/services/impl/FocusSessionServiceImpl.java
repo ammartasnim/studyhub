@@ -8,6 +8,7 @@ import com.dsi.studyhub.mappers.FocusSessionMapper;
 import com.dsi.studyhub.repositories.FocusSessionRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.FocusSessionService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,12 +38,20 @@ public class FocusSessionServiceImpl implements FocusSessionService {
     }
 
     @Override
+    @Transactional
     public List<FocusSessionResDto> getSessionsByUserId(Long userId) {
-        return List.of();
+        return focusSessionRepository.findByUserId(userId)
+                .stream()
+                .map(focusSessionMapper::toDto)
+                .toList();
     }
 
     @Override
+    @Transactional
     public void deleteSession(Long id) {
-
+        if (!focusSessionRepository.existsById(id)) {
+            throw new RuntimeException("FocusSession not found");
+        }
+        focusSessionRepository.deleteById(id);
     }
 }

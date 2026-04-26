@@ -22,8 +22,10 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentResDto> editComment(@PathVariable Long commentId, @RequestBody String content) {
-        return ResponseEntity.ok(commentService.editComment(commentId, content));
+    public ResponseEntity<CommentResDto> editComment(
+            @PathVariable Long commentId,
+            @RequestBody CommentReqDto request) {
+        return ResponseEntity.ok(commentService.editComment(commentId, request));
     }
 
     @DeleteMapping("/{commentId}")

@@ -46,11 +46,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentResDto editComment(Long commentId, String newContent) {
+    public CommentResDto editComment(Long commentId, CommentReqDto request) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        comment.setContent(newContent);
+        commentMapper.partialUpdate(request, comment);
+
         return commentMapper.toDto(commentRepository.save(comment));
     }
 

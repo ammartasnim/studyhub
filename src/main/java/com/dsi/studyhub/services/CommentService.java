@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CommentService {
     CommentResDto createComment(CommentReqDto request);
-    CommentResDto editComment(Long commentId, String newContent);
+    CommentResDto editComment(Long commentId, CommentReqDto request);
     void deleteComment(Long commentId);
     List<CommentResDto> getCommentsByPost(Long postId);
 }
