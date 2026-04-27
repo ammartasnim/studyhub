@@ -51,6 +51,14 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<FocusSession> focusSessions = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "community_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "community_id")
+    )
+    private List<Community> joinedCommunities = new ArrayList<>();
+
     @OneToMany(mappedBy = "moderator", orphanRemoval = true)
     private List<Community> communities = new ArrayList<>();
 

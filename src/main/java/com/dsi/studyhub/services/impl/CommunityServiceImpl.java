@@ -1,6 +1,8 @@
 package com.dsi.studyhub.services.impl;
 
 import com.dsi.studyhub.dtos.CommunityReqDto;
+import com.dsi.studyhub.dtos.CommunityResDto;
+import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.BadgeType;
@@ -53,10 +55,27 @@ public class CommunityServiceImpl implements CommunityService {
     public Optional<Community> getCommunityById(Long id) {
         return communityRepository.findById(id);
     }
-    
+
     @Override
-    public Page<Community> getAllCommunities(String title, String description, Integer minMembers, Pageable pageable) {
-        return communityRepository.findByFilters(title, description, minMembers, pageable);
+    public Page<CommunityResDto> getMyCommunities(Pageable pageable) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+
+        return communityRepository.findAllJoinedOrModerated(currentUser.getId(), pageable)
+                .map(communityMapper::toDto);
+    }
+
+    @Override
+    public Page<CommunityResDto> getMyCreatedCommunities(Pageable pageable) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+
+        return communityRepository.findModerated(currentUser.getId(), pageable)
+                .map(communityMapper::toDto);
+    }
+
+    @Override
+    public Page<CommunityResDto> getAllCommunities(String title, String description, Integer minMembers, Pageable pageable) {
+        return communityRepository.findByFilters(title, description, minMembers, pageable)
+                .map(communityMapper::toDto);
     }
     
     @Override

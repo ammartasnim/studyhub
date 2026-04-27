@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,8 @@ public class Community {
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
+    @ManyToMany(mappedBy = "joinedCommunities")
+    private List<User> members = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "moderator_id")

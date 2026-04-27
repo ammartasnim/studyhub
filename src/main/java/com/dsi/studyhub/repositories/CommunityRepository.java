@@ -18,6 +18,14 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // Fix: correct Spring Data keyword is GreaterThanEqual (not GreaterThanOrEqual)
     List<Community> findByNbrMembersGreaterThanEqual(Integer minMembers);
+    @Query("SELECT DISTINCT c FROM Community c LEFT JOIN c.members m " +
+            "WHERE c.moderator.id = :userId OR m.id = :userId")
+    Page<Community> findAllJoinedOrModerated(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT DISTINCT c FROM Community c LEFT JOIN c.members m " +
+            "WHERE c.moderator.id = :userId")
+    Page<Community> findModerated(@Param("userId") Long userId, Pageable pageable);
+
 
     // Combined, pageable-aware filter method. Parameters are optional (can be null).
     @Query("SELECT c FROM Community c WHERE " +
