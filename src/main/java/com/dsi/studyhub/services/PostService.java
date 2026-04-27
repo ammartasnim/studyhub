@@ -2,11 +2,9 @@ package com.dsi.studyhub.services;
 
 import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
-import com.dsi.studyhub.entities.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface PostService {
     PostResDto createPost(PostReqDto request);

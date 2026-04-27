@@ -5,6 +5,8 @@ import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.entities.Comment;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.gamification.GamificationService;
+import com.dsi.studyhub.gamification.XpConfig;
 import com.dsi.studyhub.mappers.CommentMapper;
 import com.dsi.studyhub.repositories.CommentRepository;
 import com.dsi.studyhub.repositories.PostRepository;
@@ -27,6 +29,9 @@ public class CommentServiceImpl implements CommentService {
     private CommentMapper commentMapper;
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
+    @Autowired
+    private GamificationService gamificationService;
+
 
     @Override
     @Transactional
@@ -41,6 +46,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(post);
 
         Comment saved = commentRepository.save(comment);
+        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
         return commentMapper.toDto(saved);
     }
 

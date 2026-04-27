@@ -6,6 +6,8 @@ import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
+import com.dsi.studyhub.gamification.GamificationService;
+import com.dsi.studyhub.gamification.XpConfig;
 import com.dsi.studyhub.mappers.PostMapper;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
@@ -31,23 +33,30 @@ public class PostServiceImpl implements PostService {
     private PostMapper postMapper;
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
+    @Autowired
+    private GamificationService gamificationService;
 
     @Override
     @Transactional
     public PostResDto createPost(PostReqDto request) {
         User user = authenticatedUserService.getAuthenticatedUser();
 
-        Community community = communityRepository.findById(request.communityId())
-                .orElseThrow(() -> new RuntimeException("Community not found"));
-
         Post post = new Post();
         post.setTitle(request.title());
         post.setContent(request.content());
         post.setImgs(request.imgs());
         post.setUser(user);
-        post.setCommunity(community);
+
+        if (request.communityId() != null) {
+            Community community = communityRepository.findById(request.communityId())
+                    .orElseThrow(() -> new RuntimeException("Community not found"));
+            post.setCommunity(community);
+        } else {
+            post.setCommunity(null);
+        }
 
         user.setXpPts(user.getXpPts() + 20);
+        gamificationService.awardXp(user.getId(), XpConfig.POST_CREATED);
         userRepository.save(user);
 
         Post savedPost = postRepository.save(post);
@@ -122,13 +131,16 @@ public class PostServiceImpl implements PostService {
     public void toggleLike(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new  ResourceNotFoundException("Post not found"));
+        Long postOwnerId = post.getUser().getId();
         User user = authenticatedUserService.getAuthenticatedUser();
 
         if (post.getLikes().contains(user)) {
             post.getLikes().remove(user);
+            gamificationService.awardXp(postOwnerId, XpConfig.LIKE_REMOVED);
         } else {
             post.getLikes().add(user);
-            post.getUser().setXpPts(post.getUser().getXpPts() + 5);
+//            post.getUser().setXpPts(post.getUser().getXpPts() + 5);
+            gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
         }
         postRepository.save(post);
     }
