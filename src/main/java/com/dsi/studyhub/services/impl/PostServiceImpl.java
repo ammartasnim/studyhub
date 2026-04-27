@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.mappers.PostMapper;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
@@ -102,7 +103,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostResDto updatePost(Long id, PostReqDto request) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
         postMapper.partialUpdate(request, post);
         return postMapper.toDto(postRepository.save(post));
     }
@@ -120,7 +121,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void toggleLike(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new  ResourceNotFoundException("Post not found"));
         User user = authenticatedUserService.getAuthenticatedUser();
 
         if (post.getLikes().contains(user)) {

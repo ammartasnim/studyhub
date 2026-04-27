@@ -7,11 +7,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_post_user_id", columnList = "user_id"),
+        @Index(name = "idx_post_community_id", columnList = "community_id"),
+        @Index(name = "idx_post_status", columnList = "status")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,6 +51,6 @@ public class Post {
 
 
     @ManyToMany(mappedBy = "likes")
-    private Set<User> likes = new LinkedHashSet<>();
+    private ArrayList <User> likes = new ArrayList<>();
 
 }

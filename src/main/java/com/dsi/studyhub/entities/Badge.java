@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_badge_user_id", columnList = "user_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor

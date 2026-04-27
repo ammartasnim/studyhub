@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public record FocusSessionResDto(
         Long id,
         String title,
-        LocalDateTime timer,
+        String  timer,
         Long userId
 ) implements Serializable {
 }

@@ -52,6 +52,7 @@ public class AuthService {
         user.setRole(UserRole.Client);
         user.setBanned(false);
         user.setXpPts(0);
+        user.setLevel(1);
 
         Badge beginnerBadge = new Badge();
         beginnerBadge.setUser(user);

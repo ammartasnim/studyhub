@@ -1,8 +1,10 @@
 package com.dsi.studyhub.dtos;
 
+import com.dsi.studyhub.entities.Badge;
 import com.dsi.studyhub.enums.UserRole;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * DTO for {@link com.dsi.studyhub.entities.User}
@@ -18,6 +20,7 @@ public record UserResDto(
         String phone,
         int xpPts,
         int level,
-        boolean banned
+        boolean banned,
+        List<BadgeResDto> badges
 ) implements Serializable {
 }

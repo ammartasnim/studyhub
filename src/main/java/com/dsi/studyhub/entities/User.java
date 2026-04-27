@@ -15,7 +15,9 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_users_banned", columnList = "banned")
+})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +28,7 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String password;
-
+     @Column(nullable = true)
     private String pfp;
 
     @Column(nullable = false)
@@ -55,8 +57,13 @@ public class User implements UserDetails {
     @ManyToMany
     @JoinTable(name = "users_posts",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id"))
-    private Set<Post> likes = new LinkedHashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "post_id"),
+            indexes = {
+                    @Index(name = "idx_users_posts_user_id", columnList = "user_id"),
+                    @Index(name = "idx_users_posts_post_id", columnList = "post_id"),
+                    @Index(name = "idx_users_posts_user_post", columnList = "user_id, post_id")
+            })
+    private List<Post> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
@@ -65,7 +72,7 @@ public class User implements UserDetails {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Badge> badges = new LinkedHashSet<>();
+    private List<Badge> badges = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
