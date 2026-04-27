@@ -6,10 +6,12 @@ import com.dsi.studyhub.entities.FocusSession;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.mappers.FocusSessionMapper;
 import com.dsi.studyhub.repositories.FocusSessionRepository;
-import com.dsi.studyhub.repositories.UserRepository;
+import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.FocusSessionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,14 +21,13 @@ public class FocusSessionServiceImpl implements FocusSessionService {
     @Autowired
     private FocusSessionRepository focusSessionRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private FocusSessionMapper focusSessionMapper;
+    @Autowired
+    private AuthenticatedUserService authenticatedUserService;
 
     @Override
     public FocusSessionResDto saveSession(FocusSessionReqDto request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = authenticatedUserService.getAuthenticatedUser();
 
         FocusSession session = new FocusSession();
         session.setTitle(request.title());
@@ -38,12 +39,17 @@ public class FocusSessionServiceImpl implements FocusSessionService {
     }
 
     @Override
+    public Page<FocusSessionResDto> getMySessions(Pageable pageable) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        return focusSessionRepository.findByUserId(user.getId(), pageable)
+                .map(focusSessionMapper::toDto);
+    }
+
+    @Override
     @Transactional
-    public List<FocusSessionResDto> getSessionsByUserId(Long userId) {
-        return focusSessionRepository.findByUserId(userId)
-                .stream()
-                .map(focusSessionMapper::toDto)
-                .toList();
+    public Page<FocusSessionResDto> getSessionsByUserId(Long userId, Pageable pageable) {
+        return focusSessionRepository.findByUserId(userId, pageable)
+                .map(focusSessionMapper::toDto);
     }
 
     @Override

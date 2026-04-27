@@ -5,6 +5,8 @@ import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.entities.Comment;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.UserRole;
+import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.gamification.GamificationService;
 import com.dsi.studyhub.gamification.XpConfig;
 import com.dsi.studyhub.mappers.CommentMapper;
@@ -14,6 +16,8 @@ import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommentService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -55,7 +59,10 @@ public class CommentServiceImpl implements CommentService {
     public CommentResDto editComment(Long commentId, CommentReqDto request) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        User user = authenticatedUserService.getAuthenticatedUser();
+        if (!comment.getUser().getId().equals(user.getId()) && user.getRole()!= UserRole.Admin) {
+            throw new ForbiddenException("You don't own this comment!");
+        }
         commentMapper.partialUpdate(request, comment);
 
         return commentMapper.toDto(commentRepository.save(comment));
@@ -64,19 +71,26 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long commentId) {
-        if (!commentRepository.existsById(commentId)) {
-            throw new RuntimeException("Comment not found");
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        User user = authenticatedUserService.getAuthenticatedUser();
+        if (!comment.getUser().getId().equals(user.getId()) && user.getRole()!= UserRole.Admin) {
+            throw new ForbiddenException("You don't own this comment!");
         }
         commentRepository.deleteById(commentId);
     }
 
     @Override
-    public List<CommentResDto> getCommentsByPost(Long postId) {
-        List<Comment>  comments = commentRepository.findByPostId(postId);
-        List<CommentResDto> dtos = new ArrayList<>();
-        for (Comment comment : comments) {
-            dtos.add(commentMapper.toDto(comment));
-        }
-        return dtos;
+    public Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable) {
+        return commentRepository.findByPostId(postId, pageable)
+                .map(commentMapper::toDto);
+    }
+
+    @Override
+    public Page<CommentResDto> getMyComments(Pageable pageable) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+
+        return commentRepository.findByUserId(user.getId(), pageable)
+                .map(commentMapper::toDto);
     }
 }
