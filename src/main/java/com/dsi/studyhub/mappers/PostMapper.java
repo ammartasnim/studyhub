@@ -27,7 +27,7 @@ public abstract class PostMapper {
     public abstract PostResDto toDto(Post post);
 
     @AfterMapping
-    protected void computeExtraFields(Post post, @MappingTarget PostResDto.Builder builder) {
+    protected void computeExtraFields(Post post, @MappingTarget PostResDto.PostResDtoBuilder builder) {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
 
         builder.likeCount(post.getLikes() == null ? 0 : post.getLikes().size());
