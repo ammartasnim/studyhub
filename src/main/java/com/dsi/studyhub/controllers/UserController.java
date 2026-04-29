@@ -1,6 +1,7 @@
 package com.dsi.studyhub.controllers;
 
 import com.dsi.studyhub.dtos.ChangePasswordDto;
+import com.dsi.studyhub.dtos.ProfileUpdateResDto;
 import com.dsi.studyhub.dtos.UserReqDto;
 import com.dsi.studyhub.dtos.UserResDto;
 import com.dsi.studyhub.entities.User;
@@ -22,19 +23,19 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private UserMapper userMapper;  
+    private UserMapper userMapper;
 
 
     @GetMapping("/me")
     public ResponseEntity<UserResDto> getMe() {
         return ResponseEntity.ok(userMapper.toDto(userService.getMe()));
     }
-    @PutMapping("/edit")
-    public ResponseEntity<UserResDto> editUser(@RequestBody UserReqDto userReqDto) {
-        User u=userService.editUser(userReqDto);
-        return ResponseEntity.ok(userMapper.toDto(u));
-    }
 
+    @PutMapping("/edit")
+    public ResponseEntity<ProfileUpdateResDto> editUser(@RequestBody @Valid UserReqDto userReqDto) {
+        ProfileUpdateResDto res = userService.editUser(userReqDto);
+        return ResponseEntity.ok(res);
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")

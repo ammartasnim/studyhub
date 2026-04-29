@@ -2,6 +2,8 @@ package com.dsi.studyhub.exceptions;
 
 import com.dsi.studyhub.dtos.ErrorResDto;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -66,6 +68,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResDto> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI(), List.of());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResDto> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
+        String message = "A record with this value already exists";
+        Throwable cause = ex.getRootCause();
+        if (cause != null && cause.getMessage() != null) {
+            String msg = cause.getMessage().toLowerCase();
+            if (msg.contains("username")) {
+                message = "Username is already taken";
+            } else if (msg.contains("email")) {
+                message = "Email is already registered";
+            }
+        }
+        return build(HttpStatus.CONFLICT, message, request.getRequestURI(), List.of());
     }
 
     @ExceptionHandler(Exception.class)

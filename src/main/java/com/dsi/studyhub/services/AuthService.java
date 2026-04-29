@@ -67,16 +67,22 @@ public class AuthService {
     }
 
     public AuthResDto login(LoginReqDto request) {
+        String input = request.username();
+
+        boolean looksLikeEmail = input.contains("@");
+
+        var user = looksLikeEmail
+                ? userRepository.findByEmail(input)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"))
+                : userRepository.findByUsername(input)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(),
+                        user.getUsername(),
                         request.password()
                 )
         );
-
-        var user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         String token = jwtService.generateToken(user);
         return new AuthResDto(token, user.getId(), user.getUsername(), user.getRole());

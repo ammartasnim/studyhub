@@ -1,10 +1,13 @@
 package com.dsi.studyhub.services;
 
 import com.dsi.studyhub.dtos.ChangePasswordDto;
+import com.dsi.studyhub.dtos.ProfileUpdateResDto;
 import com.dsi.studyhub.dtos.UserReqDto;
+import com.dsi.studyhub.dtos.UserResDto;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.mappers.UserMapper;
 import com.dsi.studyhub.repositories.UserRepository;
+import com.dsi.studyhub.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,6 +29,8 @@ public class UserService {
     UserMapper userMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtService jwtService;
 
 
         public User getMe() {
@@ -34,13 +39,27 @@ public class UserService {
                     .orElseThrow(() -> new RuntimeException("user not found"));
         }
 
-     public User  editUser(UserReqDto userReqDto) {
+     public ProfileUpdateResDto editUser(UserReqDto userReqDto) {
             User user = authenticatedUserService.getAuthenticatedUser();
-            userMapper.partialUpdate(userReqDto, user);
-            return  userRepository.save(user);
-
-
-
+            if (userReqDto.username() != null && !userReqDto.username().isBlank()) {
+                user.setUsername(userReqDto.username());
+            }
+            if (userReqDto.firstName() != null && !userReqDto.firstName().isBlank()) {
+                user.setFirstName(userReqDto.firstName());
+            }
+            if (userReqDto.lastName() != null && !userReqDto.lastName().isBlank()) {
+                user.setLastName(userReqDto.lastName());
+            }
+            if (userReqDto.email() != null && !userReqDto.email().isBlank()) {
+                user.setEmail(userReqDto.email());
+            }
+            if (userReqDto.phone() != null) {
+                user.setPhone(userReqDto.phone());
+            }
+            User saved = userRepository.save(user);
+            String newToken = jwtService.generateToken(saved);
+            UserResDto dto = userMapper.toDto(saved);
+            return new ProfileUpdateResDto(dto, newToken);
      }
     public void changePassword(ChangePasswordDto dto) {
         User user = authenticatedUserService.getAuthenticatedUser();
