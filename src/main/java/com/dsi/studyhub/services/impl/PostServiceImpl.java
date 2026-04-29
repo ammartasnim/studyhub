@@ -148,6 +148,13 @@ public class PostServiceImpl implements PostService {
         }
         postRepository.save(post);
     }
+    @Override
+    @Transactional
+    public Page<PostResDto> getFeed(Pageable pageable) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        return postRepository.findFeedForUser(currentUser.getId(), pageable)
+                .map(postMapper::toDto);
+    }
 
 
 }

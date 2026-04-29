@@ -69,4 +69,8 @@ public class PostController {
         postService.toggleLike(postId);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/feed")
+    public ResponseEntity<Page<PostResDto>> getFeed(Pageable pageable) {
+        return ResponseEntity.ok(postService.getFeed(pageable));
+    }
 }

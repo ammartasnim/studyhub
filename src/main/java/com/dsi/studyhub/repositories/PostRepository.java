@@ -18,4 +18,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByCommunityId(Long communityId, Pageable pageable);
     Page<Post> findByUserId(Long userId, Pageable pageable);
     Page<Post> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    @Query("SELECT p FROM Post p WHERE p.community IN " +
+            "(SELECT c FROM Community c JOIN c.members m WHERE m.id = :userId) " +
+            "AND p.status = com.dsi.studyhub.enums.PostStatus.Approved " +
+            "ORDER BY p.createdAt DESC")
+    Page<Post> findFeedForUser(@Param("userId") Long userId, Pageable pageable);
 }

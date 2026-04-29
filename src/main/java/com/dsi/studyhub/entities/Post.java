@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -28,6 +30,10 @@ public class Post {
     private Long id;
     private String title;
     private String content;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
     @ElementCollection
     @CollectionTable(name = "post_imgs", joinColumns = @JoinColumn(name = "post_id"))

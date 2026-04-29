@@ -16,4 +16,5 @@ public interface PostService {
     PostResDto updatePost(Long id, PostReqDto request);
     void deletePost(Long id);
     void toggleLike(Long postId);
+    Page<PostResDto> getFeed(Pageable pageable);
 }
