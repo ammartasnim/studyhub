@@ -1,9 +1,12 @@
 package com.dsi.studyhub.controllers;
 
+import com.dsi.studyhub.dtos.ChangePasswordDto;
+import com.dsi.studyhub.dtos.UserReqDto;
 import com.dsi.studyhub.dtos.UserResDto;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.mappers.UserMapper;
 import com.dsi.studyhub.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,12 +22,17 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserMapper userMapper;  
 
 
     @GetMapping("/me")
     public ResponseEntity<UserResDto> getMe() {
         return ResponseEntity.ok(userMapper.toDto(userService.getMe()));
+    }
+    @PutMapping("/edit")
+    public ResponseEntity<UserResDto> editUser(@RequestBody UserReqDto userReqDto) {
+        User u=userService.editUser(userReqDto);
+        return ResponseEntity.ok(userMapper.toDto(u));
     }
 
 
@@ -65,5 +73,10 @@ public class UserController {
     public ResponseEntity<String> unbanUser(@PathVariable Long id) {
         userService.unbanUser(id);
         return ResponseEntity.ok("User unbanned successfully");
+    }
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordDto dto) {
+        userService.changePassword(dto);
+        return ResponseEntity.noContent().build();
     }
 }

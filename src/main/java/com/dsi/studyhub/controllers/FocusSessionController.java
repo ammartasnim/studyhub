@@ -26,7 +26,14 @@ public class FocusSessionController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<FocusSessionResDto>> getUserSessions(
+    public ResponseEntity<List<FocusSessionResDto>> getUserSessions(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(focusSessionService.getSessionsByUserIdAsList(userId));
+    }
+
+    @GetMapping("/user/{userId}/paginated")
+    public ResponseEntity<Page<FocusSessionResDto>> getUserSessionsPaginated(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

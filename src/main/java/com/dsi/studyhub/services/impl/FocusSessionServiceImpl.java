@@ -54,6 +54,15 @@ public class FocusSessionServiceImpl implements FocusSessionService {
 
     @Override
     @Transactional
+    public List<FocusSessionResDto> getSessionsByUserIdAsList(Long userId) {
+        return focusSessionRepository.findByUserId(userId)
+                .stream()
+                .map(focusSessionMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional
     public void deleteSession(Long id) {
         if (!focusSessionRepository.existsById(id)) {
             throw new RuntimeException("FocusSession not found");

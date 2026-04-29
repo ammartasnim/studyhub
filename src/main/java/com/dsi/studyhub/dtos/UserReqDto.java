@@ -10,16 +10,10 @@ import java.io.Serializable;
  * DTO for {@link com.dsi.studyhub.entities.User}
  */
 public record UserReqDto(
-        @NotBlank String username,
-        @NotBlank String password,
-        String pfp,
-        @NotBlank String firstName,
-        @NotBlank String lastName,
-        @NotBlank @Email String email,
-        UserRole role,
-        String phone,
-        Integer xpPts,
-        Integer level,
-        Boolean banned
-) implements Serializable {
-}
+        String username,
+        String firstName,
+        String lastName,
+        @Email(message = "Email format is invalid")
+        String email,
+        String phone
+) implements Serializable {}

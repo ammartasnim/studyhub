@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FocusSessionRepository extends JpaRepository<FocusSession, Long> {
-//    List<FocusSession> findByUserId(Long userId);
+    List<FocusSession> findByUserId(Long userId);
     Page<FocusSession> findByUserId(Long userId, Pageable pageable);
 }
