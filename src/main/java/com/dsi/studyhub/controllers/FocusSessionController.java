@@ -26,9 +26,7 @@ public class FocusSessionController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<FocusSessionResDto>> getUserSessions(
-            @PathVariable Long userId
-    ) {
+    public ResponseEntity<List<FocusSessionResDto>> getUserSessions(@PathVariable Long userId) {
         return ResponseEntity.ok(focusSessionService.getSessionsByUserIdAsList(userId));
     }
 

@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.gamification.GamificationService;
 import com.dsi.studyhub.gamification.XpConfig;
@@ -50,16 +51,19 @@ public class PostServiceImpl implements PostService {
         if (request.communityId() != null) {
             Community community = communityRepository.findById(request.communityId())
                     .orElseThrow(() -> new RuntimeException("Community not found"));
+            boolean isModerator = community.getModerator().getId().equals(user.getId());
+            boolean isMember = community.getMembers().contains(user);
+            if (!isModerator && !isMember) {
+                throw new ForbiddenException("You must join this community before posting in it.");
+            }
             post.setCommunity(community);
         } else {
             post.setCommunity(null);
         }
 
-        user.setXpPts(user.getXpPts() + 20);
-        gamificationService.awardXp(user.getId(), XpConfig.POST_CREATED);
-        userRepository.save(user);
-
         Post savedPost = postRepository.save(post);
+        gamificationService.awardXp(user.getId(), XpConfig.POST_CREATED);
+
         return postMapper.toDto(savedPost);
     }
 
