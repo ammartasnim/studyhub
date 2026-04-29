@@ -17,10 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class UserService {
-
+    @Autowired
+    private FileStorageService fileStorageService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -101,6 +105,15 @@ public class UserService {
                                       int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
         return userRepository.findWithFilters(firstName, lastName, email, banned, pageable);
+    }
+    public User updatePfp(MultipartFile file, User currentUser) throws IOException {
+        // Delete old pfp if exists
+        fileStorageService.deleteFile(currentUser.getPfp());
+
+        // Save new file
+        String filename = fileStorageService.storeFile(file, "pfp");
+        currentUser.setPfp(filename);
+        return userRepository.save(currentUser);
     }
 
 }
