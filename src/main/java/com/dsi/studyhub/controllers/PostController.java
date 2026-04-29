@@ -73,4 +73,14 @@ public class PostController {
     public ResponseEntity<Page<PostResDto>> getFeed(Pageable pageable) {
         return ResponseEntity.ok(postService.getFeed(pageable));
     }
+
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<PostResDto> approvePost(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.approvePost(id));
+    }
+
+    @PatchMapping("/{id}/flag")
+    public ResponseEntity<PostResDto> flagPost(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.flagPost(id));
+    }
 }

@@ -3,7 +3,7 @@ package com.dsi.studyhub.enums;
 public enum BadgeType {
     BEGINNER,
     LEARNER,
-    EXPLORER,
+EXPLORER,
     CONTRIBUTOR,
     HELPER,
     CONSISTENT,
