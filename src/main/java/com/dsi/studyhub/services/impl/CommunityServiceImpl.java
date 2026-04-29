@@ -84,6 +84,12 @@ public class CommunityServiceImpl implements CommunityService {
 
         if (existingCommunity.isPresent()) {
             Community comm = existingCommunity.get();
+            User currentUser = authenticatedUserService.getAuthenticatedUser();
+            
+            if (!comm.getModerator().getId().equals(currentUser.getId())) {
+                throw new ForbiddenException("Only the moderator can update this community.");
+            }
+
             communityMapper.partialUpdate(communityDto, comm);
             if (communityDto.nbrMembers() != null && communityDto.nbrMembers() <= 0) {
                 comm.setNbrMembers(1);
@@ -96,7 +102,19 @@ public class CommunityServiceImpl implements CommunityService {
     
     @Override
     public void deleteCommunity(Long id) {
-        communityRepository.deleteById(id);
+        Optional<Community> existingCommunity = communityRepository.findById(id);
+        if (existingCommunity.isPresent()) {
+            Community comm = existingCommunity.get();
+            User currentUser = authenticatedUserService.getAuthenticatedUser();
+            
+            if (!comm.getModerator().getId().equals(currentUser.getId())) {
+                throw new ForbiddenException("Only the moderator can delete this community.");
+            }
+            
+            communityRepository.deleteById(id);
+        } else {
+            throw new ResourceNotFoundException("Community not found with id: " + id);
+        }
     }
 }
 
