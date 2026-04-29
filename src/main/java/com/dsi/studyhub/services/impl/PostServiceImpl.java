@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.PostStatus;
 import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.gamification.GamificationService;
@@ -50,13 +51,17 @@ public class PostServiceImpl implements PostService {
 
         if (request.communityId() != null) {
             Community community = communityRepository.findById(request.communityId())
-                    .orElseThrow(() -> new RuntimeException("Community not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Community not found"));
             boolean isModerator = community.getModerator().getId().equals(user.getId());
-            boolean isMember = community.getMembers().contains(user);
+            boolean isMember = community.getMembers().stream()
+                    .anyMatch(m -> m.getId().equals(user.getId()));
             if (!isModerator && !isMember) {
                 throw new ForbiddenException("You must join this community before posting in it.");
             }
             post.setCommunity(community);
+            if (isModerator) {
+                post.setStatus(PostStatus.Approved);
+            }
         } else {
             post.setCommunity(null);
         }
@@ -68,6 +73,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public PostResDto getPostById(Long id) {
         return postRepository.findById(id)
                 .map(postMapper::toDto)
@@ -97,6 +103,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Page<PostResDto> getPostsByUserId(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found");
@@ -106,6 +113,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Page<PostResDto> getMyPosts(Pageable pageable) {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
         return postRepository.findByUserId(currentUser.getId(), pageable)
@@ -138,12 +146,13 @@ public class PostServiceImpl implements PostService {
         Long postOwnerId = post.getUser().getId();
         User user = authenticatedUserService.getAuthenticatedUser();
 
-        if (post.getLikes().contains(user)) {
-            post.getLikes().remove(user);
+        boolean alreadyLiked = post.getLikes().stream()
+                .anyMatch(u -> u.getId().equals(user.getId()));
+        if (alreadyLiked) {
+            post.getLikes().removeIf(u -> u.getId().equals(user.getId()));
             gamificationService.awardXp(postOwnerId, XpConfig.LIKE_REMOVED);
         } else {
             post.getLikes().add(user);
-//            post.getUser().setXpPts(post.getUser().getXpPts() + 5);
             gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
         }
         postRepository.save(post);
@@ -156,5 +165,39 @@ public class PostServiceImpl implements PostService {
                 .map(postMapper::toDto);
     }
 
+    @Override
+    @Transactional
+    public PostResDto approvePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
 
+        if (post.getCommunity() == null) {
+            throw new ForbiddenException("Post does not belong to a community");
+        }
+        if (!post.getCommunity().getModerator().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("Only the community moderator can approve posts");
+        }
+
+        post.setStatus(PostStatus.Approved);
+        return postMapper.toDto(postRepository.save(post));
+    }
+
+    @Override
+    @Transactional
+    public PostResDto flagPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+
+        if (post.getCommunity() == null) {
+            throw new ForbiddenException("Post does not belong to a community");
+        }
+        if (!post.getCommunity().getModerator().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("Only the community moderator can flag posts");
+        }
+
+        post.setStatus(PostStatus.Flagged);
+        return postMapper.toDto(postRepository.save(post));
+    }
 }
