@@ -6,9 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FocusSessionService {
-    FocusSessionResDto saveSession(FocusSessionReqDto request);
+    FocusSessionResDto startSession(FocusSessionReqDto request);
+    FocusSessionResDto pauseSession(Long id, Integer remainingSeconds);
+    FocusSessionResDto resumeSession(Long id, Integer remainingSeconds);
+    FocusSessionResDto completeSession(Long id, String finalTimer);
+    Optional<FocusSessionResDto> getActiveSession();
     Page<FocusSessionResDto> getMySessions(Pageable pageable);
     Page<FocusSessionResDto> getSessionsByUserId(Long userId, Pageable pageable);
     List<FocusSessionResDto> getSessionsByUserIdAsList(Long userId);

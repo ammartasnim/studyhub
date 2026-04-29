@@ -20,9 +20,41 @@ public class FocusSessionController {
     @Autowired
     private FocusSessionService focusSessionService;
 
-    @PostMapping
-    public ResponseEntity<FocusSessionResDto> createSession(@RequestBody FocusSessionReqDto request) {
-        return new ResponseEntity<>(focusSessionService.saveSession(request), HttpStatus.CREATED);
+//    @PostMapping
+//    public ResponseEntity<FocusSessionResDto> createSession(@RequestBody FocusSessionReqDto request) {
+//        return new ResponseEntity<>(focusSessionService.saveSession(request), HttpStatus.CREATED);
+//    }
+    @PostMapping("/start")
+    public ResponseEntity<FocusSessionResDto> start(@RequestBody FocusSessionReqDto request) {
+        return ResponseEntity.ok(focusSessionService.startSession(request));
+    }
+
+    @PatchMapping("/{id}/pause")
+    public ResponseEntity<FocusSessionResDto> pause(
+            @PathVariable Long id,
+            @RequestParam Integer remainingSeconds) {
+        return ResponseEntity.ok(focusSessionService.pauseSession(id, remainingSeconds));
+    }
+
+    @PatchMapping("/{id}/resume")
+    public ResponseEntity<FocusSessionResDto> resume(
+            @PathVariable Long id,
+            @RequestParam Integer remainingSeconds) {
+        return ResponseEntity.ok(focusSessionService.resumeSession(id, remainingSeconds));
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<FocusSessionResDto> complete(
+            @PathVariable Long id,
+            @RequestParam String finalTimer) {
+        return ResponseEntity.ok(focusSessionService.completeSession(id, finalTimer));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<FocusSessionResDto> getActive() {
+        return focusSessionService.getActiveSession()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/user/{userId}")

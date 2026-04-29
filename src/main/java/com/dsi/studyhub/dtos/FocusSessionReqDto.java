@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 public record FocusSessionReqDto(
         @NotBlank String title,
         String timer,
+        Integer remainingSeconds,
         Long userId
-) implements Serializable {
-}
+) implements Serializable { }
