@@ -19,7 +19,7 @@ target/
 *.iml
 *.ipr
 .opencode.json
-
+.env
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
