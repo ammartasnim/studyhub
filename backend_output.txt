@@ -1,0 +1,2696 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.dsi:studyhub >--------------------------
+[INFO] Building studyhub 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.5:run (default-cli) > test-compile @ studyhub >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ studyhub ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ studyhub ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ studyhub ---
+[INFO] skip non existing resourceDirectory E:\Study-Hub\studyhub\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ studyhub ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.0.5:run (default-cli) < test-compile @ studyhub <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.5:run (default-cli) @ studyhub ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.5)
+
+2026-04-30T23:13:11.324+01:00  INFO 18808 --- [studyhub] [           main] com.dsi.studyhub.StudyhubApplication     : Starting StudyhubApplication using Java 25 with PID 18808 (E:\Study-Hub\studyhub\target\classes started by USER in E:\Study-Hub\studyhub)
+2026-04-30T23:13:11.326+01:00  INFO 18808 --- [studyhub] [           main] com.dsi.studyhub.StudyhubApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-04-30T23:13:12.186+01:00  INFO 18808 --- [studyhub] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-30T23:13:12.301+01:00  INFO 18808 --- [studyhub] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 100 ms. Found 5 JPA repository interfaces.
+2026-04-30T23:13:13.062+01:00  INFO 18808 --- [studyhub] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-04-30T23:13:13.080+01:00  INFO 18808 --- [studyhub] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-30T23:13:13.081+01:00  INFO 18808 --- [studyhub] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-30T23:13:13.153+01:00  INFO 18808 --- [studyhub] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1781 ms
+2026-04-30T23:13:13.317+01:00  INFO 18808 --- [studyhub] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-30T23:13:13.365+01:00  INFO 18808 --- [studyhub] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-30T23:13:14.246+01:00  INFO 18808 --- [studyhub] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-30T23:13:14.312+01:00  INFO 18808 --- [studyhub] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-30T23:13:14.669+01:00  INFO 18808 --- [studyhub] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4d770bcd
+2026-04-30T23:13:14.674+01:00  INFO 18808 --- [studyhub] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-30T23:13:14.737+01:00  WARN 18808 --- [studyhub] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-30T23:13:14.806+01:00  INFO 18808 --- [studyhub] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/studyhub]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: studyhub/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-30T23:13:17.519+01:00  INFO 18808 --- [studyhub] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-30T23:13:17.694+01:00  INFO 18808 --- [studyhub] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-30T23:13:17.843+01:00  INFO 18808 --- [studyhub] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-30T23:13:20.612+01:00  INFO 18808 --- [studyhub] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-30T23:13:20.613+01:00  WARN 18808 --- [studyhub] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-30T23:13:21.421+01:00  WARN 18808 --- [studyhub] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-30T23:13:22.086+01:00 DEBUG 18808 --- [studyhub] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, JwtAuthFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-04-30T23:13:22.682+01:00  INFO 18808 --- [studyhub] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-04-30T23:13:22.696+01:00  INFO 18808 --- [studyhub] [           main] com.dsi.studyhub.StudyhubApplication     : Started StudyhubApplication in 11.766 seconds (process running for 12.288)
+2026-04-30T23:13:54.197+01:00  INFO 18808 --- [studyhub] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-30T23:13:54.198+01:00  INFO 18808 --- [studyhub] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-30T23:13:54.200+01:00  INFO 18808 --- [studyhub] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-04-30T23:13:54.218+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2026-04-30T23:13:54.228+01:00  WARN 18808 --- [studyhub] [nio-8081-exec-1] o.s.w.s.h.HandlerMappingIntrospector     : Cache miss for REQUEST dispatch to '/api/auth/login' (previous null). Performing CorsConfiguration lookup. This is logged once only at WARN level, and every time at TRACE.
+2026-04-30T23:13:54.250+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2026-04-30T23:13:54.252+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:13:55.108+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2026-04-30T23:13:55.449+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:13:55.599+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?page=0&size=20
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-04-30T23:13:55.691+01:00  WARN 18808 --- [studyhub] [nio-8081-exec-2] ration$PageModule$WarningLoggingModifier : Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-04-30T23:14:12.419+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/auth/login?x=1
+2026-04-30T23:14:12.431+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2026-04-30T23:14:12.432+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/auth/login?x=1
+2026-04-30T23:14:12.436+01:00 ERROR 18808 --- [studyhub] [nio-8081-exec-8] c.d.s.exceptions.GlobalExceptionHandler  : Unhandled exception at /api/auth/login: Request method 'GET' is not supported
+org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' is not supported
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.handleNoMatch(RequestMappingInfoHandlerMapping.java:260)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lookupHandlerMethod(AbstractHandlerMethodMapping.java:434)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.getHandlerInternal(AbstractHandlerMethodMapping.java:376)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:116)
+	at org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping.getHandlerInternal(RequestMappingInfoHandlerMapping.java:68)
+	at org.springframework.web.servlet.handler.AbstractHandlerMapping.getHandler(AbstractHandlerMapping.java:544)
+	at org.springframework.web.servlet.DispatcherServlet.getHandler(DispatcherServlet.java:1157)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:951)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:235)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:371)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:132)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:86)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at com.dsi.studyhub.security.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:37)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:380)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1779)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
+	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-04-30T23:14:12.470+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/login
+2026-04-30T23:14:12.471+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2026-04-30T23:14:12.474+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/login
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:12.661+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.s.a.dao.DaoAuthenticationProvider    : Authenticated user
+2026-04-30T23:14:12.672+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=Data&page=0&size=10
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:12.683+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=Data&page=0&size=10
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-04-30T23:14:12.705+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=AI&page=0&size=10
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:12.728+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=AI&page=0&size=10
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-04-30T23:14:12.750+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=Development&page=0&size=10
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:12.763+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=Development&page=0&size=10
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-04-30T23:14:12.777+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?page=0&size=5
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:12.787+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?page=0&size=5
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:14:50.614+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/clients/me
+2026-04-30T23:14:50.626+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/clients/me
+2026-04-30T23:14:50.637+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:50.650+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        b1_0.user_id,
+        b1_0.id,
+        b1_0.type 
+    from
+        badge b1_0 
+    where
+        b1_0.user_id=?
+2026-04-30T23:14:50.684+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:50.692+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        b1_0.user_id,
+        b1_0.id,
+        b1_0.type 
+    from
+        badge b1_0 
+    where
+        b1_0.user_id=?
+2026-04-30T23:14:50.715+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=TEST&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T23:14:50.719+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/focus-sessions/active
+2026-04-30T23:14:50.720+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/focus-sessions/user/3
+2026-04-30T23:14:50.724+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:50.733+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+2026-04-30T23:14:50.733+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=TEST&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T23:14:50.742+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+2026-04-30T23:14:50.746+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+2026-04-30T23:14:54.212+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T23:14:54.234+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:14:54.260+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:15:24.925+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities/5
+2026-04-30T23:15:24.928+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+2026-04-30T23:15:24.940+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+2026-04-30T23:15:24.969+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /api/communities/5
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:25.032+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:25.044+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+2026-04-30T23:15:25.049+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /api/communities/5
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        m1_0.id,
+        m1_0.banned,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.last_name,
+        m1_0.level,
+        m1_0.password,
+        m1_0.pfp,
+        m1_0.phone,
+        m1_0.role,
+        m1_0.username,
+        m1_0.xp_pts,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    left join
+        users m1_0 
+            on m1_0.id=c1_0.moderator_id 
+    where
+        c1_0.id=?
+2026-04-30T23:15:25.123+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/posts/community/5?page=0&size=10
+2026-04-30T23:15:25.129+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /api/posts/community/5?page=0&size=10
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:25.143+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /api/posts/community/5?page=0&size=10
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.community_id,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.status,
+        p1_0.title,
+        p1_0.user_id 
+    from
+        post p1_0 
+    where
+        p1_0.community_id=? 
+    fetch
+        first ? rows only
+2026-04-30T23:15:34.684+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities/my?page=0&size=100&sortBy=id&sortDir=asc
+2026-04-30T23:15:34.690+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/communities/my?page=0&size=100&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:34.701+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/communities/my?page=0&size=100&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        distinct c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    left join
+        community_members m1_0 
+            on c1_0.id=m1_0.community_id 
+    where
+        c1_0.moderator_id=? 
+        or m1_0.user_id=? 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T23:15:39.563+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+2026-04-30T23:15:39.563+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:39.566+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:39.575+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T23:15:39.582+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+2026-04-30T23:15:39.585+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:15:42.560+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+2026-04-30T23:15:42.566+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities/7
+2026-04-30T23:15:42.570+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:42.599+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /api/communities/7
+2026-04-30T23:15:42.605+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+2026-04-30T23:15:42.620+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+2026-04-30T23:15:42.653+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /api/communities/7
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        m1_0.id,
+        m1_0.banned,
+        m1_0.email,
+        m1_0.first_name,
+        m1_0.last_name,
+        m1_0.level,
+        m1_0.password,
+        m1_0.pfp,
+        m1_0.phone,
+        m1_0.role,
+        m1_0.username,
+        m1_0.xp_pts,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    left join
+        users m1_0 
+            on m1_0.id=c1_0.moderator_id 
+    where
+        c1_0.id=?
+2026-04-30T23:15:42.688+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/posts/community/7?page=0&size=10
+2026-04-30T23:15:42.693+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/posts/community/7?page=0&size=10
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:42.702+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/posts/community/7?page=0&size=10
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.community_id,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.status,
+        p1_0.title,
+        p1_0.user_id 
+    from
+        post p1_0 
+    where
+        p1_0.community_id=? 
+    fetch
+        first ? rows only
+2026-04-30T23:15:46.104+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+2026-04-30T23:15:46.104+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T23:15:46.106+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:46.133+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+2026-04-30T23:15:46.135+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+2026-04-30T23:15:46.152+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:15:51.648+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities?title=da&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T23:15:51.665+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=da&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:51.687+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=da&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-04-30T23:15:52.339+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities?title=dat&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T23:15:52.354+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=dat&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:52.370+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=dat&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-04-30T23:15:54.279+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:54.304+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:15:56.948+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/posts/feed?page=0&size=20
+2026-04-30T23:15:56.973+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/posts/feed?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:57.001+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/posts/feed?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.community_id,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.status,
+        p1_0.title,
+        p1_0.user_id 
+    from
+        post p1_0 
+    where
+        p1_0.community_id in (select
+            c3_0.id from community c3_0 
+        join
+            community_members m1_0 
+                on c3_0.id=m1_0.community_id 
+        where
+            m1_0.user_id=?) 
+        and p1_0.status='Approved' 
+    order by
+        p1_0.created_at desc 
+    fetch
+        first ? rows only
+2026-04-30T23:15:57.898+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:15:57.919+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:16:02.297+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+2026-04-30T23:16:02.301+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:16:02.309+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:16:03.803+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities?title=&page=1&size=5&sortBy=id&sortDir=asc
+2026-04-30T23:16:03.830+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=1&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:16:03.855+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=1&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    offset
+        ? rows 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:16:05.780+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:16:05.794+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:16:07.880+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=1&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:16:07.887+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=1&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    offset
+        ? rows 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:16:33.289+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:16:33.296+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=5&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
+2026-04-30T23:16:35.097+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /api/posts/feed?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:16:35.120+01:00 DEBUG 18808 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /api/posts/feed?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.community_id,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.status,
+        p1_0.title,
+        p1_0.user_id 
+    from
+        post p1_0 
+    where
+        p1_0.community_id in (select
+            c3_0.id from community c3_0 
+        join
+            community_members m1_0 
+                on c3_0.id=m1_0.community_id 
+        where
+            m1_0.user_id=?) 
+        and p1_0.status='Approved' 
+    order by
+        p1_0.created_at desc 
+    fetch
+        first ? rows only
+2026-04-30T23:18:34.284+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/posts/feed?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:18:34.309+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/posts/feed?page=0&size=20
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.community_id,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.status,
+        p1_0.title,
+        p1_0.user_id 
+    from
+        post p1_0 
+    where
+        p1_0.community_id in (select
+            c3_0.id from community c3_0 
+        join
+            community_members m1_0 
+                on c3_0.id=m1_0.community_id 
+        where
+            m1_0.user_id=?) 
+        and p1_0.status='Approved' 
+    order by
+        p1_0.created_at desc 
+    fetch
+        first ? rows only
+2026-04-30T23:18:35.233+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T23:18:35.240+01:00 DEBUG 18808 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        count(c1_0.id) 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or ?='' 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        )
