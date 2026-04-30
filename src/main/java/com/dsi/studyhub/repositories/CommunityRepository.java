@@ -29,8 +29,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // Combined, pageable-aware filter method. Parameters are optional (can be null).
     @Query("SELECT c FROM Community c WHERE " +
-            "(:title IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
-            "(:description IS NULL OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%'))) AND " +
+            "(:title IS NULL OR :title = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:description IS NULL OR :description = '' OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%'))) AND " +
             "(:minMembers IS NULL OR c.nbrMembers >= :minMembers)")
     Page<Community> findByFilters(@Param("title") String title,
                                   @Param("description") String description,

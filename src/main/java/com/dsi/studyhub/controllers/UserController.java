@@ -9,11 +9,10 @@ import com.dsi.studyhub.mappers.UserMapper;
 import com.dsi.studyhub.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,11 +84,10 @@ public class UserController {
         userService.changePassword(dto);
         return ResponseEntity.noContent().build();
     }
-    @PutMapping(value = "/me/pfp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResDto> uploadPfp(
-            @RequestParam("file") MultipartFile file,
-            @AuthenticationPrincipal User currentUser) throws IOException {
-        User updated = userService.updatePfp(file, currentUser);
-        return ResponseEntity.ok(userMapper.toDto(updated));
+
+    @PostMapping(value = "/me/pfp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResDto> uploadPfp(@RequestParam("file") MultipartFile file) throws IOException {
+        User updatedUser = userService.updatePfp(file, userService.getMe());
+        return ResponseEntity.ok(userMapper.toDto(updatedUser));
     }
 }

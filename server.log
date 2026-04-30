@@ -1,0 +1,698 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.dsi:studyhub >--------------------------
+[INFO] Building studyhub 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.5:run (default-cli) > test-compile @ studyhub >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ studyhub ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ studyhub ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ studyhub ---
+[INFO] skip non existing resourceDirectory E:\Study-Hub\studyhub\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ studyhub ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.0.5:run (default-cli) < test-compile @ studyhub <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.5:run (default-cli) @ studyhub ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.5)
+
+2026-04-30T21:10:10.542+01:00  INFO 2648 --- [studyhub] [           main] com.dsi.studyhub.StudyhubApplication     : Starting StudyhubApplication using Java 25 with PID 2648 (E:\Study-Hub\studyhub\target\classes started by USER in E:\Study-Hub\studyhub)
+2026-04-30T21:10:10.545+01:00  INFO 2648 --- [studyhub] [           main] com.dsi.studyhub.StudyhubApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-04-30T21:10:11.162+01:00  INFO 2648 --- [studyhub] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-30T21:10:11.223+01:00  INFO 2648 --- [studyhub] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 52 ms. Found 5 JPA repository interfaces.
+2026-04-30T21:10:11.849+01:00  INFO 2648 --- [studyhub] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-04-30T21:10:11.866+01:00  INFO 2648 --- [studyhub] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-30T21:10:11.867+01:00  INFO 2648 --- [studyhub] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-30T21:10:11.918+01:00  INFO 2648 --- [studyhub] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1339 ms
+2026-04-30T21:10:12.056+01:00  INFO 2648 --- [studyhub] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-30T21:10:12.095+01:00  INFO 2648 --- [studyhub] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-30T21:10:12.556+01:00  INFO 2648 --- [studyhub] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-30T21:10:12.600+01:00  INFO 2648 --- [studyhub] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-30T21:10:12.760+01:00  INFO 2648 --- [studyhub] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@28a3fc34
+2026-04-30T21:10:12.762+01:00  INFO 2648 --- [studyhub] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-30T21:10:12.807+01:00  WARN 2648 --- [studyhub] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-30T21:10:12.864+01:00  INFO 2648 --- [studyhub] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/studyhub]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.1
+	Default catalog/schema: studyhub/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-30T21:10:15.549+01:00  INFO 2648 --- [studyhub] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-30T21:10:15.743+01:00  INFO 2648 --- [studyhub] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-30T21:10:15.901+01:00  INFO 2648 --- [studyhub] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-30T21:10:18.720+01:00  INFO 2648 --- [studyhub] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-04-30T21:10:18.724+01:00  WARN 2648 --- [studyhub] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-04-30T21:10:19.418+01:00  WARN 2648 --- [studyhub] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-30T21:10:20.131+01:00 DEBUG 2648 --- [studyhub] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, JwtAuthFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-04-30T21:10:20.869+01:00  INFO 2648 --- [studyhub] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-04-30T21:10:20.910+01:00  INFO 2648 --- [studyhub] [           main] com.dsi.studyhub.StudyhubApplication     : Started StudyhubApplication in 10.677 seconds (process running for 11.071)
+2026-04-30T21:16:08.858+01:00  INFO 2648 --- [studyhub] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-30T21:16:08.861+01:00  INFO 2648 --- [studyhub] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-30T21:16:08.869+01:00  INFO 2648 --- [studyhub] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2026-04-30T21:16:08.923+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T21:16:08.940+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-1] o.s.w.s.h.HandlerMappingIntrospector     : Cache miss for REQUEST dispatch to '/api/communities' (previous null). Performing CorsConfiguration lookup. This is logged once only at WARN level, and every time at TRACE.
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:16:09.655+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T21:16:09.758+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 42883
+2026-04-30T21:16:09.760+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-1] org.hibernate.orm.jdbc.error             : ERROR: function lower(bytea) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 224
+2026-04-30T21:19:15.926+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:19:17.664+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T21:19:17.672+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-2] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 42883
+2026-04-30T21:19:17.675+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-2] org.hibernate.orm.jdbc.error             : ERROR: function lower(bytea) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 224
+2026-04-30T21:26:18.983+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-3] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/clients/me
+2026-04-30T21:26:19.050+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/clients/me
+2026-04-30T21:26:19.061+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:26:19.105+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        b1_0.user_id,
+        b1_0.id,
+        b1_0.type 
+    from
+        badge b1_0 
+    where
+        b1_0.user_id=?
+2026-04-30T21:26:19.207+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:26:19.229+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Secured GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        b1_0.user_id,
+        b1_0.id,
+        b1_0.type 
+    from
+        badge b1_0 
+    where
+        b1_0.user_id=?
+2026-04-30T21:26:19.604+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:26:19.628+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T21:26:19.638+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/focus-sessions/active
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T21:26:19.645+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 42883
+2026-04-30T21:26:19.646+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-7] org.hibernate.orm.jdbc.error             : ERROR: function lower(bytea) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 224
+2026-04-30T21:26:19.649+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/focus-sessions/user/3
+2026-04-30T21:26:19.660+01:00 DEBUG 2648 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:26:19.673+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:26:19.681+01:00 DEBUG 2648 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+2026-04-30T21:26:19.699+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+2026-04-30T21:28:43.885+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:28:43.924+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-4] o.s.security.web.FilterChainProxy        : Secured GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        b1_0.user_id,
+        b1_0.id,
+        b1_0.type 
+    from
+        badge b1_0 
+    where
+        b1_0.user_id=?
+2026-04-30T21:28:43.950+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Securing GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:28:43.970+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-5] o.s.security.web.FilterChainProxy        : Secured GET /api/clients/me
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        b1_0.user_id,
+        b1_0.id,
+        b1_0.type 
+    from
+        badge b1_0 
+    where
+        b1_0.user_id=?
+2026-04-30T21:28:44.600+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-6] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T21:28:44.604+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/active
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:28:44.620+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+2026-04-30T21:28:44.620+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-8] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/active
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=? 
+        and fs1_0.status in (?, ?) 
+    order by
+        fs1_0.last_updated desc 
+    fetch
+        first ? rows only
+2026-04-30T21:28:44.640+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-7] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T21:28:44.660+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 42883
+2026-04-30T21:28:44.661+01:00  WARN 2648 --- [studyhub] [nio-8081-exec-7] org.hibernate.orm.jdbc.error             : ERROR: function lower(bytea) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 224
+2026-04-30T21:28:44.787+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Securing GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:28:44.812+01:00 DEBUG 2648 --- [studyhub] [nio-8081-exec-9] o.s.security.web.FilterChainProxy        : Secured GET /api/focus-sessions/user/3
+Hibernate: 
+    select
+        fs1_0.id,
+        fs1_0.last_updated,
+        fs1_0.remaining_seconds,
+        fs1_0.status,
+        fs1_0.timer,
+        fs1_0.title,
+        fs1_0.user_user_id 
+    from
+        focus_session fs1_0 
+    where
+        fs1_0.user_user_id=?
+2026-04-30T21:44:48.806+01:00 DEBUG 2648 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Securing GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.banned,
+        u1_0.email,
+        u1_0.first_name,
+        u1_0.last_name,
+        u1_0.level,
+        u1_0.password,
+        u1_0.pfp,
+        u1_0.phone,
+        u1_0.role,
+        u1_0.username,
+        u1_0.xp_pts 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+2026-04-30T21:44:50.582+01:00 DEBUG 2648 --- [studyhub] [io-8081-exec-10] o.s.security.web.FilterChainProxy        : Secured GET /api/communities?title=&page=0&size=10&sortBy=id&sortDir=asc
+Hibernate: 
+    select
+        c1_0.id,
+        c1_0.description,
+        c1_0.moderator_id,
+        c1_0.nbr_members,
+        c1_0.title 
+    from
+        community c1_0 
+    where
+        (
+            ? is null 
+            or lower(c1_0.title) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or lower(c1_0.description) like lower(('%'||?||'%')) escape ''
+        ) 
+        and (
+            ? is null 
+            or c1_0.nbr_members>=?
+        ) 
+    order by
+        c1_0.id 
+    fetch
+        first ? rows only
+2026-04-30T21:44:50.590+01:00  WARN 2648 --- [studyhub] [io-8081-exec-10] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 42883
+2026-04-30T21:44:50.591+01:00  WARN 2648 --- [studyhub] [io-8081-exec-10] org.hibernate.orm.jdbc.error             : ERROR: function lower(bytea) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 224

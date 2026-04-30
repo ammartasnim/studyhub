@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = Logger.getLogger(GlobalExceptionHandler.class.getName());
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResDto> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
@@ -87,7 +90,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResDto> handleGeneric(Exception ex, HttpServletRequest request) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", request.getRequestURI(), List.of());
+        logger.severe("Unhandled exception at " + request.getRequestURI() + ": " + ex.getMessage());
+        ex.printStackTrace();
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", request.getRequestURI(), List.of(ex.getMessage()));
     }
 
     private ResponseEntity<ErrorResDto> build(HttpStatus status, String message, String path, List<String> details) {
