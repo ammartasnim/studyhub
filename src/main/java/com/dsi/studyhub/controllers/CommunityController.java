@@ -41,27 +41,27 @@ public class CommunityController {
         return ResponseEntity.ok(communityMapper.toDto(savedCommunity));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<CommunityResDto>> getAllCommunities(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Integer minMembers,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
-    ) {
-        Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-//        Page<Community> communitiesPage = communityService.getAllCommunities(title, description, minMembers, pageable);
-//        Page<CommunityResDto> response = new PageImpl<>(
-//                communitiesPage.getContent().stream().map(communityMapper::toDto).toList(),
-//                communitiesPage.getPageable(),
-//                communitiesPage.getTotalElements()
-//        );
-//        return ResponseEntity.ok(response);
-        return ResponseEntity.ok(communityService.getAllCommunities(title, description, minMembers, pageable));
-    }
+        @GetMapping
+        public ResponseEntity<Page<CommunityResDto>> getAllCommunities(
+                @RequestParam(required = false) String title,
+                @RequestParam(required = false) String description,
+                @RequestParam(required = false) Integer minMembers,
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size,
+                @RequestParam(defaultValue = "id") String sortBy,
+                @RequestParam(defaultValue = "asc") String sortDir
+        ) {
+            Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+    //        Page<Community> communitiesPage = communityService.getAllCommunities(title, description, minMembers, pageable);
+    //        Page<CommunityResDto> response = new PageImpl<>(
+    //                communitiesPage.getContent().stream().map(communityMapper::toDto).toList(),
+    //                communitiesPage.getPageable(),
+    //                communitiesPage.getTotalElements()
+    //        );
+    //        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(communityService.getAllCommunities(title, description, minMembers, pageable));
+        }
 
     @GetMapping("/my")
     public ResponseEntity<Page<CommunityResDto>> getMyCommunities(
