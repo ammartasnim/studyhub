@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -51,7 +52,10 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
                     user.getId(), List.of(SessionStatus.ACTIVE, SessionStatus.PAUSED))
             .isPresent();
     if (hasActive) {
-        throw new IllegalStateException("You already have an active or paused session.");
+//        throw new IllegalStateException("You already have an active or paused session.");
+        throw new org.springframework.web.server.ResponseStatusException(
+                HttpStatus.CONFLICT, "You already have a session in progress."
+        );
     }
 
     FocusSession session = new FocusSession();
@@ -96,8 +100,8 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
     public Optional<FocusSessionResDto> getActiveSession() {
         User user = authenticatedUserService.getAuthenticatedUser();
 
-        return focusSessionRepository.findFirstByUserIdAndStatusNotOrderByLastUpdatedDesc(
-                        user.getId(), SessionStatus.COMPLETED)
+        return focusSessionRepository.findFirstByUserIdAndStatusInOrderByLastUpdatedDesc(
+                        user.getId(), List.of(SessionStatus.ACTIVE, SessionStatus.PAUSED))
                 .flatMap(session -> {
                     // 2. If it was RUNNING when we left, calculate the "lost" time
                     if (session.getStatus() == SessionStatus.ACTIVE) {
