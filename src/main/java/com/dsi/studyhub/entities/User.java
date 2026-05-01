@@ -71,7 +71,7 @@ public class User implements UserDetails {
                     @Index(name = "idx_users_posts_post_id", columnList = "post_id"),
                     @Index(name = "idx_users_posts_user_post", columnList = "user_id, post_id")
             })
-    private List<Post> likes = new ArrayList<>();
+    private Set<Post> likedPosts = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();

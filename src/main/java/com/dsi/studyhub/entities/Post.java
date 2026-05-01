@@ -56,7 +56,7 @@ public class Post {
     private List<Comment> comments;
 
 
-    @ManyToMany(mappedBy = "likes")
-    private ArrayList <User> likes = new ArrayList<>();
+    @ManyToMany(mappedBy = "likedPosts")
+    private Set<User> likes = new LinkedHashSet<>();
 
 }
