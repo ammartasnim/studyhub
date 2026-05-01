@@ -15,12 +15,18 @@ import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
+import com.dsi.studyhub.services.FileStorageService;
 import com.dsi.studyhub.services.PostService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -37,28 +43,47 @@ public class PostServiceImpl implements PostService {
     private AuthenticatedUserService authenticatedUserService;
     @Autowired
     private GamificationService gamificationService;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Override
     @Transactional
     public PostResDto createPost(PostReqDto request) {
         User user = authenticatedUserService.getAuthenticatedUser();
+        List<String> imgPaths = new ArrayList<>();
+        if (request.imgs() != null && !request.imgs().isEmpty()) {
+            for (MultipartFile file : request.imgs()) {
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        String path = fileStorageService.storeFile(file, "posts");
+                        imgPaths.add(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to store image: " + e.getMessage());
+                    }
+                }
+            }
+        }
 
         Post post = new Post();
         post.setTitle(request.title());
         post.setContent(request.content());
-        post.setImgs(request.imgs());
+        post.setImgs(imgPaths);
         post.setUser(user);
 
         if (request.communityId() != null) {
             Community community = communityRepository.findById(request.communityId())
                     .orElseThrow(() -> new ResourceNotFoundException("Community not found"));
+
             boolean isModerator = community.getModerator().getId().equals(user.getId());
             boolean isMember = community.getMembers().stream()
                     .anyMatch(m -> m.getId().equals(user.getId()));
+
             if (!isModerator && !isMember) {
                 throw new ForbiddenException("You must join this community before posting in it.");
             }
+
             post.setCommunity(community);
+
             if (isModerator) {
                 post.setStatus(PostStatus.Approved);
             }

@@ -53,13 +53,6 @@ public class CommunityController {
         ) {
             Sort.Direction direction = "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC;
             Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-    //        Page<Community> communitiesPage = communityService.getAllCommunities(title, description, minMembers, pageable);
-    //        Page<CommunityResDto> response = new PageImpl<>(
-    //                communitiesPage.getContent().stream().map(communityMapper::toDto).toList(),
-    //                communitiesPage.getPageable(),
-    //                communitiesPage.getTotalElements()
-    //        );
-    //        return ResponseEntity.ok(response);
             return ResponseEntity.ok(communityService.getAllCommunities(title, description, minMembers, pageable));
         }
 

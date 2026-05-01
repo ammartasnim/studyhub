@@ -10,20 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING)
+
 public abstract class PostMapper {
 
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
 
+    @Mapping(target = "imgs", ignore = true)  // ✅ service handles this
     public abstract Post toEntity(PostReqDto postReqDto);
 
-    @Mapping(target = "userUsername", source = "user.username")
+    @Mapping(target = "userUsername",  source = "user.username")
     @Mapping(target = "userFirstName", source = "user.firstName")
-    @Mapping(target = "userLastName", source = "user.lastName")
+    @Mapping(target = "userLastName",  source = "user.lastName")
     @Mapping(target = "communityTitle", source = "community.title")
-    @Mapping(target = "likeCount", ignore = true)
+    @Mapping(target = "likeCount",    ignore = true)
     @Mapping(target = "commentCount", ignore = true)
-    @Mapping(target = "isLiked", ignore = true)
+    @Mapping(target = "isLiked",      ignore = true)
     public abstract PostResDto toDto(Post post);
 
     @AfterMapping
@@ -37,5 +39,6 @@ public abstract class PostMapper {
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "imgs", ignore = true)  // ✅ same here
     public abstract Post partialUpdate(PostReqDto postReqDto, @MappingTarget Post post);
 }

@@ -7,8 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 
 @RestController
@@ -17,9 +21,20 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     private final PostService postService;
 
-    @PostMapping
-    public ResponseEntity<PostResDto> createPost(@RequestBody PostReqDto request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResDto> createPost(
+            @RequestPart("title")   String title,
+            @RequestPart("content" )String content,
+            @RequestPart(value = "imgs",        required = false) List<MultipartFile> imgs,
+            @RequestPart(value = "communityId", required = false)          String communityId
+    ) {
+        PostReqDto dto = new PostReqDto(
+                title,
+                content,
+                imgs,
+                communityId != null ? Long.parseLong(communityId) : null
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(dto));
     }
 
     @GetMapping("/{id}")
