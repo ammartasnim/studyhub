@@ -36,5 +36,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
                                   @Param("description") String description,
                                   @Param("minMembers") Integer minMembers,
                                   Pageable pageable);
+
+    @Query("SELECT c FROM Community c ORDER BY SIZE(c.members) DESC")
+    List<Community> findTopByMemberCount(Pageable pageable);
 }
 

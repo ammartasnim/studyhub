@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.ProfileUpdateResDto;
 import com.dsi.studyhub.dtos.UserReqDto;
 import com.dsi.studyhub.dtos.UserResDto;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.BadgeType;
 import com.dsi.studyhub.mappers.UserMapper;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.security.JwtService;
@@ -20,6 +21,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -114,6 +118,24 @@ public class UserService {
         String filename = fileStorageService.storeFile(file, "pfp");
         currentUser.setPfp(filename);
         return userRepository.save(currentUser);
+    }
+
+    public Map<String, Long> getUserStats() {
+        return Map.of(
+                "total", userRepository.count(),
+                "banned", userRepository.countByBanned(true)
+        );
+    }
+
+    public Map<BadgeType, Long> getBadgeDistribution() {
+        List<Object[]> results = userRepository.countGroupedByBadgeRaw();
+
+        // Convert List<Object[]> to Map<BadgeType, Long>
+        return results.stream()
+                .collect(Collectors.toMap(
+                        result -> (BadgeType) result[0], // The BadgeType enum
+                        result -> (Long) result[1]       // The count
+                ));
     }
 
 }

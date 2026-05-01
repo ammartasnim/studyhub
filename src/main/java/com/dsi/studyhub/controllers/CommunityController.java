@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/communities")
@@ -108,6 +112,18 @@ public class CommunityController {
     public ResponseEntity<Void> deleteCommunity(@PathVariable Long id) {
         communityService.deleteCommunity(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Long>> getCommunityStats() {
+        return ResponseEntity.ok(communityService.getCommunityStats());
+    }
+
+    @GetMapping("/stats/top")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CommunityResDto>> getTopCommunities() {
+        return ResponseEntity.ok(communityService.getTopCommunities());
     }
 }
 

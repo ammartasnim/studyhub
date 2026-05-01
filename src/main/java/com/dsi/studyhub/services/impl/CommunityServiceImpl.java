@@ -13,9 +13,12 @@ import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommunityService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -115,6 +118,19 @@ public class CommunityServiceImpl implements CommunityService {
         } else {
             throw new ResourceNotFoundException("Community not found with id: " + id);
         }
+    }
+
+    @Override
+    public Map<String, Long> getCommunityStats() {
+        return Map.of("total", communityRepository.count());
+    }
+
+    @Override
+    public List<CommunityResDto> getTopCommunities() {
+        return communityRepository.findTopByMemberCount(PageRequest.of(0, 5))
+                .stream()
+                .map(communityMapper::toDto)
+                .toList();
     }
 }
 

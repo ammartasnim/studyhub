@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CommentService {
     CommentResDto createComment(CommentReqDto request);
@@ -14,4 +15,5 @@ public interface CommentService {
     Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable);
     Page<CommentResDto> getMyComments(Pageable pageable);
     Page<CommentResDto> getAllComments(Pageable pageable);
+    Map<String, Long> getCommentStats();
 }

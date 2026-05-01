@@ -2,10 +2,12 @@ package com.dsi.studyhub.services;
 
 import com.dsi.studyhub.dtos.FocusSessionReqDto;
 import com.dsi.studyhub.dtos.FocusSessionResDto;
+import com.dsi.studyhub.dtos.UserFocusRankDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface FocusSessionService {
@@ -18,4 +20,6 @@ public interface FocusSessionService {
     Page<FocusSessionResDto> getSessionsByUserId(Long userId, Pageable pageable);
     List<FocusSessionResDto> getSessionsByUserIdAsList(Long userId);
     void deleteSession(Long id);
+    Map<String, Long> getFocusStats();
+    List<UserFocusRankDto> getTopFocusUsers();
 }
