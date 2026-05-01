@@ -2,6 +2,7 @@ package com.dsi.studyhub.controllers;
 
 import com.dsi.studyhub.dtos.FocusSessionReqDto;
 import com.dsi.studyhub.dtos.FocusSessionResDto;
+import com.dsi.studyhub.dtos.UserFocusRankDto;
 import com.dsi.studyhub.services.FocusSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,9 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/focus-sessions")
@@ -89,5 +92,17 @@ public class FocusSessionController {
     public ResponseEntity<Void> deleteSession(@PathVariable Long id) {
         focusSessionService.deleteSession(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Long>> getFocusStats() {
+        return ResponseEntity.ok(focusSessionService.getFocusStats());
+    }
+
+    @GetMapping("/stats/top-users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserFocusRankDto>> getTopFocusUsers() {
+        return ResponseEntity.ok(focusSessionService.getTopFocusUsers());
     }
 }

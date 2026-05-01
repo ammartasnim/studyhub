@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.ProfileUpdateResDto;
 import com.dsi.studyhub.dtos.UserReqDto;
 import com.dsi.studyhub.dtos.UserResDto;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.BadgeType;
 import com.dsi.studyhub.mappers.UserMapper;
 import com.dsi.studyhub.services.UserService;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -89,6 +91,18 @@ public class UserController {
     public ResponseEntity<UserResDto> uploadPfp(@RequestParam("file") MultipartFile file) throws IOException {
         User updatedUser = userService.updatePfp(file, userService.getMe());
         return ResponseEntity.ok(userMapper.toDto(updatedUser));
+    }
+
+    @GetMapping("/stats/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Long>> getUserStats() {
+        return ResponseEntity.ok(userService.getUserStats());
+    }
+
+    @GetMapping("/stats/badges")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<BadgeType, Long>> getBadgeDistribution() {
+        return ResponseEntity.ok(userService.getBadgeDistribution());
     }
 
 }
