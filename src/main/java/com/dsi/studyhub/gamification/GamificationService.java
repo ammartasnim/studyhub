@@ -67,16 +67,16 @@ public class GamificationService {
         return BadgeType.BEGINNER;
     }
 
-    private int calculateLevel(int totalXp) {
-        if (totalXp >= 35000) return 10; // Legend
-        if (totalXp >= 20000) return 9;  // Mentor
-        if (totalXp >= 12000) return 8;  // Achiever
-        if (totalXp >= 7000)  return 7;  // Collaborator
-        if (totalXp >= 4000)  return 6;  // Consistent
-        if (totalXp >= 2000)  return 5;  // Helper
-        if (totalXp >= 1000)  return 4;  // Contributor
-        if (totalXp >= 500)   return 3;  // Explorer
-        if (totalXp >= 200)   return 2;  // Learner
-        return 1; // Beginner
-    }
+//    private int calculateLevel(int totalXp) {
+//        if (totalXp >= 35000) return 10; // Legend
+//        if (totalXp >= 20000) return 9;  // Mentor
+//        if (totalXp >= 12000) return 8;  // Achiever
+//        if (totalXp >= 7000)  return 7;  // Collaborator
+//        if (totalXp >= 4000)  return 6;  // Consistent
+//        if (totalXp >= 2000)  return 5;  // Helper
+//        if (totalXp >= 1000)  return 4;  // Contributor
+//        if (totalXp >= 500)   return 3;  // Explorer
+//        if (totalXp >= 200)   return 2;  // Learner
+//        return 1; // Beginner
+//    }
 }
