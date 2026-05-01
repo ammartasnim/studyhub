@@ -34,16 +34,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     long countByBanned(boolean banned);
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.badge = :badge GROUP BY u.badge")
-    Map<String, Long> countByBadgeGrouped();
+//    @Query("SELECT COUNT(u) FROM User u WHERE u.badge = :badge GROUP BY u.badge")
+//    Map<String, Long> countByBadgeGrouped();
 
     // For growth chart — requires createdAt on User entity
-    @Query(value = """
-    SELECT CAST(created_at AS DATE) as date, COUNT(*) as count
-    FROM users
-    WHERE created_at BETWEEN :from AND :to
-    GROUP BY CAST(created_at AS DATE)
-    ORDER BY date
-    """, nativeQuery = true)
-    List<DailyCountDto> countByCreatedAtBetweenGroupByDay(LocalDate from, LocalDate to);
+//    @Query(value = """
+//    SELECT CAST(created_at AS DATE) as date, COUNT(*) as count
+//    FROM users
+//    WHERE created_at BETWEEN :from AND :to
+//    GROUP BY CAST(created_at AS DATE)
+//    ORDER BY date
+//    """, nativeQuery = true)
+//    List<DailyCountDto> countByCreatedAtBetweenGroupByDay(LocalDate from, LocalDate to);
 }
