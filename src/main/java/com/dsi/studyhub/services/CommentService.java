@@ -13,4 +13,5 @@ public interface CommentService {
     void deleteComment(Long commentId);
     Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable);
     Page<CommentResDto> getMyComments(Pageable pageable);
+    Page<CommentResDto> getAllComments(Pageable pageable);
 }

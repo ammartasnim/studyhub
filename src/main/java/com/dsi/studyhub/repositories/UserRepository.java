@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -28,4 +31,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                @Param("email") String email,
                                @Param("banned") Boolean banned,
                                Pageable pageable);
+
+    long countByBanned(boolean banned);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.badge = :badge GROUP BY u.badge")
+    Map<String, Long> countByBadgeGrouped();
+
+    // For growth chart — requires createdAt on User entity
+    @Query(value = """
+    SELECT CAST(created_at AS DATE) as date, COUNT(*) as count
+    FROM users
+    WHERE created_at BETWEEN :from AND :to
+    GROUP BY CAST(created_at AS DATE)
+    ORDER BY date
+    """, nativeQuery = true)
+    List<DailyCountDto> countByCreatedAtBetweenGroupByDay(LocalDate from, LocalDate to);
 }

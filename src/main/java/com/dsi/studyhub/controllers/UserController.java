@@ -90,4 +90,5 @@ public class UserController {
         User updatedUser = userService.updatePfp(file, userService.getMe());
         return ResponseEntity.ok(userMapper.toDto(updatedUser));
     }
+
 }

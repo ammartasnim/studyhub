@@ -62,4 +62,11 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getMyComments(pageable));
     }
 
+    @GetMapping
+    public ResponseEntity<Page<CommentResDto>> getAllComments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(commentService.getAllComments(PageRequest.of(page, size)));
+    }
+
 }

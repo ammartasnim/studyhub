@@ -87,6 +87,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public Page<CommentResDto> getAllComments(Pageable pageable) {
+        return commentRepository.findAll(pageable)
+                .map(commentMapper::toDto);
+    }
+
+    @Override
     public Page<CommentResDto> getMyComments(Pageable pageable) {
         User user = authenticatedUserService.getAuthenticatedUser();
 

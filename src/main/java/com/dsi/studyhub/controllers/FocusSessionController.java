@@ -20,10 +20,6 @@ public class FocusSessionController {
     @Autowired
     private FocusSessionService focusSessionService;
 
-//    @PostMapping
-//    public ResponseEntity<FocusSessionResDto> createSession(@RequestBody FocusSessionReqDto request) {
-//        return new ResponseEntity<>(focusSessionService.saveSession(request), HttpStatus.CREATED);
-//    }
     @PostMapping("/start")
     public ResponseEntity<FocusSessionResDto> start(@RequestBody FocusSessionReqDto request) {
         return ResponseEntity.ok(focusSessionService.startSession(request));
