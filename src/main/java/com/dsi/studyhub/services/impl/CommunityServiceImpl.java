@@ -12,6 +12,7 @@ import com.dsi.studyhub.mappers.CommunityMapper;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommunityService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -131,6 +132,44 @@ public class CommunityServiceImpl implements CommunityService {
                 .stream()
                 .map(communityMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void joinCommunity(Long communityId) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+
+        if (community.getMembers().contains(currentUser)) {
+            throw new IllegalStateException("You are already a member of this community.");
+        }
+
+        community.getMembers().add(currentUser);
+        currentUser.getJoinedCommunities().add(community);
+        community.setNbrMembers(community.getNbrMembers() + 1);
+        communityRepository.save(community);
+    }
+
+    @Override
+    @Transactional
+    public void leaveCommunity(Long communityId) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found with id: " + communityId));
+
+        if (!community.getMembers().contains(currentUser)) {
+            throw new IllegalStateException("You are not a member of this community.");
+        }
+
+        if (community.getModerator().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("You are the moderator — transfer or delete the community instead of leaving.");
+        }
+
+        community.getMembers().remove(currentUser);
+        currentUser.getJoinedCommunities().remove(community);
+        community.setNbrMembers(Math.max(1, community.getNbrMembers() - 1));
+        communityRepository.save(community);
     }
 }
 

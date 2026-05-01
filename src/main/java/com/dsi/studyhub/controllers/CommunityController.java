@@ -118,5 +118,17 @@ public class CommunityController {
     public ResponseEntity<List<CommunityResDto>> getTopCommunities() {
         return ResponseEntity.ok(communityService.getTopCommunities());
     }
+
+    @PostMapping("/{id}/join")
+    public ResponseEntity<Void> joinCommunity(@PathVariable Long id) {
+        communityService.joinCommunity(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/leave")
+    public ResponseEntity<Void> leaveCommunity(@PathVariable Long id) {
+        communityService.leaveCommunity(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 

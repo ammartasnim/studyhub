@@ -20,4 +20,6 @@ public interface CommunityService {
     void deleteCommunity(Long id);
     Map<String, Long> getCommunityStats();
     List<CommunityResDto> getTopCommunities();
+    void joinCommunity(Long communityId);
+    void leaveCommunity(Long communityId);
 }
