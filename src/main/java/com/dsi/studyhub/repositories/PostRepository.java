@@ -23,4 +23,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "AND p.status = com.dsi.studyhub.enums.PostStatus.Approved " +
             "ORDER BY p.createdAt DESC")
     Page<Post> findFeedForUser(@Param("userId") Long userId, Pageable pageable);
+
 }

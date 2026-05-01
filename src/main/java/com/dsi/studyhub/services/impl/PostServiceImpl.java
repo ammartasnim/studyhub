@@ -167,20 +167,22 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void toggleLike(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new  ResourceNotFoundException("Post not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
         Long postOwnerId = post.getUser().getId();
         User user = authenticatedUserService.getAuthenticatedUser();
 
-        boolean alreadyLiked = post.getLikes().stream()
-                .anyMatch(u -> u.getId().equals(user.getId()));
+        boolean alreadyLiked = user.getLikedPosts().stream()
+                .anyMatch(p -> p.getId().equals(postId));
+
         if (alreadyLiked) {
-            post.getLikes().removeIf(u -> u.getId().equals(user.getId()));
+            user.getLikedPosts().removeIf(p -> p.getId().equals(postId));
             gamificationService.awardXp(postOwnerId, XpConfig.LIKE_REMOVED);
         } else {
-            post.getLikes().add(user);
+            user.getLikedPosts().add(post);
             gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
         }
-        postRepository.save(post);
+
+        userRepository.save(user);
     }
     @Override
     @Transactional

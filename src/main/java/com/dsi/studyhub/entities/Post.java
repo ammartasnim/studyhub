@@ -52,11 +52,11 @@ public class Post {
     @JoinColumn(name = "community_id")
     private Community community;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> comments;
-
 
     @ManyToMany(mappedBy = "likedPosts")
-    private Set<User> likes = new LinkedHashSet<>();
+    private List<User> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
 }

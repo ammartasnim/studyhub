@@ -39,6 +39,6 @@ public abstract class PostMapper {
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "imgs", ignore = true)  // ✅ same here
+    @Mapping(target = "imgs", ignore = true)
     public abstract Post partialUpdate(PostReqDto postReqDto, @MappingTarget Post post);
 }
