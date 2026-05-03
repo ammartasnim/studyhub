@@ -16,4 +16,5 @@ public interface CommentService {
     Page<CommentResDto> getMyComments(Pageable pageable);
     Page<CommentResDto> getAllComments(Pageable pageable);
     Map<String, Long> getCommentStats();
+    void toggleLike(Long commentId);
 }

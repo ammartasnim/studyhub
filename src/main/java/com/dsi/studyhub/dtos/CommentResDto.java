@@ -1,9 +1,23 @@
 package com.dsi.studyhub.dtos;
 
-import java.io.Serializable;
+import lombok.Builder;
 
-/**
- * DTO for {@link com.dsi.studyhub.entities.Comment}
- */
-public record CommentResDto(Long id, Long postId, Long userId, String content) implements Serializable {
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Builder
+public record CommentResDto(
+        Long id,
+        Long postId,
+        Long userId,
+        String content,
+        String authorFirstName,
+        String authorLastName,
+        String authorUsername,
+        String authorPfp,
+        LocalDateTime createdAt,
+        boolean isLiked,
+        int likeCount
+) implements Serializable {
 }

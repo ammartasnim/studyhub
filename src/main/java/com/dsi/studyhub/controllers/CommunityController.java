@@ -121,6 +121,7 @@ public class CommunityController {
 
     @PostMapping("/{id}/join")
     public ResponseEntity<Void> joinCommunity(@PathVariable Long id) {
+        System.out.println("ID RECEIVED = " + id);
         communityService.joinCommunity(id);
         return ResponseEntity.ok().build();
     }

@@ -3,20 +3,36 @@ package com.dsi.studyhub.mappers;
 import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.entities.Comment;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.services.AuthenticatedUserService;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface CommentMapper {
+public abstract class CommentMapper {
+    @Autowired
+    private AuthenticatedUserService authenticatedUserService;
+
     @Mapping(source = "post.id", target = "postId")
     @Mapping(source = "user.id", target = "userId")
-    CommentResDto toDto(Comment comment);
+    @Mapping(source = "user.firstName", target = "authorFirstName")
+    @Mapping(source = "user.lastName", target = "authorLastName")
+    @Mapping(source = "user.username", target = "authorUsername")
+    @Mapping(source = "user.pfp", target = "authorPfp")
+    @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(target = "isLiked",      ignore = true)
+    public abstract CommentResDto toDto(Comment comment);
+
+    @AfterMapping
+    protected void computeExtraFields(Comment comment, @MappingTarget CommentResDto.CommentResDtoBuilder builder) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+
+        builder.likeCount(comment.getLikedByUsers() == null ? 0 : comment.getLikedByUsers().size());
+        /*builder.replyCount(comment.getReplies() == null ? 0 : comment.getReplies().size());*/
+        builder.isLiked(comment.getLikedByUsers() != null && comment.getLikedByUsers().stream()
+                .anyMatch(u -> u.getId().equals(currentUser.getId())));
+    }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdate(CommentReqDto dto, @MappingTarget Comment comment);
+    public abstract void partialUpdate(CommentReqDto dto, @MappingTarget Comment comment);
 }

@@ -12,8 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Map;
 
 @RestController
@@ -25,6 +24,13 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentResDto> createComment(@RequestBody CommentReqDto request) {
         return new ResponseEntity<>(commentService.createComment(request), HttpStatus.CREATED);
+    }
+    @PostMapping("/post/{postId}")
+    public ResponseEntity<CommentResDto> createCommentForPost(
+            @PathVariable Long postId,
+            @RequestBody CommentReqDto request) {
+        CommentReqDto merged = new CommentReqDto(postId, request.content());
+        return new ResponseEntity<>(commentService.createComment(merged), HttpStatus.CREATED);
     }
 
     @PutMapping("/{commentId}")
@@ -75,6 +81,11 @@ public class CommentController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Long>> getCommentStats() {
         return ResponseEntity.ok(commentService.getCommentStats());
+    }
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<Void> toggleLike(@PathVariable Long commentId) {
+        commentService.toggleLike(commentId);
+        return ResponseEntity.ok().build();
     }
 
 }

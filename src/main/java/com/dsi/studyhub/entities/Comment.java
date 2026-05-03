@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Table(indexes = {
@@ -29,4 +33,13 @@ public class Comment {
 
     private Long id;
     private String content;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @ManyToMany(mappedBy = "likedComments")
+    private Set<User> likedByUsers = new HashSet<>();
+
+
 }

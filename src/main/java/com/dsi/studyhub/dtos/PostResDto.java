@@ -19,6 +19,7 @@ public class PostResDto {
     private String userUsername;
     private String userFirstName;
     private String userLastName;
+    private String userPfp;
     private String communityTitle;
     private PostStatus status;
     private int likeCount;

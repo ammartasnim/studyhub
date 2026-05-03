@@ -22,6 +22,7 @@ public abstract class PostMapper {
     @Mapping(target = "userUsername",  source = "user.username")
     @Mapping(target = "userFirstName", source = "user.firstName")
     @Mapping(target = "userLastName",  source = "user.lastName")
+    @Mapping(target = "userPfp",       source = "user.pfp")
     @Mapping(target = "communityTitle", source = "community.title")
     @Mapping(target = "likeCount",    ignore = true)
     @Mapping(target = "commentCount", ignore = true)

@@ -73,8 +73,19 @@ public class User implements UserDetails {
             })
     private Set<Post> likedPosts = new LinkedHashSet<>();
 
+
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(name = "users_comments",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id"),
+            indexes = {
+                    @Index(name = "idx_users_comments_user_id", columnList = "user_id"),
+                    @Index(name = "idx_users_comments_comment_id", columnList = "comment_id"),
+                    @Index(name = "idx_users_comments_user_comment", columnList = "user_id, comment_id")
+            })
+    private Set<Comment> likedComments = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

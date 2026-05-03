@@ -7,11 +7,13 @@ import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.UserRole;
 import com.dsi.studyhub.exceptions.ForbiddenException;
+import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.gamification.GamificationService;
 import com.dsi.studyhub.gamification.XpConfig;
 import com.dsi.studyhub.mappers.CommentMapper;
 import com.dsi.studyhub.repositories.CommentRepository;
 import com.dsi.studyhub.repositories.PostRepository;
+import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommentService;
 import jakarta.transaction.Transactional;
@@ -20,30 +22,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 
 @Service
 public class CommentServiceImpl implements CommentService {
+
     @Autowired
     private CommentRepository commentRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private CommentMapper commentMapper;
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
     @Autowired
     private GamificationService gamificationService;
-
-
     @Override
     @Transactional
     public CommentResDto createComment(CommentReqDto request) {
         User user = authenticatedUserService.getAuthenticatedUser();
         Post post = postRepository.findById(request.postId())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new RuntimeException("Post not found with id: " + request.postId()));
 
         Comment comment = new Comment();
         comment.setContent(request.content());
@@ -51,33 +53,66 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(post);
 
         Comment saved = commentRepository.save(comment);
+
+        // Re-fetch to ensure user and post relations are fully loaded before mapping
+        Comment fresh = commentRepository.findById(saved.getId())
+                .orElseThrow(() -> new RuntimeException("Comment not found after save"));
+
         gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
-        return commentMapper.toDto(saved);
+        return commentMapper.toDto(fresh);
     }
+
 
     @Override
     @Transactional
     public CommentResDto editComment(Long commentId, CommentReqDto request) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
         User user = authenticatedUserService.getAuthenticatedUser();
-        if (!comment.getUser().getId().equals(user.getId()) && user.getRole()!= UserRole.Admin) {
+
+        if (!comment.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.Admin) {
             throw new ForbiddenException("You don't own this comment!");
         }
-        commentMapper.partialUpdate(request, comment);
 
+        comment.setContent(request.content());
         return commentMapper.toDto(commentRepository.save(comment));
+    }
+    @Override
+    @Transactional
+    public void toggleLike(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        Long commentOwnerId = comment.getUser().getId();
+        User user = authenticatedUserService.getAuthenticatedUser();
+
+        boolean alreadyLiked = user.getLikedComments().stream()
+                .anyMatch(c -> c.getId().equals(commentId));
+
+        if (alreadyLiked) {
+            user.getLikedComments().removeIf(p -> p.getId().equals(commentId));
+            gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_REMOVED);
+        } else {
+            user.getLikedComments().add(comment);
+            gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_RECEIVED);
+        }
+
+        userRepository.save(user);
     }
 
     @Override
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
         User user = authenticatedUserService.getAuthenticatedUser();
-        if (!comment.getUser().getId().equals(user.getId()) && user.getRole()!= UserRole.Admin) {
+
+        if (!comment.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.Admin) {
             throw new ForbiddenException("You don't own this comment!");
         }
+        for (User u : new HashSet<>(comment.getLikedByUsers())) {
+            u.getLikedComments().remove(comment);
+        }
+        commentRepository.save(comment);
         commentRepository.deleteById(commentId);
     }
 
@@ -96,7 +131,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentResDto> getMyComments(Pageable pageable) {
         User user = authenticatedUserService.getAuthenticatedUser();
-
         return commentRepository.findByUserId(user.getId(), pageable)
                 .map(commentMapper::toDto);
     }

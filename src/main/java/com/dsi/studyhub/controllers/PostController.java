@@ -1,11 +1,17 @@
 package com.dsi.studyhub.controllers;
 
+import com.dsi.studyhub.dtos.CommentReqDto;
+import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
+import com.dsi.studyhub.services.CommentService;
 import com.dsi.studyhub.services.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+
+    @Autowired
+    private CommentService commentService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResDto> createPost(
@@ -87,6 +96,23 @@ public class PostController {
     @GetMapping("/feed")
     public ResponseEntity<Page<PostResDto>> getFeed(Pageable pageable) {
         return ResponseEntity.ok(postService.getFeed(pageable));
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<CommentResDto> createCommentForPost(
+            @PathVariable Long postId,
+            @RequestBody CommentReqDto request) {
+        CommentReqDto req = new CommentReqDto(postId, request.content());
+        return new ResponseEntity<>(commentService.createComment(req), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<Page<CommentResDto>> getCommentsForPost(
+            @PathVariable Long postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return ResponseEntity.ok(commentService.getCommentsByPost(postId, pageable));
     }
 
     @PatchMapping("/{id}/approve")
