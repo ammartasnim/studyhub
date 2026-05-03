@@ -18,6 +18,9 @@ public record CommentResDto(
         String authorPfp,
         LocalDateTime createdAt,
         boolean isLiked,
-        int likeCount
+        int likeCount,
+        Long parentCommentId,
+        int replyCount
+
 ) implements Serializable {
 }

@@ -112,14 +112,16 @@ public class CommentServiceImpl implements CommentService {
         for (User u : new HashSet<>(comment.getLikedByUsers())) {
             u.getLikedComments().remove(comment);
         }
+        comment.getLikedByUsers().clear();
         commentRepository.save(comment);
         commentRepository.deleteById(commentId);
     }
 
     @Override
     public Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable) {
-        return commentRepository.findByPostId(postId, pageable)
-                .map(commentMapper::toDto);
+        User user = authenticatedUserService.getAuthenticatedUser();
+        return commentRepository.findByPostIdAndParentCommentIsNull(postId, pageable)
+                .map(c -> commentMapper.toDto(c));
     }
 
     @Override
@@ -138,5 +140,31 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Map<String, Long> getCommentStats() {
         return Map.of("total", commentRepository.count());
+    }
+    @Override
+    @Transactional
+    public CommentResDto createReply(Long parentCommentId, CommentReqDto request) {
+
+        User user = authenticatedUserService.getAuthenticatedUser();
+
+        Comment parent = commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+        Comment reply = new Comment();
+        reply.setContent(request.content());
+        reply.setUser(user);
+        reply.setPost(parent.getPost());
+        reply.setParentComment(parent);
+
+        Comment saved = commentRepository.save(reply);
+        Comment fresh = commentRepository.findById(saved.getId())
+                .orElseThrow(() -> new RuntimeException("Reply not found after save"));
+        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+        return commentMapper.toDto(fresh);
+    }
+    @Override
+    public Page<CommentResDto> getReplies(Long commentId, Pageable pageable) {
+        return commentRepository.findByParentCommentId(commentId, pageable)
+                .map(commentMapper::toDto);
     }
 }

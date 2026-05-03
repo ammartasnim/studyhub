@@ -20,7 +20,10 @@ public abstract class CommentMapper {
     @Mapping(source = "user.username", target = "authorUsername")
     @Mapping(source = "user.pfp", target = "authorPfp")
     @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "parentComment.id", target = "parentCommentId")
     @Mapping(target = "isLiked",      ignore = true)
+    @Mapping(expression = "java(comment.getReplies().size())", target = "replyCount")
+
     public abstract CommentResDto toDto(Comment comment);
 
     @AfterMapping
@@ -28,7 +31,7 @@ public abstract class CommentMapper {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
 
         builder.likeCount(comment.getLikedByUsers() == null ? 0 : comment.getLikedByUsers().size());
-        /*builder.replyCount(comment.getReplies() == null ? 0 : comment.getReplies().size());*/
+        builder.replyCount(comment.getReplies() == null ? 0 : comment.getReplies().size());
         builder.isLiked(comment.getLikedByUsers() != null && comment.getLikedByUsers().stream()
                 .anyMatch(u -> u.getId().equals(currentUser.getId())));
     }

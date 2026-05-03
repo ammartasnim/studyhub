@@ -1,7 +1,7 @@
 package com.dsi.studyhub.controllers;
 
-import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.dtos.CommentResDto;
+import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -86,6 +86,21 @@ public class CommentController {
     public ResponseEntity<Void> toggleLike(@PathVariable Long commentId) {
         commentService.toggleLike(commentId);
         return ResponseEntity.ok().build();
+    }
+    @PostMapping("/{commentId}/reply")
+    public ResponseEntity<CommentResDto> reply(
+            @PathVariable Long commentId,
+            @RequestBody CommentReqDto request
+    ) {
+        return ResponseEntity.ok(commentService.createReply(commentId, request));
+    }
+    @GetMapping("/{commentId}/replies")
+    public ResponseEntity<Page<CommentResDto>> getReplies(
+            @PathVariable Long commentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return ResponseEntity.ok(commentService.getReplies(commentId, pageable));
     }
 
 }

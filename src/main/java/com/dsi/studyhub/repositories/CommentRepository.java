@@ -10,6 +10,6 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findByUserId(Long userId, Pageable pageable);
     Page<Comment> findByPostId(Long postId, Pageable pageable);
-
-
+    Page<Comment> findByPostIdAndParentCommentIsNull(Long postId, Pageable pageable);
+    Page<Comment> findByParentCommentId(Long parentCommentId, Pageable pageable);
 }
