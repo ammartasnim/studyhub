@@ -363,4 +363,13 @@ public class PostServiceImpl implements PostService {
     public void cleanupOldSeenPosts() {
         seenPostRepository.deleteOlderThan(LocalDateTime.now().minusDays(30));
     }
+
+    @Override
+    public Map<String, Long> getPostStats() {
+        return Map.of(
+                "total",   postRepository.count(),
+                "flagged", postRepository.countByStatus(PostStatus.Flagged),
+                "pending", postRepository.countByStatus(PostStatus.Pending)
+        );
+    }
 }

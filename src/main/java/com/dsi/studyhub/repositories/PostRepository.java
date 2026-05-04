@@ -3,6 +3,7 @@ package com.dsi.studyhub.repositories;
 import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.PostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,5 +44,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.status = com.dsi.studyhub.enums.PostStatus.Approved " +
             "AND p.user.id != :userId")
     List<Post> findAllApprovedExcludingUser(@Param("userId") Long userId);
+    long countByStatus(PostStatus status);
 
 }

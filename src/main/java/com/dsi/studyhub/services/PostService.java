@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface PostService {
@@ -22,4 +23,5 @@ public interface PostService {
     PostResDto approvePost(Long id);
     PostResDto flagPost(Long id);
     void markPostsSeen(List<Long> postIds);
+    Map<String, Long> getPostStats();
 }
