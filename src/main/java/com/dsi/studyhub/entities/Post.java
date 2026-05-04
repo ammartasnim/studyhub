@@ -59,7 +59,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(name = "flag_count", nullable = false, columnDefinition = "integer default 0")
     private int flagCount = 0;
 
     @ElementCollection(fetch = FetchType.EAGER)
