@@ -157,10 +157,11 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void deletePost(Long id) {
-        if (!postRepository.existsById(id)) {
-            throw new RuntimeException("Post not found");
-        }
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        User user = authenticatedUserService.getAuthenticatedUser();
         postRepository.deleteById(id);
+        gamificationService.awardXp(user.getId(), XpConfig.POST_DELETED);
     }
 
     @Override
@@ -168,18 +169,21 @@ public class PostServiceImpl implements PostService {
     public void toggleLike(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        Long postOwnerId = post.getUser().getId();
         User user = authenticatedUserService.getAuthenticatedUser();
+        Long postOwnerId = post.getUser().getId();
+
+        // No XP when liking your own post
+        boolean isOwnPost = postOwnerId.equals(user.getId());
 
         boolean alreadyLiked = user.getLikedPosts().stream()
                 .anyMatch(p -> p.getId().equals(postId));
 
         if (alreadyLiked) {
             user.getLikedPosts().removeIf(p -> p.getId().equals(postId));
-            gamificationService.awardXp(postOwnerId, XpConfig.LIKE_REMOVED);
+            if (!isOwnPost) gamificationService.awardXp(postOwnerId, XpConfig.LIKE_REMOVED);
         } else {
             user.getLikedPosts().add(post);
-            gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
+            if (!isOwnPost) gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
         }
 
         userRepository.save(user);
