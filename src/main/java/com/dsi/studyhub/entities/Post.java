@@ -62,7 +62,7 @@ public class Post {
     @Column(name = "flag_count", nullable = false, columnDefinition = "integer default 0")
     private int flagCount = 0;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_flag_users", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "user_id")
     private Set<Long> flaggedByUserIds = new LinkedHashSet<>();
