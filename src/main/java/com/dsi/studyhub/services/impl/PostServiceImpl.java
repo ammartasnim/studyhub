@@ -84,7 +84,7 @@ public class PostServiceImpl implements PostService {
             Community community = communityRepository.findById(request.communityId())
                     .orElseThrow(() -> new ResourceNotFoundException("Community not found"));
 
-            boolean isModerator = community.getModerator().getId().equals(user.getId());
+            boolean isModerator = community.getOwner().getId().equals(user.getId());
             boolean isMember = community.getMembers().stream()
                     .anyMatch(m -> m.getId().equals(user.getId()));
 
@@ -315,7 +315,7 @@ public class PostServiceImpl implements PostService {
         if (post.getCommunity() == null) {
             throw new ForbiddenException("Post does not belong to a community");
         }
-        if (!post.getCommunity().getModerator().getId().equals(currentUser.getId())) {
+        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
             throw new ForbiddenException("Only the community moderator can approve posts");
         }
 
@@ -333,7 +333,7 @@ public class PostServiceImpl implements PostService {
         if (post.getCommunity() == null) {
             throw new ForbiddenException("Post does not belong to a community");
         }
-        if (!post.getCommunity().getModerator().getId().equals(currentUser.getId())) {
+        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
             throw new ForbiddenException("Only the community moderator can flag posts");
         }
 

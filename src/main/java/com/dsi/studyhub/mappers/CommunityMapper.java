@@ -3,29 +3,44 @@ package com.dsi.studyhub.mappers;
 import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.Community;
+import com.dsi.studyhub.entities.CommunityModerator;
 import com.dsi.studyhub.entities.User;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CommunityMapper {
 
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "moderators", ignore = true)
     Community toEntity(CommunityReqDto dto);
 
-    @Mapping(source = "moderator", target = "moderatorId", qualifiedByName = "moderatorToId")
+    @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToId")
+    @Mapping(source = "moderators", target = "moderators", qualifiedByName = "mappedModerators")
     CommunityResDto toDto(Community community);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "moderators", ignore = true)
     void partialUpdate(CommunityReqDto dto, @MappingTarget Community community);
 
-    @Named("moderatorToId")
-    default Long moderatorToId(User moderator) {
-        return moderator != null ? moderator.getId() : 0L;
+    @Named("userToId")
+    default Long userToId(User user) {
+        return user != null ? user.getId() : null;
+    }
+
+    @Named("mappedModerators")
+    default List<CommunityResDto.ModeratorInfo> mappedModerators(List<CommunityModerator> moderators) {
+        if (moderators == null) return List.of();
+        return moderators.stream()
+                .map(m -> new CommunityResDto.ModeratorInfo(
+                        m.getUser().getId(),
+                        m.getUser().getUsername(),
+                        m.getUser().getFirstName() + " " + m.getUser().getLastName(),
+                        m.getPermissions()
+                ))
+                .collect(Collectors.toList());
     }
 }

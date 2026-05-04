@@ -51,7 +51,7 @@ public class CommunityServiceImpl implements CommunityService {
         int members = community.nbrMembers() != null && community.nbrMembers() > 0 ? community.nbrMembers() : 1;
         newCommunity.setNbrMembers(members);
         newCommunity.setPosts(null);
-        newCommunity.setModerator(moderator);
+        newCommunity.setOwner(moderator);
         return communityRepository.save(newCommunity);
     }
     
@@ -71,8 +71,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public Page<CommunityResDto> getMyCreatedCommunities(Pageable pageable) {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
-
-        return communityRepository.findModerated(currentUser.getId(), pageable)
+        return communityRepository.findByOwner(currentUser.getId(), pageable)
                 .map(communityMapper::toDto);
     }
 
@@ -90,7 +89,7 @@ public class CommunityServiceImpl implements CommunityService {
             Community comm = existingCommunity.get();
             User currentUser = authenticatedUserService.getAuthenticatedUser();
             
-            if (!comm.getModerator().getId().equals(currentUser.getId())) {
+             if (!comm.getOwner().getId().equals(currentUser.getId())){
                 throw new ForbiddenException("Only the moderator can update this community.");
             }
 
@@ -110,8 +109,8 @@ public class CommunityServiceImpl implements CommunityService {
         if (existingCommunity.isPresent()) {
             Community comm = existingCommunity.get();
             User currentUser = authenticatedUserService.getAuthenticatedUser();
-            
-            if (!comm.getModerator().getId().equals(currentUser.getId())) {
+
+            if (!comm.getOwner().getId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Only the moderator can delete this community.");
             }
             
@@ -162,7 +161,7 @@ public class CommunityServiceImpl implements CommunityService {
             throw new IllegalStateException("You are not a member of this community.");
         }
 
-        if (community.getModerator().getId().equals(currentUser.getId())) {
+        if (community.getOwner().getId().equals(currentUser.getId())) {
             throw new ForbiddenException("You are the moderator — transfer or delete the community instead of leaving.");
         }
 
