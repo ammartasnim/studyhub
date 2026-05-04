@@ -298,14 +298,30 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostResDto flagPost(Long id) {
+        // 1. Fetch the post or throw error
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        // 2. Get the current user trying to flag the post
         User currentUser = authenticatedUserService.getAuthenticatedUser();
-        if (post.getCommunity() == null) throw new ForbiddenException("Post does not belong to a community");
-        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the community owner can flag posts");
+        Long currentUserId = currentUser.getId();
+
+        // 3. Check if this user has already flagged this post
+        if (post.getFlaggedByUserIds().contains(currentUserId)) {
+            throw new ForbiddenException("You have already flagged this post");
         }
-        post.setStatus(PostStatus.Flagged);
+
+        // 4. Add the user to the set and update the count
+        post.getFlaggedByUserIds().add(currentUserId);
+        post.setFlagCount(post.getFlaggedByUserIds().size());
+
+        // 5. Check the threshold (3 flags)
+        // If it hits 3, change the status to Flagged
+        if (post.getFlagCount() >= 3) {
+            post.setStatus(PostStatus.Flagged);
+        }
+
+        // 6. Save and return the DTO
         return postMapper.toDto(postRepository.save(post));
     }
 
