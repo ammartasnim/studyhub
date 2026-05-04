@@ -39,6 +39,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT b.type, COUNT(b) FROM User u JOIN u.badges b GROUP BY b.type")
     List<Object[]> countGroupedByBadgeRaw();
+    @Query("""
+    SELECT u FROM User u
+    WHERE u.id != :userId
+    AND u.id NOT IN (
+        SELECT f.addressee.id FROM Friendship f
+        WHERE f.requester.id = :userId
+        AND f.status != 'BLOCKED'
+    )
+    AND u.id NOT IN (
+        SELECT f.requester.id FROM Friendship f
+        WHERE f.addressee.id = :userId
+        AND f.status != 'BLOCKED'
+    )
+""")
+    Page<User> findSuggestedFriends(@Param("userId") Long userId, Pageable pageable);
 
     // For growth chart — requires createdAt on User entity
 //    @Query(value = """
