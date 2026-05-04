@@ -162,4 +162,5 @@ public class PostController {
         // We just pass the string "status" down; the Service will handle the conversion
         return ResponseEntity.ok(postService.getPostsByStatus(status, page, size));
     }
+
 }
