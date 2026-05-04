@@ -188,4 +188,19 @@ public class CommunityController {
         communityService.warnMember(id, request);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/{id}/banned")
+    public ResponseEntity<List<CommunityMemberResDto>> getBannedMembers(@PathVariable Long id) {
+        return ResponseEntity.ok(communityService.getBannedMembers(id));
+    }
+    @GetMapping("/{id}/members/preview")
+    public ResponseEntity<List<CommunityMemberResDto>> getMembersPreview(@PathVariable Long id) {
+        return ResponseEntity.ok(communityService.getMembersPreview(id));
+    }
+    @GetMapping("/{id}/members/all")
+    public ResponseEntity<Page<CommunityMemberResDto>> getAllMembersPublic(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(communityService.getMembersPublic(id, PageRequest.of(page, size)));
+    }
 }

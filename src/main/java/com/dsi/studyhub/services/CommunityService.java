@@ -31,4 +31,7 @@ public interface CommunityService {
     void banMember(Long communityId, CommunityReqDto.BanMemberReq request);
     void unbanMember(Long communityId, Long userId);
     void warnMember(Long communityId, CommunityReqDto.WarnMemberReq request);
+    List<CommunityMemberResDto> getBannedMembers(Long communityId);
+    List<CommunityMemberResDto> getMembersPreview(Long communityId);
+    Page<CommunityMemberResDto> getMembersPublic(Long communityId, Pageable pageable);
 }

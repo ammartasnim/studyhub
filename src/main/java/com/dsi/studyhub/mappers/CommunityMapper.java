@@ -19,7 +19,18 @@ public interface CommunityMapper {
 
     @Mapping(source = "owner", target = "ownerId", qualifiedByName = "userToId")
     @Mapping(source = "moderators", target = "moderators", qualifiedByName = "mappedModerators")
+    @Mapping(source = "community", target = "nbrMembers", qualifiedByName = "computeMemberCount")
     CommunityResDto toDto(Community community);
+
+    @Named("computeMemberCount")
+    default int computeMemberCount(Community community) {
+        if (community == null) return 0;
+        long regularMembers = community.getMembers() == null ? 0 :
+                community.getMembers().stream()
+                        .filter(m -> !m.getId().equals(community.getOwner().getId()))
+                        .count();
+        return (int) regularMembers + 1;
+    }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "owner", ignore = true)
@@ -43,4 +54,6 @@ public interface CommunityMapper {
                 ))
                 .collect(Collectors.toList());
     }
+
+
 }

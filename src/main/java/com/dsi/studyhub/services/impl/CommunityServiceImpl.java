@@ -21,10 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -254,15 +251,23 @@ public class CommunityServiceImpl implements CommunityService {
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Community not found: " + communityId));
 
-        List<User> members = community.getMembers();
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), members.size());
+        User owner = community.getOwner();
 
-        if (start >= members.size()) {
-            return new PageImpl<>(List.of(), pageable, members.size());
+        // Build full list: owner first, then members excluding owner
+        List<User> allMembers = new ArrayList<>();
+        allMembers.add(owner);
+        community.getMembers().stream()
+                .filter(m -> !m.getId().equals(owner.getId()))
+                .forEach(allMembers::add);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allMembers.size());
+
+        if (start >= allMembers.size()) {
+            return new PageImpl<>(List.of(), pageable, allMembers.size());
         }
 
-        List<CommunityMemberResDto> dtos = members.subList(start, end).stream()
+        List<CommunityMemberResDto> dtos = allMembers.subList(start, end).stream()
                 .map(m -> new CommunityMemberResDto(
                         m.getId(),
                         m.getUsername(),
@@ -275,7 +280,7 @@ public class CommunityServiceImpl implements CommunityService {
                 ))
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(dtos, pageable, members.size());
+        return new PageImpl<>(dtos, pageable, allMembers.size());
     }
 
     @Override
@@ -345,4 +350,93 @@ public class CommunityServiceImpl implements CommunityService {
             banMember(communityId, new CommunityReqDto.BanMemberReq(target.getId(), "Auto-banned after 3 warnings"));
         }
     }
+    @Override
+    public List<CommunityMemberResDto> getBannedMembers(Long communityId) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        communityAuthService.requireOwnerOrPermission(currentUser.getId(), communityId, CommunityPermission.BAN_MEMBER);
+        return communityBanRepository.findByCommunityId(communityId).stream()
+                .map(ban -> new CommunityMemberResDto(
+                        ban.getUser().getId(),
+                        ban.getUser().getUsername(),
+                        ban.getUser().getFirstName() + " " + ban.getUser().getLastName(),
+                        ban.getUser().getPfp(),
+                        ban.getUser().getXpPts(),
+                        ban.getUser().getLevel(),
+                        false,
+                        0
+                ))
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<CommunityMemberResDto> getMembersPreview(Long communityId) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found: " + communityId));
+
+        List<CommunityMemberResDto> result = new ArrayList<>();
+
+
+        User owner = community.getOwner();
+        result.add(new CommunityMemberResDto(
+                owner.getId(),
+                owner.getUsername(),
+                owner.getFirstName() + " " + owner.getLastName(),
+                owner.getPfp(),
+                owner.getXpPts(),
+                owner.getLevel(),
+                false,
+                0
+        ));
+
+
+        community.getMembers().stream()
+                .filter(m -> !m.getId().equals(owner.getId()))
+                .limit(2)
+                .forEach(m -> result.add(new CommunityMemberResDto(
+                        m.getId(),
+                        m.getUsername(),
+                        m.getFirstName() + " " + m.getLastName(),
+                        m.getPfp(),
+                        m.getXpPts(),
+                        m.getLevel(),
+                        communityModeratorRepository.existsByUserIdAndCommunityId(m.getId(), communityId),
+                        0
+                )));
+
+        return result;
+    }
+    @Override
+    public Page<CommunityMemberResDto> getMembersPublic(Long communityId, Pageable pageable) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found: " + communityId));
+
+        User owner = community.getOwner();
+        List<User> allMembers = new ArrayList<>();
+        allMembers.add(owner);
+        community.getMembers().stream()
+                .filter(m -> !m.getId().equals(owner.getId()))
+                .forEach(allMembers::add);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allMembers.size());
+
+        if (start >= allMembers.size()) {
+            return new PageImpl<>(List.of(), pageable, allMembers.size());
+        }
+
+        List<CommunityMemberResDto> dtos = allMembers.subList(start, end).stream()
+                .map(m -> new CommunityMemberResDto(
+                        m.getId(),
+                        m.getUsername(),
+                        m.getFirstName() + " " + m.getLastName(),
+                        m.getPfp(),
+                        m.getXpPts(),
+                        m.getLevel(),
+                        communityModeratorRepository.existsByUserIdAndCommunityId(m.getId(), communityId),
+                        0
+                ))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtos, pageable, allMembers.size());
+    }
+
 }
