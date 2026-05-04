@@ -4,6 +4,7 @@ import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
+import com.dsi.studyhub.repositories.SeenPostRepository;
 import com.dsi.studyhub.services.CommentService;
 import com.dsi.studyhub.services.PostService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ public class PostController {
 
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private SeenPostRepository seenPostRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResDto> createPost(
@@ -123,5 +126,16 @@ public class PostController {
     @PatchMapping("/{id}/flag")
     public ResponseEntity<PostResDto> flagPost(@PathVariable Long id) {
         return ResponseEntity.ok(postService.flagPost(id));
+    }
+    @PostMapping("/seen")
+    public ResponseEntity<Void> markPostsSeen(@RequestBody List<Long> postIds) {
+        postService.markPostsSeen(postIds);
+        return ResponseEntity.ok().build();
+    }
+    /* will remove this later only for testing*/
+    @DeleteMapping("/seen/all")
+    public ResponseEntity<Void> clearAllSeenPosts() {
+        seenPostRepository.deleteAll();
+        return ResponseEntity.ok().build();
     }
 }
