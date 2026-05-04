@@ -1,17 +1,25 @@
 package com.dsi.studyhub.dtos;
 
-import java.io.Serializable;
+import com.dsi.studyhub.enums.CommunityPermission;
 
-/**
- * DTO for {@link com.dsi.studyhub.entities.Community}
- */
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 public record CommunityResDto(
         Long id,
         String title,
         String description,
         int nbrMembers,
-        Long moderatorId,
-        String category
+        Long ownerId,
+        String category,
+        List<ModeratorInfo> moderators
 ) implements Serializable {
+
+    public record ModeratorInfo(
+            Long userId,
+            String username,
+            String fullName,
+            Set<CommunityPermission> permissions
+    ) implements Serializable {}
 }

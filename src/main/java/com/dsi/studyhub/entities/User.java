@@ -61,8 +61,8 @@ public class User implements UserDetails {
     )
     private List<Community> joinedCommunities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "moderator", orphanRemoval = true)
-    private List<Community> communities = new ArrayList<>();
+    @OneToMany(mappedBy = "owner", orphanRemoval = true)
+    private List<Community> ownedCommunities = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "users_posts",
