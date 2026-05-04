@@ -115,11 +115,24 @@ public class CommentServiceImpl implements CommentService {
             throw new ForbiddenException("You don't own this comment!");
         }
 
+        // Clean up likes on all replies first
+        for (Comment reply : comment.getReplies()) {
+            for (User u : new HashSet<>(reply.getLikedByUsers())) {
+                u.getLikedComments().remove(reply);
+                userRepository.save(u);
+            }
+            reply.getLikedByUsers().clear();
+            commentRepository.save(reply);
+        }
+
+        // Clean up likes on the comment itself
         for (User u : new HashSet<>(comment.getLikedByUsers())) {
             u.getLikedComments().remove(comment);
+            userRepository.save(u);
         }
         comment.getLikedByUsers().clear();
         commentRepository.save(comment);
+
         commentRepository.deleteById(commentId);
         gamificationService.awardXp(user.getId(), XpConfig.COMMENT_DELETED);
     }
