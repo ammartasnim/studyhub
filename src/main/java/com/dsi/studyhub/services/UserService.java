@@ -104,12 +104,22 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("user not found with id: " + userId));
     }
 
-    public Page<User> getAllusers(String firstName, String lastName,
-                                      String email, Boolean banned,
-                                      int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
-        return userRepository.findWithFilters(firstName, lastName, email, banned, pageable);
-    }
+//    public Page<User> getAllusers(String firstName, String lastName,
+//                                      String email, Boolean banned,
+//                                      int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
+//        return userRepository.findWithFilters(firstName, lastName, email, banned, pageable);
+//    }
+public Page<User> getAllusers(String firstName, String lastName,
+                              String email, Boolean banned,
+                              int page, int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
+    // Pass null when empty string comes in
+    String fn = (firstName != null && firstName.isBlank()) ? null : firstName;
+    String ln = (lastName  != null && lastName.isBlank())  ? null : lastName;
+    String em = (email     != null && email.isBlank())     ? null : email;
+    return userRepository.findWithFilters(fn, ln, em, banned, pageable);
+}
     public User updatePfp(MultipartFile file, User currentUser) throws IOException {
         // Delete old pfp if exists
         fileStorageService.deleteFile(currentUser.getPfp());
