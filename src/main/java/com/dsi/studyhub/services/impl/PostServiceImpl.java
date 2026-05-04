@@ -209,15 +209,27 @@ public class PostServiceImpl implements PostService {
                 .filter(cat -> cat != null && !cat.trim().isEmpty())
                 .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
 
+        // All posts from user's communities (excluding user's own posts)
         List<Post> communityPosts = postRepository.findCommunityFeedPosts(userId);
+
+        // Discovery posts — from communities user is NOT in
         List<Post> discoveryPosts = userCategories.isEmpty()
                 ? postRepository.findAllApprovedExcludingUser(userId)
                 : postRepository.findDiscoveryPostsByCategories(userId, userCategories);
 
-        List<Post> unseenCommunity = communityPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
-        List<Post> seenCommunity   = communityPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
-        List<Post> unseenDiscovery = discoveryPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
-        List<Post> seenDiscovery   = discoveryPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
+        // If both are empty, fall back to ALL approved posts excluding user's own
+        if (communityPosts.isEmpty() && discoveryPosts.isEmpty()) {
+            discoveryPosts = postRepository.findAllApprovedExcludingUser(userId);
+        }
+
+        List<Post> unseenCommunity = communityPosts.stream()
+                .filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenCommunity = communityPosts.stream()
+                .filter(p -> seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> unseenDiscovery = discoveryPosts.stream()
+                .filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenDiscovery = discoveryPosts.stream()
+                .filter(p -> seenIds.contains(p.getId())).collect(Collectors.toList());
 
         List<Post> sorted1 = sortByScore(unseenCommunity);
         List<Post> sorted2 = sortByScore(unseenDiscovery);
@@ -245,6 +257,12 @@ public class PostServiceImpl implements PostService {
 
         addAll.accept(sorted3);
         addAll.accept(sorted4);
+
+        // If still empty after all that, show everything approved excluding user's own
+        if (merged.isEmpty()) {
+            List<Post> fallback = sortByScore(postRepository.findAllApprovedExcludingUser(userId));
+            merged.addAll(fallback);
+        }
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), merged.size());
