@@ -45,5 +45,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "AND p.user.id != :userId")
     List<Post> findAllApprovedExcludingUser(@Param("userId") Long userId);
     long countByStatus(PostStatus status);
+    Page<Post> findByStatus(PostStatus status, Pageable pageable);
 
 }

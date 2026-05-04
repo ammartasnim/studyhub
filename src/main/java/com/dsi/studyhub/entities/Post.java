@@ -59,4 +59,11 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
+    @Column(nullable = false)
+    private int flagCount = 0;
+
+    @ElementCollection
+    @CollectionTable(name = "post_flag_users", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "user_id")
+    private Set<Long> flaggedByUserIds = new LinkedHashSet<>();
 }

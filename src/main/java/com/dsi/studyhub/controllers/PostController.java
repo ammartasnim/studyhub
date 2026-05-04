@@ -146,4 +146,15 @@ public class PostController {
     public ResponseEntity<Map<String, Long>> getPostStats() {
         return ResponseEntity.ok(postService.getPostStats());
     }
+
+    @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<PostResDto>> getByStatus(
+            @PathVariable String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // We just pass the string "status" down; the Service will handle the conversion
+        return ResponseEntity.ok(postService.getPostsByStatus(status, page, size));
+    }
 }

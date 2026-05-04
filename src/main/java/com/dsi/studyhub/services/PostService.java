@@ -24,4 +24,5 @@ public interface PostService {
     PostResDto flagPost(Long id);
     void markPostsSeen(List<Long> postIds);
     Map<String, Long> getPostStats();
+    Page<PostResDto> getPostsByStatus(String statusName, int page, int size);
 }

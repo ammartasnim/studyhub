@@ -21,9 +21,7 @@ import com.dsi.studyhub.services.FileStorageService;
 import com.dsi.studyhub.services.PostService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
@@ -217,6 +215,10 @@ public class PostServiceImpl implements PostService {
                 .map(Community::getCategory)
                 .filter(cat -> cat != null && !cat.isBlank())
                 .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
+//        currentUser.getOwnedCommunities().stream()
+//                .map(Community::getCategory)
+//                .filter(cat -> cat != null && !cat.isBlank())
+//                .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
 
         // Fetch all posts
         List<Post> communityPosts = postRepository.findCommunityFeedPosts(userId);
@@ -323,23 +325,51 @@ public class PostServiceImpl implements PostService {
         return postMapper.toDto(postRepository.save(post));
     }
 
-    @Override
-    @Transactional
-    public PostResDto flagPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        User currentUser = authenticatedUserService.getAuthenticatedUser();
+//    @Override
+//    @Transactional
+//    public PostResDto flagPost(Long id) {
+//        Post post = postRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+//        User currentUser = authenticatedUserService.getAuthenticatedUser();
+//
+//        if (post.getCommunity() == null) {
+//            throw new ForbiddenException("Post does not belong to a community");
+//        }
+//        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
+//            throw new ForbiddenException("Only the community moderator can flag posts");
+//        }
+//
+//        post.setStatus(PostStatus.Flagged);
+//        return postMapper.toDto(postRepository.save(post));
+//    }
+@Override
+@Transactional
+public PostResDto flagPost(Long id) {
+    Post post = postRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+    User currentUser = authenticatedUserService.getAuthenticatedUser();
 
-        if (post.getCommunity() == null) {
-            throw new ForbiddenException("Post does not belong to a community");
-        }
-        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the community moderator can flag posts");
-        }
-
-        post.setStatus(PostStatus.Flagged);
-        return postMapper.toDto(postRepository.save(post));
+    // Prevent self-flagging
+    if (post.getUser().getId().equals(currentUser.getId())) {
+        throw new ForbiddenException("You cannot flag your own post");
     }
+
+    // Prevent duplicate flags from the same user
+    if (post.getFlaggedByUserIds().contains(currentUser.getId())) {
+        throw new IllegalStateException("You have already reported this post");
+    }
+
+    post.getFlaggedByUserIds().add(currentUser.getId());
+    post.setFlagCount(post.getFlagCount() + 1);
+
+    // Auto-flag at threshold
+    if (post.getFlagCount() >= 3) {
+        post.setStatus(PostStatus.Flagged);
+    }
+
+    return postMapper.toDto(postRepository.save(post));
+}
+
     private double scorePost(Post post) {
         int likes = post.getLikes() == null ? 0 : post.getLikes().size();
         int comments = post.getComments() == null ? 0 : post.getComments().size();
@@ -372,4 +402,24 @@ public class PostServiceImpl implements PostService {
                 "pending", postRepository.countByStatus(PostStatus.Pending)
         );
     }
+
+    @Override
+    public Page<PostResDto> getPostsByStatus(String statusName, int page, int size) {
+        // 1. Centralized Enum Conversion
+        PostStatus status;
+        try {
+            status = PostStatus.valueOf(statusName);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid post status: " + statusName);
+        }
+
+        // 2. Centralized Pagination Logic
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        // 3. Fetch, Map, and Return
+        return postRepository.findByStatus(status, pageable)
+                .map(postMapper::toDto);
+    }
+
+
 }
