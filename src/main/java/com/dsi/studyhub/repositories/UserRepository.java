@@ -48,7 +48,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("""
     SELECT u FROM User u
     WHERE u.id != :userId
-    AND u.role != 'ADMIN'
+    AND u.role != 'Admin'
     AND u.id NOT IN (
         SELECT f.addressee.id FROM Friendship f WHERE f.requester.id = :userId
         UNION
