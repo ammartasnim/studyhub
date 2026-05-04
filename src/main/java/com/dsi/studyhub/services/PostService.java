@@ -5,6 +5,9 @@ import com.dsi.studyhub.dtos.PostResDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Map;
+
 
 public interface PostService {
     PostResDto createPost(PostReqDto request);
@@ -19,4 +22,6 @@ public interface PostService {
     Page<PostResDto> getFeed(Pageable pageable);
     PostResDto approvePost(Long id);
     PostResDto flagPost(Long id);
+    void markPostsSeen(List<Long> postIds);
+    Map<String, Long> getPostStats();
 }

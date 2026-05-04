@@ -40,6 +40,8 @@ public class CommentServiceImpl implements CommentService {
     private AuthenticatedUserService authenticatedUserService;
     @Autowired
     private GamificationService gamificationService;
+
+
     @Override
     @Transactional
     public CommentResDto createComment(CommentReqDto request) {
@@ -53,15 +55,15 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(post);
 
         Comment saved = commentRepository.save(comment);
-
-        // Re-fetch to ensure user and post relations are fully loaded before mapping
         Comment fresh = commentRepository.findById(saved.getId())
                 .orElseThrow(() -> new RuntimeException("Comment not found after save"));
 
-        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+        // No XP when commenting on your own post
+        boolean isOwnPost = post.getUser().getId().equals(user.getId());
+        if (!isOwnPost) gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+
         return commentMapper.toDto(fresh);
     }
-
 
     @Override
     @Transactional
@@ -82,18 +84,21 @@ public class CommentServiceImpl implements CommentService {
     public void toggleLike(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
-        Long commentOwnerId = comment.getUser().getId();
         User user = authenticatedUserService.getAuthenticatedUser();
+        Long commentOwnerId = comment.getUser().getId();
+
+        // No XP when liking your own comment
+        boolean isOwnComment = commentOwnerId.equals(user.getId());
 
         boolean alreadyLiked = user.getLikedComments().stream()
                 .anyMatch(c -> c.getId().equals(commentId));
 
         if (alreadyLiked) {
-            user.getLikedComments().removeIf(p -> p.getId().equals(commentId));
-            gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_REMOVED);
+            user.getLikedComments().removeIf(c -> c.getId().equals(commentId));
+            if (!isOwnComment) gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_REMOVED);
         } else {
             user.getLikedComments().add(comment);
-            gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_RECEIVED);
+            if (!isOwnComment) gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_RECEIVED);
         }
 
         userRepository.save(user);
@@ -109,12 +114,14 @@ public class CommentServiceImpl implements CommentService {
         if (!comment.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.Admin) {
             throw new ForbiddenException("You don't own this comment!");
         }
+
         for (User u : new HashSet<>(comment.getLikedByUsers())) {
             u.getLikedComments().remove(comment);
         }
         comment.getLikedByUsers().clear();
         commentRepository.save(comment);
         commentRepository.deleteById(commentId);
+        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_DELETED);
     }
 
     @Override
@@ -141,12 +148,11 @@ public class CommentServiceImpl implements CommentService {
     public Map<String, Long> getCommentStats() {
         return Map.of("total", commentRepository.count());
     }
+
     @Override
     @Transactional
     public CommentResDto createReply(Long parentCommentId, CommentReqDto request) {
-
         User user = authenticatedUserService.getAuthenticatedUser();
-
         Comment parent = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new RuntimeException("Parent comment not found"));
 
@@ -159,7 +165,13 @@ public class CommentServiceImpl implements CommentService {
         Comment saved = commentRepository.save(reply);
         Comment fresh = commentRepository.findById(saved.getId())
                 .orElseThrow(() -> new RuntimeException("Reply not found after save"));
-        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+
+        // No XP when replying on your own post or to your own comment
+        boolean isOwnPost = parent.getPost().getUser().getId().equals(user.getId());
+        boolean isOwnComment = parent.getUser().getId().equals(user.getId());
+        if (!isOwnPost && !isOwnComment) {
+            gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+        }
         return commentMapper.toDto(fresh);
     }
     @Override

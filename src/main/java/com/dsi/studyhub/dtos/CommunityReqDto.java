@@ -10,6 +10,7 @@
     public record CommunityReqDto(
             @NotBlank String title,
             @NotBlank String description,
-            Integer nbrMembers
+            Integer nbrMembers,
+            String category
     ) implements Serializable {
     }

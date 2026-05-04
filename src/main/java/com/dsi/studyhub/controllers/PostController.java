@@ -4,6 +4,7 @@ import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
+import com.dsi.studyhub.repositories.SeenPostRepository;
 import com.dsi.studyhub.services.CommentService;
 import com.dsi.studyhub.services.PostService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -29,6 +32,8 @@ public class PostController {
 
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private SeenPostRepository seenPostRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResDto> createPost(
@@ -123,5 +128,22 @@ public class PostController {
     @PatchMapping("/{id}/flag")
     public ResponseEntity<PostResDto> flagPost(@PathVariable Long id) {
         return ResponseEntity.ok(postService.flagPost(id));
+    }
+    @PostMapping("/seen")
+    public ResponseEntity<Void> markPostsSeen(@RequestBody List<Long> postIds) {
+        postService.markPostsSeen(postIds);
+        return ResponseEntity.ok().build();
+    }
+    /* will remove this later only for testing*/
+    @DeleteMapping("/seen/all")
+    public ResponseEntity<Void> clearAllSeenPosts() {
+        seenPostRepository.deleteAll();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/stats/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Long>> getPostStats() {
+        return ResponseEntity.ok(postService.getPostStats());
     }
 }

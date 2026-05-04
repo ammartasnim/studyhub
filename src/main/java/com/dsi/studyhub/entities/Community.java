@@ -25,6 +25,7 @@ public class Community {
     private String title;
     private String description;
     private int nbrMembers;
+    private String category;
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
