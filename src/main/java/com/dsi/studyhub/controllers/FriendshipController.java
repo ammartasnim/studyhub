@@ -61,6 +61,22 @@ public class FriendshipController {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(friendshipService.getPendingRequests(currentUser.getId(), pageable));
     }
+    @GetMapping("/sent")
+    public ResponseEntity<Page<FriendshipResDto>> getSentRequests(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(friendshipService.getSentRequests(currentUser.getId(), pageable));
+    }
+    @GetMapping("/blocked")
+    public ResponseEntity<Page<UserSummaryDto>> getBlockedUsers(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(friendshipService.getBlockedUsers(currentUser.getId(), pageable));
+    }
     @GetMapping("/is-friend/{friendId}")
     public ResponseEntity<Boolean> isFriend(
             @PathVariable Long friendId,
@@ -68,15 +84,38 @@ public class FriendshipController {
         return ResponseEntity.ok(
                 friendshipService.isFriend(currentUser.getId(), friendId));
     }
+    @GetMapping("/requested/{userId}")
+    public ResponseEntity<Boolean> hasPendingRequest(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(
+                friendshipService.hasPendingRequest(currentUser.getId(), userId));
+    }
     @GetMapping("/suggestions")
     public ResponseEntity<Page<UserSummaryDto>> getSuggestedFriends(
             @AuthenticationPrincipal User currentUser,
+            @RequestParam (required = false) String keyword  ,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(
-                friendshipService.getSuggestedFriends(currentUser.getId(), pageable));
+                friendshipService.getSuggestedFriends(currentUser.getId(), pageable,keyword));
     }
+    @PutMapping("/block/{userId}")
+    public  ResponseEntity<UserSummaryDto> blockFriendship(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal User currentUser
+    ){
+        return ResponseEntity.ok(friendshipService.blockUser(currentUser.getId(), userId));
+    }
+    @PutMapping("unblock/{userId}")
+    public ResponseEntity<UserSummaryDto> unblockFriendship(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal User currentUser
+    )
+        {
+        return ResponseEntity.ok(friendshipService.unblockUser(currentUser.getId(), userId));
+        }
 
 
 }

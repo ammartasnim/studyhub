@@ -52,8 +52,26 @@ public interface UserRepository extends JpaRepository<User, Long> {
         WHERE f.addressee.id = :userId
         AND f.status != 'BLOCKED'
     )
+    AND u.id NOT IN (
+        SELECT f.addressee.id FROM Friendship f
+        WHERE f.requester.id = :userId
+        AND f.status = 'BLOCKED'
+    )
+    AND u.id NOT IN (
+        SELECT f.requester.id FROM Friendship f
+        WHERE f.addressee.id = :userId
+        AND f.status = 'BLOCKED'
+    )
+    AND (
+        LOWER(COALESCE(u.username, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(COALESCE(u.firstName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(COALESCE(u.lastName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    )
+    
 """)
-    Page<User> findSuggestedFriends(@Param("userId") Long userId, Pageable pageable);
+    Page<User> findSuggestedFriends(@Param("userId") Long userId,
+                                    @Param("keyword") String keyword,
+                                    Pageable pageable);
 
     // For growth chart — requires createdAt on User entity
 //    @Query(value = """

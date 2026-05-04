@@ -35,6 +35,10 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
                                               FriendshipStatus status,
                                               Pageable pageable);
 
+    Page<Friendship> findByRequesterAndStatus(User requester,
+                                              FriendshipStatus status,
+                                              Pageable pageable);
+
     @Query("""
         SELECT COUNT(f) > 0 FROM Friendship f
         WHERE ((f.requester.id = :userId AND f.addressee.id = :friendId)
@@ -43,4 +47,12 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
     """)
     boolean existsAcceptedFriendship(@Param("userId") Long userId,
                                      @Param("friendId") Long friendId);
+
+    @Query("""
+        SELECT f FROM Friendship f
+        WHERE f.requester.id = :userId
+        AND f.status = 'BLOCKED'
+    """)
+    Page<Friendship> findBlockedByRequester(@Param("userId") Long userId,
+                                            Pageable pageable);
 }

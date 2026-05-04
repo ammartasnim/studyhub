@@ -11,6 +11,7 @@ import com.dsi.studyhub.dtos.FriendshipResDto;
 import com.dsi.studyhub.dtos.UserSummaryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Block;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class FriendshipService {
         friendshipRepository.findBetweenUsers(requesterId, addresseeId).ifPresent(f -> {
             throw new IllegalStateException("Friendship already exists with status: " + f.getStatus());
         });
+
+
 
         User requester = userRepository.findById(requesterId).orElseThrow();
         User addressee = userRepository.findById(addresseeId).orElseThrow();
@@ -83,13 +86,35 @@ public class FriendshipService {
                 .map(this::toResDto);
 
     }
+    public Page<FriendshipResDto> getSentRequests(long userId, Pageable pageable) {
+        User u= userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User not found with id: " + userId)
+        );
+        return friendshipRepository.findByRequesterAndStatus(u, FriendshipStatus.PENDING, pageable)
+                .map(this::toResDto);
+    }
+    public Page<UserSummaryDto> getBlockedUsers(Long userId, Pageable pageable) {
+        userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User not found"));
+        return friendshipRepository.findBlockedByRequester(userId, pageable)
+                .map(Friendship::getAddressee)
+                .map(this::toUserSummaryDto);
+    }
     public boolean isFriend(Long userId, Long friendId) {
         return friendshipRepository.existsAcceptedFriendship(userId, friendId);
     }
-    public Page<UserSummaryDto> getSuggestedFriends(Long userId, Pageable pageable) {
+    public boolean hasPendingRequest(Long requesterId, Long addresseeId) {
+        return friendshipRepository.findBetweenUsers(requesterId, addresseeId)
+                .map(f -> f.getRequester().getId().equals(requesterId)
+                        && f.getAddressee().getId().equals(addresseeId)
+                        && f.getStatus() == FriendshipStatus.PENDING)
+                .orElse(false);
+    }
+    public Page<UserSummaryDto> getSuggestedFriends(Long userId, Pageable pageable, String keyword) {
         userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
-        return userRepository.findSuggestedFriends(userId, pageable)
+        String safeKeyword = keyword == null ? "" : keyword;
+        return userRepository.findSuggestedFriends(userId, safeKeyword, pageable)
                 .map(this::toUserSummaryDto);
     }
 
@@ -115,4 +140,59 @@ public class FriendshipService {
                 user.getLastName()
         );
     }
+    public UserSummaryDto blockUser(Long currentUserId, Long targetUserId) {
+        if (currentUserId.equals(targetUserId))
+            throw new IllegalArgumentException("You cannot block yourself.");
+
+        User target = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Friendship friendship = friendshipRepository
+                .findBetweenUsers(currentUserId, targetUserId)
+                .orElse(null);
+
+        if (friendship != null) {
+            if (friendship.getStatus() == FriendshipStatus.BLOCKED)
+                throw new IllegalStateException("User is already blocked.");
+
+            friendship.setStatus(FriendshipStatus.BLOCKED);
+            friendship.getRequester();
+            friendshipRepository.save(friendship);
+        } else {
+            // no prior friendship — create a new blocked row
+            FriendshipId id = new FriendshipId();
+            id.setRequesterId(currentUserId);
+            id.setAddresseeId(targetUserId);
+            User u =userRepository.findById(targetUserId).orElseThrow(
+                    () -> new ResourceNotFoundException("User not found")
+            );
+
+            Friendship blocked = new Friendship();
+            blocked.setId(id);
+            blocked.setRequester(userRepository.findById(currentUserId).orElseThrow());
+            blocked.setAddressee(target);
+            blocked.setStatus(FriendshipStatus.BLOCKED);
+            friendshipRepository.save(blocked);
+        }
+
+        return toUserSummaryDto(target);
+    }
+    public UserSummaryDto unblockUser(Long currentUserId, Long targetUserId) {
+        if (currentUserId.equals(targetUserId))
+            throw new IllegalArgumentException("You cannot unblock yourself.");
+
+        Friendship friendship = friendshipRepository
+                .findBetweenUsers(currentUserId, targetUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("No relationship found."));
+
+        if (friendship.getStatus() != FriendshipStatus.BLOCKED)
+            throw new IllegalStateException("User is not blocked.");
+
+        friendshipRepository.delete(friendship);
+
+        return toUserSummaryDto(userRepository.findById(targetUserId).orElseThrow());
+    }
+
+
+
 }
