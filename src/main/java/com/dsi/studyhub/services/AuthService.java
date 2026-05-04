@@ -10,12 +10,17 @@ import com.dsi.studyhub.enums.UserRole;
 import com.dsi.studyhub.exceptions.ConflictException;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.security.JwtService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -30,6 +35,7 @@ public class AuthService {
     private JwtService jwtService;
 
     @Autowired
+    @Lazy
     private AuthenticationManager authenticationManager;
 
 
@@ -73,9 +79,9 @@ public class AuthService {
 
         var user = looksLikeEmail
                 ? userRepository.findByEmail(input)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"))
                 : userRepository.findByUsername(input)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -87,4 +93,33 @@ public class AuthService {
         String token = jwtService.generateToken(user);
         return new AuthResDto(token, user.getId(), user.getUsername(), user.getRole());
     }
+   @Transactional
+   public UserDetails syncAndReturnUserDetails(String uid, String email, String firstName, String lastName) {
+       return userRepository.findBySupabaseUid(uid)
+               .map(user -> (UserDetails) user)
+               .orElseGet(() -> {
+                   String baseUsername = email.split("@")[0]
+                           .replaceAll("[^a-zA-Z0-9_]", "");
+                   if (baseUsername.isEmpty()) baseUsername = "user";
+
+                   User newUser = new User();
+                   newUser.setSupabaseUid(uid);
+                   newUser.setEmail(email);
+                   newUser.setUsername(baseUsername + "_" + uid.substring(0, 5));
+                   newUser.setFirstName(firstName != null && !firstName.isBlank() ? firstName.trim() : baseUsername);
+                   newUser.setLastName(lastName  != null && !lastName.isBlank()  ? lastName.trim()  : "");
+                   newUser.setRole(UserRole.Client);
+                   newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                   newUser.setBanned(false);
+                   newUser.setXpPts(0);
+                   newUser.setLevel(1);
+
+                   Badge beginnerBadge = new Badge();
+                   beginnerBadge.setUser(newUser);
+                   beginnerBadge.setType(BadgeType.BEGINNER);
+                   newUser.getBadges().add(beginnerBadge);
+
+                   return userRepository.save(newUser);
+               });
+   }
 }

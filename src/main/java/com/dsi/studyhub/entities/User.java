@@ -19,6 +19,8 @@ import java.util.*;
         @Index(name = "idx_users_banned", columnList = "banned")
 })
 public class User implements UserDetails {
+    @Column(name = "supabase_uid", unique = true)
+    private String supabaseUid;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,10 +1,13 @@
 package com.dsi.studyhub.security;
 
+import com.dsi.studyhub.services.AuthService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -23,6 +27,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+    @Autowired
+    @Lazy
+    private AuthService authService;
 
     @Override
     protected void doFilterInternal(
@@ -41,25 +48,56 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token = authHeader.substring(7);
 
         try {
-            final String username = jwtService.extractUsername(token);
+            // 1. Get claims instead of just username so we can check the 'issuer'
+            Claims claims = jwtService.extractAllClaims(token);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails;
 
-                if (jwtService.isTokenValid(token, userDetails)) {
+                // 2. Identify the Token Source
+                if (jwtService.isSupabaseToken(claims)) {
+                    // If it's Supabase, use our 'Silent Sync' method
+                    String uid = claims.getSubject();
+                    String email = claims.get("email", String.class);
+                    String firstName = null;
+                    String lastName = null;
+
+                    Object rawMeta = claims.get("user_metadata");
+                    if (rawMeta instanceof Map<?, ?> meta) {
+                        firstName = (String) meta.get("given_name");
+                        lastName  = (String) meta.get("family_name");
+                        if (firstName == null) {
+                            String fullName = (String) meta.get("name");
+                            if (fullName != null && !fullName.isBlank()) {
+                                String[] parts = fullName.trim().split(" ", 2);
+                                firstName = parts[0];
+                                lastName  = parts.length > 1 ? parts[1] : "";
+                            }
+                        }
+                    }
+
+                    userDetails = authService.syncAndReturnUserDetails(uid, email, firstName, lastName);
+                } else {
+                    // If it's local, use your standard DB lookup
+                    String username = claims.getSubject();
+                    userDetails = userDetailsService.loadUserByUsername(username);
+                }
+
+
+                boolean isValid = jwtService.isSupabaseToken(claims) ||
+                        jwtService.isTokenValid(token, userDetails);
+
+                if (isValid) {
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
+                                    userDetails, null, userDetails.getAuthorities()
                             );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (Exception e) {
-            // Token is expired or invalid - skip authentication (will be rejected by .authenticated() if required)
-            logger.warn("Invalid JWT token: " + e.getMessage());
+            logger.warn("JWT authentication failed: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);

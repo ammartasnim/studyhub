@@ -87,7 +87,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(value = "/me/pfp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/me/pfp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResDto> uploadPfp(@RequestParam("file") MultipartFile file) throws IOException {
         User updatedUser = userService.updatePfp(file, userService.getMe());
         return ResponseEntity.ok(userMapper.toDto(updatedUser));
