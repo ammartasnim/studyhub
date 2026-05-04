@@ -109,26 +109,17 @@ public class JwtService {
                  Scanner s = new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A")) {
                 jwksJson = s.hasNext() ? s.next() : "";
             }
-
-            // Parse JWKS
             JsonNode jwks = objectMapper.readTree(jwksJson);
             JsonNode keys = jwks.get("keys");
-
-            // Find matching key by kid
             for (JsonNode key : keys) {
                 if (kid.equals(key.get("kid").asText())) {
                     String x = key.get("x").asText();
                     String y = key.get("y").asText();
-
-                    // Decode base64url coordinates
                     byte[] xBytes = Base64.getUrlDecoder().decode(x);
                     byte[] yBytes = Base64.getUrlDecoder().decode(y);
-
                     BigInteger xBI = new BigInteger(1, xBytes);
                     BigInteger yBI = new BigInteger(1, yBytes);
                     ECPoint ecPoint = new ECPoint(xBI, yBI);
-
-                    // ✅ Use named curve lookup instead of manual construction
                     AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
                     parameters.init(new ECGenParameterSpec("secp256r1"));
                     ECParameterSpec ecParams = parameters.getParameterSpec(ECParameterSpec.class);
