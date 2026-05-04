@@ -48,32 +48,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("""
     SELECT u FROM User u
     WHERE u.id != :userId
+    AND u.role != 'ADMIN'
     AND u.id NOT IN (
-        SELECT f.addressee.id FROM Friendship f
-        WHERE f.requester.id = :userId
-        AND f.status != 'BLOCKED'
-    )
-    AND u.id NOT IN (
-        SELECT f.requester.id FROM Friendship f
-        WHERE f.addressee.id = :userId
-        AND f.status != 'BLOCKED'
-    )
-    AND u.id NOT IN (
-        SELECT f.addressee.id FROM Friendship f
-        WHERE f.requester.id = :userId
-        AND f.status = 'BLOCKED'
-    )
-    AND u.id NOT IN (
-        SELECT f.requester.id FROM Friendship f
-        WHERE f.addressee.id = :userId
-        AND f.status = 'BLOCKED'
+        SELECT f.addressee.id FROM Friendship f WHERE f.requester.id = :userId
+        UNION
+        SELECT f.requester.id FROM Friendship f WHERE f.addressee.id = :userId
     )
     AND (
         LOWER(COALESCE(u.username, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
         OR LOWER(COALESCE(u.firstName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
         OR LOWER(COALESCE(u.lastName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
     )
-    
 """)
     Page<User> findSuggestedFriends(@Param("userId") Long userId,
                                     @Param("keyword") String keyword,
