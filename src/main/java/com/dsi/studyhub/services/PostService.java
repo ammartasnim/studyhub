@@ -24,4 +24,5 @@ public interface PostService {
     PostResDto flagPost(Long id);
     void markPostsSeen(List<Long> postIds);
     Map<String, Long> getPostStats();
+    void moderatorDeletePost(Long postId);
 }

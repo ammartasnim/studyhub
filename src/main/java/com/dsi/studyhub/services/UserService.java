@@ -137,5 +137,12 @@ public class UserService {
                         result -> (Long) result[1]       // The count
                 ));
     }
+    public Page<User> searchByUsername(String username, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("username").ascending());
+        return userRepository.findByUsernameContainingIgnoreCase(username, pageable);
+    }
+
+
+
 
 }

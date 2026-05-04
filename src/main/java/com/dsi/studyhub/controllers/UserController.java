@@ -104,5 +104,18 @@ public class UserController {
     public ResponseEntity<Map<BadgeType, Long>> getBadgeDistribution() {
         return ResponseEntity.ok(userService.getBadgeDistribution());
     }
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResDto>> searchByUsername(
+            @RequestParam String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<User> users = userService.searchByUsername(username, page, size);
+        Page<UserResDto> mapped = new PageImpl<>(
+                users.getContent().stream().map(userMapper::toDto).toList(),
+                users.getPageable(),
+                users.getTotalElements()
+        );
+        return ResponseEntity.ok(mapped);
+    }
 
 }

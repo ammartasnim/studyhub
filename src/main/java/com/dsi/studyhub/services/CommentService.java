@@ -19,4 +19,5 @@ public interface CommentService {
     Map<String, Long> getCommentStats();
     void toggleLike(Long commentId);
     Page<CommentResDto> getReplies(Long commentId, Pageable pageable);
+    void moderatorDeleteComment(Long commentId);
 }

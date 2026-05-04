@@ -40,6 +40,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT b.type, COUNT(b) FROM User u JOIN u.badges b GROUP BY b.type")
     List<Object[]> countGroupedByBadgeRaw();
 
+    Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
+
     // For growth chart — requires createdAt on User entity
 //    @Query(value = """
 //    SELECT CAST(created_at AS DATE) as date, COUNT(*) as count

@@ -140,6 +140,11 @@ public class PostController {
         seenPostRepository.deleteAll();
         return ResponseEntity.ok().build();
     }
+    @DeleteMapping("/{postId}/moderate")
+    public ResponseEntity<Void> moderatorDeletePost(@PathVariable Long postId) {
+        postService.moderatorDeletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/stats/count")
     @PreAuthorize("hasRole('ADMIN')")

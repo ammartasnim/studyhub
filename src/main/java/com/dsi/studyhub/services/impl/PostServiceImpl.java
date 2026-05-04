@@ -6,6 +6,7 @@ import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.SeenPost;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.CommunityPermission;
 import com.dsi.studyhub.enums.PostStatus;
 import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
@@ -17,6 +18,7 @@ import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.SeenPostRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
+import com.dsi.studyhub.services.CommunityAuthService;
 import com.dsi.studyhub.services.FileStorageService;
 import com.dsi.studyhub.services.PostService;
 import jakarta.transaction.Transactional;
@@ -47,6 +49,8 @@ public class PostServiceImpl implements PostService {
     private SeenPostRepository seenPostRepository;
     @Autowired
     private CommunityRepository communityRepository;
+    @Autowired
+    private CommunityAuthService communityAuthService;
     @Autowired
     private PostMapper postMapper;
     @Autowired
@@ -213,7 +217,7 @@ public class PostServiceImpl implements PostService {
                 .filter(cat -> cat != null && !cat.isBlank())
                 .distinct()
                 .collect(Collectors.toList());
-        currentUser.getCommunities().stream()
+        currentUser.getOwnedCommunities().stream()
                 .map(Community::getCategory)
                 .filter(cat -> cat != null && !cat.isBlank())
                 .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
@@ -367,9 +371,24 @@ public class PostServiceImpl implements PostService {
     @Override
     public Map<String, Long> getPostStats() {
         return Map.of(
-                "total",   postRepository.count(),
-                "flagged", postRepository.countByStatus(PostStatus.Flagged),
-                "pending", postRepository.countByStatus(PostStatus.Pending)
+                "total",   postRepository.count()
+                /*"flagged", postRepository.countByStatus(PostStatus.Flagged),
+                "pending", postRepository.countByStatus(PostStatus.Pending)*/
         );
+    }
+    @Override
+    @Transactional
+    public void moderatorDeletePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        Long communityId = post.getCommunity() != null ? post.getCommunity().getId() : null;
+
+        if (communityId == null) {
+            throw new ForbiddenException("Post does not belong to a community.");
+        }
+
+        communityAuthService.requireOwnerOrPermission(currentUser.getId(), communityId, CommunityPermission.DELETE_POST);
+        postRepository.deleteById(postId);
     }
 }

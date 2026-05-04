@@ -1,5 +1,6 @@
 package com.dsi.studyhub.services;
 
+import com.dsi.studyhub.dtos.CommunityMemberResDto;
 import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.Community;
@@ -22,4 +23,12 @@ public interface CommunityService {
     List<CommunityResDto> getTopCommunities();
     void joinCommunity(Long communityId);
     void leaveCommunity(Long communityId);
+    void addModerator(Long communityId, CommunityReqDto.AddModeratorReq request);
+    void removeModerator(Long communityId, Long userId);
+    void updateModeratorPermissions(Long communityId, Long userId, CommunityReqDto.UpdatePermissionsReq request);
+    void transferOwnership(Long communityId, CommunityReqDto.TransferOwnershipReq request);
+    Page<CommunityMemberResDto> getMembers(Long communityId, Pageable pageable);
+    void banMember(Long communityId, CommunityReqDto.BanMemberReq request);
+    void unbanMember(Long communityId, Long userId);
+    void warnMember(Long communityId, CommunityReqDto.WarnMemberReq request);
 }

@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.entities.Comment;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.CommunityPermission;
 import com.dsi.studyhub.enums.UserRole;
 import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommentService;
+import com.dsi.studyhub.services.CommunityAuthService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,6 +42,8 @@ public class CommentServiceImpl implements CommentService {
     private AuthenticatedUserService authenticatedUserService;
     @Autowired
     private GamificationService gamificationService;
+    @Autowired
+    private CommunityAuthService communityAuthService;
 
 
     @Override
@@ -191,5 +195,30 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentResDto> getReplies(Long commentId, Pageable pageable) {
         return commentRepository.findByParentCommentId(commentId, pageable)
                 .map(commentMapper::toDto);
+    }
+    @Override
+    @Transactional
+    public void moderatorDeleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found: " + commentId));
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+
+        Long communityId = comment.getPost() != null && comment.getPost().getCommunity() != null
+                ? comment.getPost().getCommunity().getId()
+                : null;
+
+        if (communityId == null) {
+            throw new ForbiddenException("Comment does not belong to a community post.");
+        }
+
+        communityAuthService.requireOwnerOrPermission(currentUser.getId(), communityId, CommunityPermission.DELETE_COMMENT);
+
+        for (User u : new HashSet<>(comment.getLikedByUsers())) {
+            u.getLikedComments().remove(comment);
+            userRepository.save(u);
+        }
+        comment.getLikedByUsers().clear();
+        commentRepository.save(comment);
+        commentRepository.deleteById(commentId);
     }
 }

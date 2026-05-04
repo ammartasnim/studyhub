@@ -102,5 +102,10 @@ public class CommentController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return ResponseEntity.ok(commentService.getReplies(commentId, pageable));
     }
+    @DeleteMapping("/{commentId}/moderate")
+    public ResponseEntity<Void> moderatorDeleteComment(@PathVariable Long commentId) {
+        commentService.moderatorDeleteComment(commentId);
+        return ResponseEntity.noContent().build();
+    }
 
 }
