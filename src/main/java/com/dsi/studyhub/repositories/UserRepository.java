@@ -24,11 +24,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
-    @Query("SELECT u FROM User u WHERE " +
-            "(:firstName IS NULL OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :firstName, '%'))) AND " +
-            "(:lastName IS NULL OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :lastName, '%'))) AND " +
-            "(:email IS NULL OR LOWER(u.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND " +
-            "(:banned IS NULL OR u.banned = :banned)")
+    @Query(value = "SELECT u.* FROM users u WHERE " +
+            "(:firstName IS NULL OR u.first_name ILIKE '%' || :firstName || '%') AND " +
+            "(:lastName IS NULL OR u.last_name ILIKE '%' || :lastName || '%') AND " +
+            "(:email IS NULL OR u.email ILIKE '%' || :email || '%') AND " +
+            "(:banned IS NULL OR u.banned = :banned)",
+            countQuery = "SELECT COUNT(*) FROM users u WHERE " +
+            "(:firstName IS NULL OR u.first_name ILIKE '%' || :firstName || '%') AND " +
+            "(:lastName IS NULL OR u.last_name ILIKE '%' || :lastName || '%') AND " +
+            "(:email IS NULL OR u.email ILIKE '%' || :email || '%') AND " +
+            "(:banned IS NULL OR u.banned = :banned)",
+            nativeQuery = true)
     Page<User> findWithFilters(@Param("firstName") String firstName,
                                @Param("lastName") String lastName,
                                @Param("email") String email,
@@ -72,6 +78,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findSuggestedFriends(@Param("userId") Long userId,
                                     @Param("keyword") String keyword,
                                     Pageable pageable);
+
+    Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 
     // For growth chart — requires createdAt on User entity
 //    @Query(value = """

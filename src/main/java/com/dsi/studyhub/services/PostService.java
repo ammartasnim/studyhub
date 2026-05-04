@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
 
-
 public interface PostService {
     PostResDto createPost(PostReqDto request);
     PostResDto getPostById(Long id);
@@ -23,5 +22,7 @@ public interface PostService {
     PostResDto approvePost(Long id);
     PostResDto flagPost(Long id);
     void markPostsSeen(List<Long> postIds);
+    void moderatorDeletePost(Long postId);
     Map<String, Long> getPostStats();
+    Page<PostResDto> getPostsByStatus(String status, int page, int size);
 }

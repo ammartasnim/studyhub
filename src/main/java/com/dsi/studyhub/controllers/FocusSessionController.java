@@ -95,13 +95,13 @@ public class FocusSessionController {
     }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getFocusStats() {
         return ResponseEntity.ok(focusSessionService.getFocusStats());
     }
 
     @GetMapping("/stats/top-users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<List<UserFocusRankDto>> getTopFocusUsers() {
         return ResponseEntity.ok(focusSessionService.getTopFocusUsers());
     }

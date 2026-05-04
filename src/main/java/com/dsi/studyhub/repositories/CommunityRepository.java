@@ -13,21 +13,16 @@ import java.util.List;
 public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     List<Community> findByTitleContainingIgnoreCase(String title);
-
     List<Community> findByDescriptionContainingIgnoreCase(String description);
-
-    // Fix: correct Spring Data keyword is GreaterThanEqual (not GreaterThanOrEqual)
     List<Community> findByNbrMembersGreaterThanEqual(Integer minMembers);
+
     @Query("SELECT DISTINCT c FROM Community c LEFT JOIN c.members m " +
-            "WHERE c.moderator.id = :userId OR m.id = :userId")
+            "WHERE c.owner.id = :userId OR m.id = :userId")
     Page<Community> findAllJoinedOrModerated(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT DISTINCT c FROM Community c LEFT JOIN c.members m " +
-            "WHERE c.moderator.id = :userId")
-    Page<Community> findModerated(@Param("userId") Long userId, Pageable pageable);
+    @Query("SELECT c FROM Community c WHERE c.owner.id = :userId")
+    Page<Community> findByOwner(@Param("userId") Long userId, Pageable pageable);
 
-
-    // Combined, pageable-aware filter method. Parameters are optional (can be null).
     @Query("SELECT c FROM Community c WHERE " +
             "(:title IS NULL OR :title = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
             "(:description IS NULL OR :description = '' OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%'))) AND " +
@@ -40,4 +35,3 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("SELECT c FROM Community c ORDER BY SIZE(c.members) DESC")
     List<Community> findTopByMemberCount(Pageable pageable);
 }
-

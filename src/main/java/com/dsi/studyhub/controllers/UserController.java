@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResDto> getMe() {
-        return ResponseEntity.ok(userMapper.toDto(userService.getMe()));
+        return ResponseEntity.ok(userService.getMe());
     }
 
     @PutMapping("/edit")
@@ -44,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Page<UserResDto>> getAllClients(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
@@ -52,31 +51,25 @@ public class UserController {
             @RequestParam(required = false) Boolean banned,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<User> users = userService.getAllusers(firstName, lastName, email, banned, page, size);
-        Page<UserResDto> mapped = new PageImpl<>(
-                users.getContent().stream().map(userMapper::toDto).toList(),
-                users.getPageable(),
-                users.getTotalElements()
-        );
-        return ResponseEntity.ok(mapped);
+        return ResponseEntity.ok(userService.getAllusers(firstName, lastName, email, banned, page, size));
     }
 
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<UserResDto> getClientById(@PathVariable Long id) {
-        return ResponseEntity.ok(userMapper.toDto(userService.getuserById(id)));
+        return ResponseEntity.ok(userService.getuserById(id));
     }
 
     @PatchMapping("/{id}/ban")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<String> banUser(@PathVariable Long id) {
         userService.banUser(id);
         return ResponseEntity.ok("User banned successfully");
     }
 
     @PatchMapping("/{id}/unban")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<String> unbanUser(@PathVariable Long id) {
         userService.unbanUser(id);
         return ResponseEntity.ok("User unbanned successfully");
@@ -87,22 +80,28 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/me/pfp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/me/pfp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResDto> uploadPfp(@RequestParam("file") MultipartFile file) throws IOException {
-        User updatedUser = userService.updatePfp(file, userService.getMe());
-        return ResponseEntity.ok(userMapper.toDto(updatedUser));
+        return ResponseEntity.ok(userService.updatePfp(file));
     }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getUserStats() {
         return ResponseEntity.ok(userService.getUserStats());
     }
 
     @GetMapping("/stats/badges")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<BadgeType, Long>> getBadgeDistribution() {
         return ResponseEntity.ok(userService.getBadgeDistribution());
+    }
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResDto>> searchByUsername(
+            @RequestParam String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(userService.searchByUsername(username, page, size));
     }
 
 }

@@ -78,7 +78,7 @@ public class CommentController {
     }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getCommentStats() {
         return ResponseEntity.ok(commentService.getCommentStats());
     }
@@ -101,6 +101,11 @@ public class CommentController {
             @RequestParam(defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return ResponseEntity.ok(commentService.getReplies(commentId, pageable));
+    }
+    @DeleteMapping("/{commentId}/moderate")
+    public ResponseEntity<Void> moderatorDeleteComment(@PathVariable Long commentId) {
+        commentService.moderatorDeleteComment(commentId);
+        return ResponseEntity.noContent().build();
     }
 
 }

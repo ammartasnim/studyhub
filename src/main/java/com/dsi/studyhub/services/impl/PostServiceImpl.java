@@ -6,6 +6,7 @@ import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.SeenPost;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.CommunityPermission;
 import com.dsi.studyhub.enums.PostStatus;
 import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;
@@ -17,18 +18,17 @@ import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.SeenPostRepository;
 import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
+import com.dsi.studyhub.services.CommunityAuthService;
 import com.dsi.studyhub.services.FileStorageService;
 import com.dsi.studyhub.services.PostService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -36,25 +36,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Service
 public class PostServiceImpl implements PostService {
-    @Autowired
-    private PostRepository postRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SeenPostRepository seenPostRepository;
-    @Autowired
-    private CommunityRepository communityRepository;
-    @Autowired
-    private PostMapper postMapper;
-    @Autowired
-    private AuthenticatedUserService authenticatedUserService;
-    @Autowired
-    private GamificationService gamificationService;
-    @Autowired
-    private FileStorageService fileStorageService;
+
+    @Autowired private PostRepository postRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private SeenPostRepository seenPostRepository;
+    @Autowired private CommunityRepository communityRepository;
+    @Autowired private PostMapper postMapper;
+    @Autowired private AuthenticatedUserService authenticatedUserService;
+    @Autowired private GamificationService gamificationService;
+    @Autowired private FileStorageService fileStorageService;
+    @Autowired private CommunityAuthService communityAuthService;
 
     @Override
     @Transactional
@@ -84,17 +77,17 @@ public class PostServiceImpl implements PostService {
             Community community = communityRepository.findById(request.communityId())
                     .orElseThrow(() -> new ResourceNotFoundException("Community not found"));
 
-            boolean isModerator = community.getModerator().getId().equals(user.getId());
+            boolean isOwner = community.getOwner().getId().equals(user.getId());
             boolean isMember = community.getMembers().stream()
                     .anyMatch(m -> m.getId().equals(user.getId()));
 
-            if (!isModerator && !isMember) {
+            if (!isOwner && !isMember) {
                 throw new ForbiddenException("You must join this community before posting in it.");
             }
 
             post.setCommunity(community);
 
-            if (isModerator) {
+            if (isOwner) {
                 post.setStatus(PostStatus.Approved);
             }
         } else {
@@ -103,7 +96,6 @@ public class PostServiceImpl implements PostService {
 
         Post savedPost = postRepository.save(post);
         gamificationService.awardXp(user.getId(), XpConfig.POST_CREATED);
-
         return postMapper.toDto(savedPost);
     }
 
@@ -118,41 +110,30 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Page<PostResDto> getAllPosts(String title, Pageable pageable) {
-        Page<Post> posts;
-
-        if (title != null && !title.isEmpty()) {
-            posts = postRepository.findByTitleContainingIgnoreCase(title, pageable);
-        } else {
-            posts = postRepository.findAll(pageable);
-        }
-
+        Page<Post> posts = (title != null && !title.isEmpty())
+                ? postRepository.findByTitleContainingIgnoreCase(title, pageable)
+                : postRepository.findAll(pageable);
         return posts.map(postMapper::toDto);
     }
 
     @Override
     @Transactional
     public Page<PostResDto> getPostsByCommunity(Long communityId, Pageable pageable) {
-        Page<Post> entityPage = postRepository.findByCommunityId(communityId, pageable);
-
-        return entityPage.map(postMapper::toDto);
+        return postRepository.findByCommunityId(communityId, pageable).map(postMapper::toDto);
     }
 
     @Override
     @Transactional
     public Page<PostResDto> getPostsByUserId(Long userId, Pageable pageable) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
-        }
-        return postRepository.findByUserId(userId, pageable)
-                .map(postMapper::toDto);
+        if (!userRepository.existsById(userId)) throw new RuntimeException("User not found");
+        return postRepository.findByUserId(userId, pageable).map(postMapper::toDto);
     }
 
     @Override
     @Transactional
     public Page<PostResDto> getMyPosts(Pageable pageable) {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
-        return postRepository.findByUserId(currentUser.getId(), pageable)
-                .map(postMapper::toDto);
+        return postRepository.findByUserId(currentUser.getId(), pageable).map(postMapper::toDto);
     }
 
     @Override
@@ -176,13 +157,25 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    public void moderatorDeletePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        Long communityId = post.getCommunity() != null ? post.getCommunity().getId() : null;
+        if (communityId == null) {
+            throw new ForbiddenException("Post does not belong to a community.");
+        }
+        communityAuthService.requireOwnerOrPermission(currentUser.getId(), communityId, CommunityPermission.DELETE_POST);
+        postRepository.deleteById(postId);
+    }
+
+    @Override
+    @Transactional
     public void toggleLike(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
         User user = authenticatedUserService.getAuthenticatedUser();
         Long postOwnerId = post.getUser().getId();
-
-        // No XP when liking your own post
         boolean isOwnPost = postOwnerId.equals(user.getId());
 
         boolean alreadyLiked = user.getLikedPosts().stream()
@@ -195,67 +188,51 @@ public class PostServiceImpl implements PostService {
             user.getLikedPosts().add(post);
             if (!isOwnPost) gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
         }
-
         userRepository.save(user);
     }
+
     @Override
     @Transactional
     public Page<PostResDto> getFeed(Pageable pageable) {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
         Long userId = currentUser.getId();
 
-        // Get seen post IDs from DB
         Set<Long> seenIds = seenPostRepository.findSeenPostIdsByUserId(userId);
 
-        // Get user's community categories
         List<String> userCategories = currentUser.getJoinedCommunities().stream()
                 .map(Community::getCategory)
-                .filter(cat -> cat != null && !cat.isBlank())
+                .filter(cat -> cat != null && !cat.trim().isEmpty())
                 .distinct()
                 .collect(Collectors.toList());
-        currentUser.getCommunities().stream()
+        currentUser.getOwnedCommunities().stream()
                 .map(Community::getCategory)
-                .filter(cat -> cat != null && !cat.isBlank())
+                .filter(cat -> cat != null && !cat.trim().isEmpty())
                 .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
 
-        // Fetch all posts
         List<Post> communityPosts = postRepository.findCommunityFeedPosts(userId);
         List<Post> discoveryPosts = userCategories.isEmpty()
                 ? postRepository.findAllApprovedExcludingUser(userId)
                 : postRepository.findDiscoveryPostsByCategories(userId, userCategories);
 
-        // Split into unseen and seen
-        List<Post> unseenCommunity = communityPosts.stream()
-                .filter(p -> !seenIds.contains(p.getId()))
-                .collect(Collectors.toList());
-        List<Post> seenCommunity = communityPosts.stream()
-                .filter(p -> seenIds.contains(p.getId()))
-                .collect(Collectors.toList());
-        List<Post> unseenDiscovery = discoveryPosts.stream()
-                .filter(p -> !seenIds.contains(p.getId()))
-                .collect(Collectors.toList());
-        List<Post> seenDiscovery = discoveryPosts.stream()
-                .filter(p -> seenIds.contains(p.getId()))
-                .collect(Collectors.toList());
+        List<Post> unseenCommunity = communityPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenCommunity   = communityPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> unseenDiscovery = discoveryPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenDiscovery   = discoveryPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
 
-        // Score and sort each bucket
-        List<Post> sorted1 = sortByScore(unseenCommunity);   // highest priority
-        List<Post> sorted2 = sortByScore(unseenDiscovery);   // second
-        List<Post> sorted3 = sortByScore(seenCommunity);     // third
-        List<Post> sorted4 = sortByScore(seenDiscovery);     // lowest
+        List<Post> sorted1 = sortByScore(unseenCommunity);
+        List<Post> sorted2 = sortByScore(unseenDiscovery);
+        List<Post> sorted3 = sortByScore(seenCommunity);
+        List<Post> sorted4 = sortByScore(seenDiscovery);
 
-        // Interleave: 70% community, 30% discovery — unseen first
         List<Post> merged = new ArrayList<>();
         Set<Long> addedIds = new LinkedHashSet<>();
 
-        // Helper to add without duplicates
         java.util.function.Consumer<List<Post>> addAll = list -> {
             for (Post p : list) {
                 if (addedIds.add(p.getId())) merged.add(p);
             }
         };
 
-        // Build interleaved list: unseen community + unseen discovery mixed 7/3
         int ci = 0, di = 0;
         while (ci < sorted1.size() || di < sorted2.size()) {
             for (int i = 0; i < 7 && ci < sorted1.size(); i++, ci++) {
@@ -266,11 +243,9 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        // Append seen posts as fallback
         addAll.accept(sorted3);
         addAll.accept(sorted4);
 
-        // Paginate
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), merged.size());
 
@@ -305,20 +280,17 @@ public class PostServiceImpl implements PostService {
             });
         }
     }
+
     @Override
     @Transactional
     public PostResDto approvePost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
         User currentUser = authenticatedUserService.getAuthenticatedUser();
-
-        if (post.getCommunity() == null) {
-            throw new ForbiddenException("Post does not belong to a community");
+        if (post.getCommunity() == null) throw new ForbiddenException("Post does not belong to a community");
+        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("Only the community owner can approve posts");
         }
-        if (!post.getCommunity().getModerator().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the community moderator can approve posts");
-        }
-
         post.setStatus(PostStatus.Approved);
         return postMapper.toDto(postRepository.save(post));
     }
@@ -326,42 +298,38 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostResDto flagPost(Long id) {
+        // 1. Fetch the post or throw error
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        // 2. Get the current user trying to flag the post
         User currentUser = authenticatedUserService.getAuthenticatedUser();
+        Long currentUserId = currentUser.getId();
 
-        if (post.getCommunity() == null) {
-            throw new ForbiddenException("Post does not belong to a community");
-        }
-        if (!post.getCommunity().getModerator().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the community moderator can flag posts");
+        // 3. Check if this user has already flagged this post
+        if (post.getFlaggedByUserIds().contains(currentUserId)) {
+            throw new ForbiddenException("You have already flagged this post");
         }
 
-        post.setStatus(PostStatus.Flagged);
+        // 4. Add the user to the set and update the count
+        post.getFlaggedByUserIds().add(currentUserId);
+        post.setFlagCount(post.getFlaggedByUserIds().size());
+
+        // 5. Check the threshold (3 flags)
+        // If it hits 3, change the status to Flagged
+        if (post.getFlagCount() >= 3) {
+            post.setStatus(PostStatus.Flagged);
+        }
+
+        // 6. Save and return the DTO
         return postMapper.toDto(postRepository.save(post));
     }
-    private double scorePost(Post post) {
-        int likes = post.getLikes() == null ? 0 : post.getLikes().size();
-        int comments = post.getComments() == null ? 0 : post.getComments().size();
 
-        long ageInHours = ChronoUnit.HOURS.between(post.getCreatedAt(), LocalDateTime.now());
-        double recencyScore = Math.max(0, 100 - (ageInHours * 0.5));
-
-        double score = (likes * 2.0) + (comments * 1.5) + recencyScore;
-        score += score * (Math.random() * 0.1 - 0.05);
-
-        return score;
-    }
-
-    private List<Post> sortByScore(List<Post> posts) {
-        return posts.stream()
-                .sorted(Comparator.comparingDouble(this::scorePost).reversed())
-                .collect(Collectors.toList());
-    }
-    @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 3 * * *")
-    @Transactional
-    public void cleanupOldSeenPosts() {
-        seenPostRepository.deleteOlderThan(LocalDateTime.now().minusDays(30));
+    @Override
+    public Page<PostResDto> getPostsByStatus(String status, int page, int size) {
+        PostStatus postStatus = PostStatus.valueOf(status);
+        Pageable pageable = PageRequest.of(page, size);
+        return postRepository.findByStatus(postStatus, pageable).map(postMapper::toDto);
     }
 
     @Override
@@ -371,5 +339,27 @@ public class PostServiceImpl implements PostService {
                 "flagged", postRepository.countByStatus(PostStatus.Flagged),
                 "pending", postRepository.countByStatus(PostStatus.Pending)
         );
+    }
+
+    @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 3 * * *")
+    @Transactional
+    public void cleanupOldSeenPosts() {
+        seenPostRepository.deleteOlderThan(LocalDateTime.now().minusDays(30));
+    }
+
+    private double scorePost(Post post) {
+        int likes = post.getLikes() == null ? 0 : post.getLikes().size();
+        int comments = post.getComments() == null ? 0 : post.getComments().size();
+        long ageInHours = ChronoUnit.HOURS.between(post.getCreatedAt(), LocalDateTime.now());
+        double recencyScore = Math.max(0, 100 - (ageInHours * 0.5));
+        double score = (likes * 2.0) + (comments * 1.5) + recencyScore;
+        score += score * (Math.random() * 0.1 - 0.05);
+        return score;
+    }
+
+    private List<Post> sortByScore(List<Post> posts) {
+        return posts.stream()
+                .sorted(Comparator.comparingDouble(this::scorePost).reversed())
+                .collect(Collectors.toList());
     }
 }

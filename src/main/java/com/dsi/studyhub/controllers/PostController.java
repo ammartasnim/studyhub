@@ -140,10 +140,27 @@ public class PostController {
         seenPostRepository.deleteAll();
         return ResponseEntity.ok().build();
     }
+    @DeleteMapping("/{postId}/moderate")
+    public ResponseEntity<Void> moderatorDeletePost(@PathVariable Long postId) {
+        postService.moderatorDeletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getPostStats() {
         return ResponseEntity.ok(postService.getPostStats());
     }
+
+    @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<Page<PostResDto>> getByStatus(
+            @PathVariable String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // We just pass the string "status" down; the Service will handle the conversion
+        return ResponseEntity.ok(postService.getPostsByStatus(status, page, size));
+    }
+
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "idx_community_moderator_id", columnList = "moderator_id"),
+        @Index(name = "idx_community_owner_id", columnList = "owner_id"),
         @Index(name = "idx_community_nbr_members", columnList = "nbrMembers")
 })
 @Getter
@@ -19,21 +19,26 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Community {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
     private String description;
-    private int nbrMembers;
     private String category;
+    private int nbrMembers;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    private List<CommunityModerator> moderators = new ArrayList<>();
+
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
 
     @ManyToMany(mappedBy = "joinedCommunities")
     private List<User> members = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "moderator_id")
-    private User moderator;
-
 }

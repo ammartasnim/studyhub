@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageImpl;
+
 @Service
 public class UserService {
     @Autowired
@@ -41,12 +43,15 @@ public class UserService {
     private JwtService jwtService;
 
 
-        public User getMe() {
+        @org.springframework.transaction.annotation.Transactional(readOnly = true)
+        public UserResDto getMe() {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            return userRepository.findByUsername(username)
+            User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("user not found"));
+            return userMapper.toDto(user);
         }
 
+     @org.springframework.transaction.annotation.Transactional
      public ProfileUpdateResDto editUser(UserReqDto userReqDto) {
             User user = authenticatedUserService.getAuthenticatedUser();
             if (userReqDto.username() != null && !userReqDto.username().isBlank()) {
@@ -99,25 +104,51 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User getuserById(Long userId) {
-        return userRepository.findById(userId)
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public UserResDto getuserById(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("user not found with id: " + userId));
+        return userMapper.toDto(user);
     }
 
-    public Page<User> getAllusers(String firstName, String lastName,
-                                      String email, Boolean banned,
-                                      int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
-        return userRepository.findWithFilters(firstName, lastName, email, banned, pageable);
+//    public Page<User> getAllusers(String firstName, String lastName,
+//                                      String email, Boolean banned,
+//                                      int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
+//        return userRepository.findWithFilters(firstName, lastName, email, banned, pageable);
+//    }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<UserResDto> getAllusers(String firstName, String lastName,
+                              String email, Boolean banned,
+                              int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("first_name").ascending());
+        String fn = (firstName != null && firstName.isBlank()) ? null : firstName;
+        String ln = (lastName  != null && lastName.isBlank())  ? null : lastName;
+        String em = (email     != null && email.isBlank())     ? null : email;
+
+        Page<User> userPage = userRepository.findWithFilters(fn, ln, em, banned, pageable);
+        List<UserResDto> dtos = userPage.getContent()
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
+        return new PageImpl<>(dtos, pageable, userPage.getTotalElements());
     }
-    public User updatePfp(MultipartFile file, User currentUser) throws IOException {
-        // Delete old pfp if exists
+    @org.springframework.transaction.annotation.Transactional
+    public UserResDto updatePfp(MultipartFile file) throws IOException {
+        User currentUser = getMeEntity();
         fileStorageService.deleteFile(currentUser.getPfp());
-
-        // Save new file
         String filename = fileStorageService.storeFile(file, "pfp");
         currentUser.setPfp(filename);
-        return userRepository.save(currentUser);
+        userRepository.save(currentUser);
+        return userMapper.toDto(userRepository.findByUsername(
+                SecurityContextHolder.getContext().getAuthentication().getName()
+        ).orElseThrow(() -> new RuntimeException("user not found")));
+    }
+
+    private User getMeEntity() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("user not found"));
     }
 
     public Map<String, Long> getUserStats() {
@@ -137,5 +168,18 @@ public class UserService {
                         result -> (Long) result[1]       // The count
                 ));
     }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<UserResDto> searchByUsername(String username, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("username").ascending());
+        Page<User> userPage = userRepository.findByUsernameContainingIgnoreCase(username, pageable);
+        List<UserResDto> dtos = userPage.getContent()
+                .stream()
+                .map(userMapper::toDto)
+                .toList();
+        return new PageImpl<>(dtos, pageable, userPage.getTotalElements());
+    }
+
+
+
 
 }
