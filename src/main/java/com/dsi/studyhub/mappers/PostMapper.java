@@ -27,6 +27,7 @@ public abstract class PostMapper {
     @Mapping(target = "likeCount",    ignore = true)
     @Mapping(target = "commentCount", ignore = true)
     @Mapping(target = "isLiked",      ignore = true)
+    @Mapping(target = "isFlaggedByCurrentUser", ignore = true)
     public abstract PostResDto toDto(Post post);
 
     @AfterMapping
@@ -37,6 +38,11 @@ public abstract class PostMapper {
         builder.commentCount(post.getComments() == null ? 0 : post.getComments().size());
         builder.isLiked(post.getLikes() != null && post.getLikes().stream()
                 .anyMatch(u -> u.getId().equals(currentUser.getId())));
+        boolean isFlagged = post.getFlaggedByUserIds() != null &&
+                post.getFlaggedByUserIds().contains(currentUser.getId());
+        builder.isFlaggedByCurrentUser(isFlagged);
+        System.out.println("Current User ID: " + currentUser.getId());
+        System.out.println("Flagged IDs in DB: " + post.getFlaggedByUserIds());
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
