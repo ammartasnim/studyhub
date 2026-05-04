@@ -26,4 +26,5 @@ public class PostResDto {
     private int commentCount;
     private boolean isLiked;
     private LocalDateTime createdAt;
+    Integer flagCount;
 }
