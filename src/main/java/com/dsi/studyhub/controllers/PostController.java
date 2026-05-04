@@ -147,13 +147,13 @@ public class PostController {
     }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getPostStats() {
         return ResponseEntity.ok(postService.getPostStats());
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Page<PostResDto>> getByStatus(
             @PathVariable String status,
             @RequestParam(defaultValue = "0") int page,

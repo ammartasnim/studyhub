@@ -78,7 +78,7 @@ public class CommentController {
     }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getCommentStats() {
         return ResponseEntity.ok(commentService.getCommentStats());
     }

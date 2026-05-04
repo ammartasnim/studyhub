@@ -146,13 +146,13 @@ public class CommunityController {
     }
 
     @GetMapping("/stats/count")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getCommunityStats() {
         return ResponseEntity.ok(communityService.getCommunityStats());
     }
 
     @GetMapping("/stats/top")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<List<CommunityResDto>> getTopCommunities() {
         return ResponseEntity.ok(communityService.getTopCommunities());
     }
