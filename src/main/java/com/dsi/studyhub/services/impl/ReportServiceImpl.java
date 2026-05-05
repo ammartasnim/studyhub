@@ -191,4 +191,12 @@ public class ReportServiceImpl implements ReportService {
                 .createdAt(report.getCreatedAt())
                 .build();
     }
+    @Override
+    @Transactional
+    public Page<ReportResDto> getMyReports(Pageable pageable) {
+        User reporter = authenticatedUserService.getAuthenticatedUser();
+        return reportRepository.findByReporter(reporter, pageable)
+                .map(r -> toDto(r, resolvePreview(r.getTargetType(), r.getTargetId())));
+    }
+
 }

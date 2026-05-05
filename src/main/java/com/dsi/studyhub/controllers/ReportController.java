@@ -35,6 +35,10 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reportService.reportComment(commentId, request));
     }
+    @GetMapping("/my")
+    public ResponseEntity<Page<ReportResDto>> getMyReports(Pageable pageable) {
+        return ResponseEntity.ok(reportService.getMyReports(pageable));
+    }
 
     // ─── ADMIN ONLY ───────────────────────────────────────────────────────────
 

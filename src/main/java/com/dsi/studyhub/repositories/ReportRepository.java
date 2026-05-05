@@ -1,6 +1,7 @@
 package com.dsi.studyhub.repositories;
 
 import com.dsi.studyhub.entities.Report;
+import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.ReportStatus;
 import com.dsi.studyhub.enums.ReportTargetType;
 import org.springframework.data.domain.Page;
@@ -45,4 +46,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             @Param("reporterId") Long reporterId,
             @Param("targetType") ReportTargetType targetType,
             @Param("targetId") Long targetId);
+    Page<Report> findByReporter(User reporter, Pageable pageable);
 }

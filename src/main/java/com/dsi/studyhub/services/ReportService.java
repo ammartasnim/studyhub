@@ -11,4 +11,6 @@ public interface ReportService {
     ReportResDto approveReport(Long reportId);
     ReportResDto rejectReport(Long reportId);
     Page<ReportResDto> getAllReports(String status, Pageable pageable);
+    Page<ReportResDto> getMyReports(Pageable pageable);
+
 }
