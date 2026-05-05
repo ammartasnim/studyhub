@@ -20,7 +20,6 @@ public interface PostService {
     void toggleLike(Long postId);
     Page<PostResDto> getFeed(Pageable pageable);
     PostResDto approvePost(Long id);
-    PostResDto flagPost(Long id);
     void markPostsSeen(List<Long> postIds);
     void moderatorDeletePost(Long postId);
     Map<String, Long> getPostStats();

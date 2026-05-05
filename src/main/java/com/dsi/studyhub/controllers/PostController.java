@@ -137,10 +137,6 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/flag")
-    public ResponseEntity<PostResDto> flagPost(@PathVariable Long id) {
-        return ResponseEntity.ok(postService.flagPost(id));
-    }
 
     @PostMapping("/seen")
     public ResponseEntity<Void> markPostsSeen(@RequestBody List<Long> postIds) {

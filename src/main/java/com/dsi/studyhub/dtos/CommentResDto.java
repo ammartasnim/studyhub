@@ -2,7 +2,6 @@ package com.dsi.studyhub.dtos;
 
 import lombok.Builder;
 
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -20,7 +19,7 @@ public record CommentResDto(
         boolean isLiked,
         int likeCount,
         Long parentCommentId,
-        int replyCount
-
+        int replyCount,
+        boolean isReportedByCurrentUser
 ) implements Serializable {
 }

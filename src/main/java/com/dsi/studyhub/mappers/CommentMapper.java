@@ -4,26 +4,32 @@ import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.entities.Comment;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.ReportTargetType;
+import com.dsi.studyhub.repositories.ReportRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public abstract class CommentMapper {
+
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
 
-    @Mapping(source = "post.id", target = "postId")
-    @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.firstName", target = "authorFirstName")
-    @Mapping(source = "user.lastName", target = "authorLastName")
-    @Mapping(source = "user.username", target = "authorUsername")
-    @Mapping(source = "user.pfp", target = "authorPfp")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "parentComment.id", target = "parentCommentId")
-    @Mapping(target = "isLiked",      ignore = true)
-    @Mapping(expression = "java(comment.getReplies().size())", target = "replyCount")
+    @Autowired
+    private ReportRepository reportRepository;
 
+    @Mapping(source = "post.id",           target = "postId")
+    @Mapping(source = "user.id",           target = "userId")
+    @Mapping(source = "user.firstName",    target = "authorFirstName")
+    @Mapping(source = "user.lastName",     target = "authorLastName")
+    @Mapping(source = "user.username",     target = "authorUsername")
+    @Mapping(source = "user.pfp",          target = "authorPfp")
+    @Mapping(source = "createdAt",         target = "createdAt")
+    @Mapping(source = "parentComment.id",  target = "parentCommentId")
+    @Mapping(target = "isLiked",                 ignore = true)
+    @Mapping(target = "isReportedByCurrentUser", ignore = true)
+    @Mapping(expression = "java(comment.getReplies().size())", target = "replyCount")
     public abstract CommentResDto toDto(Comment comment);
 
     @AfterMapping
@@ -34,6 +40,9 @@ public abstract class CommentMapper {
         builder.replyCount(comment.getReplies() == null ? 0 : comment.getReplies().size());
         builder.isLiked(comment.getLikedByUsers() != null && comment.getLikedByUsers().stream()
                 .anyMatch(u -> u.getId().equals(currentUser.getId())));
+        builder.isReportedByCurrentUser(
+                reportRepository.existsByReporterAndTarget(
+                        currentUser.getId(), ReportTargetType.COMMENT, comment.getId()));
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

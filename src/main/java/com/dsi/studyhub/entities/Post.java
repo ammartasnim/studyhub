@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 @Table(indexes = {
@@ -42,7 +40,7 @@ public class Post {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PostStatus status=PostStatus.Pending;
+    private PostStatus status = PostStatus.Pending;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -52,18 +50,9 @@ public class Post {
     @JoinColumn(name = "community_id")
     private Community community;
 
-
     @ManyToMany(mappedBy = "likedPosts")
     private List<User> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
-
-    @Column(name = "flag_count", nullable = false, columnDefinition = "integer default 0")
-    private int flagCount = 0;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "post_flag_users", joinColumns = @JoinColumn(name = "post_id"))
-    @Column(name = "user_id")
-    private Set<Long> flaggedByUserIds = new LinkedHashSet<>();
 }

@@ -227,28 +227,6 @@ public class PostServiceImpl implements PostService {
         return postMapper.toDto(postRepository.save(post));
     }
 
-    @Override
-    @Transactional
-    public PostResDto flagPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-
-        User currentUser = authenticatedUserService.getAuthenticatedUser();
-        Long currentUserId = currentUser.getId();
-
-        if (post.getFlaggedByUserIds().contains(currentUserId)) {
-            throw new ForbiddenException("You have already flagged this post.");
-        }
-
-        post.getFlaggedByUserIds().add(currentUserId);
-        post.setFlagCount(post.getFlaggedByUserIds().size());
-
-        if (post.getFlagCount() >= 3) {
-            post.setStatus(PostStatus.Flagged);
-        }
-
-        return postMapper.toDto(postRepository.save(post));
-    }
 
     @Override
     @Transactional

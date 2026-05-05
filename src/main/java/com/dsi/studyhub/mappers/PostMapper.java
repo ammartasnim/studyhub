@@ -4,30 +4,34 @@ import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.ReportTargetType;
+import com.dsi.studyhub.repositories.ReportRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING)
-
 public abstract class PostMapper {
 
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
 
-    @Mapping(target = "imgs", ignore = true)  // ✅ service handles this
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Mapping(target = "imgs", ignore = true)
     public abstract Post toEntity(PostReqDto postReqDto);
 
-    @Mapping(target = "userUsername",  source = "user.username")
-    @Mapping(target = "userFirstName", source = "user.firstName")
-    @Mapping(target = "userLastName",  source = "user.lastName")
-    @Mapping(target = "userPfp",       source = "user.pfp")
-    @Mapping(target = "communityTitle", source = "community.title")
-    @Mapping(target = "likeCount",    ignore = true)
-    @Mapping(target = "commentCount", ignore = true)
-    @Mapping(target = "isLiked",      ignore = true)
-    @Mapping(target = "isFlaggedByCurrentUser", ignore = true)
+    @Mapping(target = "userUsername",            source = "user.username")
+    @Mapping(target = "userFirstName",           source = "user.firstName")
+    @Mapping(target = "userLastName",            source = "user.lastName")
+    @Mapping(target = "userPfp",                 source = "user.pfp")
+    @Mapping(target = "communityTitle",          source = "community.title")
+    @Mapping(target = "likeCount",               ignore = true)
+    @Mapping(target = "commentCount",            ignore = true)
+    @Mapping(target = "isLiked",                 ignore = true)
+    @Mapping(target = "isReportedByCurrentUser", ignore = true)
     public abstract PostResDto toDto(Post post);
 
     @AfterMapping
@@ -38,11 +42,9 @@ public abstract class PostMapper {
         builder.commentCount(post.getComments() == null ? 0 : post.getComments().size());
         builder.isLiked(post.getLikes() != null && post.getLikes().stream()
                 .anyMatch(u -> u.getId().equals(currentUser.getId())));
-        boolean isFlagged = post.getFlaggedByUserIds() != null &&
-                post.getFlaggedByUserIds().contains(currentUser.getId());
-        builder.isFlaggedByCurrentUser(isFlagged);
-        System.out.println("Current User ID: " + currentUser.getId());
-        System.out.println("Flagged IDs in DB: " + post.getFlaggedByUserIds());
+        builder.isReportedByCurrentUser(
+                reportRepository.existsByReporterAndTarget(
+                        currentUser.getId(), ReportTargetType.POST, post.getId()));
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
