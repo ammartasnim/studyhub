@@ -39,4 +39,31 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p WHERE p.status = :status")
     Page<Post> findByStatus(@Param("status") PostStatus status, Pageable pageable);
+    List<Post> findByCommunityIdAndStatus(Long communityId, PostStatus status);
+    Page<Post> findByCommunityIdAndStatus(Long communityId, PostStatus status, Pageable pageable);
+    @Query("""
+    SELECT p FROM Post p
+    WHERE p.status = com.dsi.studyhub.enums.PostStatus.Approved
+    AND p.user.id != :userId
+    AND p.user.id IN (
+        SELECT f.addressee.id FROM Friendship f
+        WHERE f.requester.id = :userId
+        AND f.status = com.dsi.studyhub.enums.FriendshipStatus.ACCEPTED
+    )
+""")
+    List<Post> findPostsByFriendsAsRequester(@Param("userId") Long userId);
+
+    @Query("""
+    SELECT p FROM Post p
+    WHERE p.status = com.dsi.studyhub.enums.PostStatus.Approved
+    AND p.user.id != :userId
+    AND p.user.id IN (
+        SELECT f.requester.id FROM Friendship f
+        WHERE f.addressee.id = :userId
+        AND f.status = com.dsi.studyhub.enums.FriendshipStatus.ACCEPTED
+    )
+""")
+    List<Post> findPostsByFriendsAsAddressee(@Param("userId") Long userId);
+    @Query("SELECT p FROM Post p WHERE p.status = com.dsi.studyhub.enums.PostStatus.Approved")
+    List<Post> findAllApproved();
 }

@@ -4,11 +4,9 @@ import com.dsi.studyhub.dtos.CommentReqDto;
 import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
-import com.dsi.studyhub.repositories.SeenPostRepository;
 import com.dsi.studyhub.services.CommentService;
 import com.dsi.studyhub.services.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,24 +21,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class PostController {
-    private final PostService postService;
 
-    @Autowired
-    private CommentService commentService;
-    @Autowired
-    private SeenPostRepository seenPostRepository;
+    private final PostService postService;
+    private final CommentService commentService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResDto> createPost(
-            @RequestPart("title")   String title,
-            @RequestPart("content" )String content,
-            @RequestPart(value = "imgs",        required = false) List<MultipartFile> imgs,
-            @RequestPart(value = "communityId", required = false)          String communityId
+            @RequestPart("title") String title,
+            @RequestPart("content") String content,
+            @RequestPart(value = "imgs", required = false) List<MultipartFile> imgs,
+            @RequestPart(value = "communityId", required = false) String communityId
     ) {
         PostReqDto dto = new PostReqDto(
                 title,
@@ -66,8 +60,13 @@ public class PostController {
     @GetMapping("/community/{communityId}")
     public ResponseEntity<Page<PostResDto>> getPostsByCommunity(
             @PathVariable Long communityId,
-            Pageable pageable) { // Updated to support pagination
+            Pageable pageable) {
         return ResponseEntity.ok(postService.getPostsByCommunity(communityId, pageable));
+    }
+
+    @GetMapping("/community/{communityId}/pending")
+    public ResponseEntity<List<PostResDto>> getPendingPosts(@PathVariable Long communityId) {
+        return ResponseEntity.ok(postService.getPendingPosts(communityId));
     }
 
     @GetMapping("/user/{userId}")
@@ -82,9 +81,15 @@ public class PostController {
         return ResponseEntity.ok(postService.getMyPosts(pageable));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PostResDto> updatePost(@PathVariable Long id, @RequestBody PostReqDto request) {
-        return ResponseEntity.ok(postService.updatePost(id, request));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResDto> updatePost(
+            @PathVariable Long id,
+            @RequestPart("title") String title,
+            @RequestPart("content") String content,
+            @RequestPart(value = "imgs", required = false) List<MultipartFile> imgs
+    ) {
+        PostReqDto dto = new PostReqDto(title, content, imgs, null);
+        return ResponseEntity.ok(postService.updatePost(id, dto));
     }
 
     @DeleteMapping("/{id}")
@@ -98,6 +103,7 @@ public class PostController {
         postService.toggleLike(postId);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/feed")
     public ResponseEntity<Page<PostResDto>> getFeed(Pageable pageable) {
         return ResponseEntity.ok(postService.getFeed(pageable));
@@ -108,7 +114,7 @@ public class PostController {
             @PathVariable Long postId,
             @RequestBody CommentReqDto request) {
         CommentReqDto req = new CommentReqDto(postId, request.content());
-        return new ResponseEntity<>(commentService.createComment(req), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(req));
     }
 
     @GetMapping("/{postId}/comments")
@@ -125,21 +131,29 @@ public class PostController {
         return ResponseEntity.ok(postService.approvePost(id));
     }
 
+    @DeleteMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectPost(@PathVariable Long id) {
+        postService.rejectPost(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{id}/flag")
     public ResponseEntity<PostResDto> flagPost(@PathVariable Long id) {
         return ResponseEntity.ok(postService.flagPost(id));
     }
+
     @PostMapping("/seen")
     public ResponseEntity<Void> markPostsSeen(@RequestBody List<Long> postIds) {
         postService.markPostsSeen(postIds);
         return ResponseEntity.ok().build();
     }
-    /* will remove this later only for testing*/
+    // ONLY FOR TESTING WILL BE REMOVED AFTER
     @DeleteMapping("/seen/all")
     public ResponseEntity<Void> clearAllSeenPosts() {
-        seenPostRepository.deleteAll();
+        postService.clearAllSeenPosts();
         return ResponseEntity.ok().build();
     }
+
     @DeleteMapping("/{postId}/moderate")
     public ResponseEntity<Void> moderatorDeletePost(@PathVariable Long postId) {
         postService.moderatorDeletePost(postId);
@@ -158,9 +172,6 @@ public class PostController {
             @PathVariable String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-
-        // We just pass the string "status" down; the Service will handle the conversion
         return ResponseEntity.ok(postService.getPostsByStatus(status, page, size));
     }
-
 }

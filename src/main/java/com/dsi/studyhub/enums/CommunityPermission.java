@@ -8,5 +8,6 @@ public enum CommunityPermission {
     BAN_MEMBER,
     WARN_MEMBER,
     DELETE_POST,
-    DELETE_COMMENT
+    DELETE_COMMENT,
+    APPROVE_POST
 }

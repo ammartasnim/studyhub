@@ -1,6 +1,6 @@
 package com.dsi.studyhub.dtos;
 
-import com.dsi.studyhub.entities.MessageStatus;
+import com.dsi.studyhub.enums.MessageStatus;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

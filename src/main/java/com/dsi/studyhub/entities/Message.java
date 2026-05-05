@@ -1,5 +1,6 @@
 package com.dsi.studyhub.entities;
 
+import com.dsi.studyhub.enums.MessageStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

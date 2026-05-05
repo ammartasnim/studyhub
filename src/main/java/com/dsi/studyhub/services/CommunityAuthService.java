@@ -63,4 +63,13 @@ public class CommunityAuthService {
             throw new ForbiddenException("You must be an owner or moderator to perform this action.");
         }
     }
+    public boolean hasPermission(Long userId, Long communityId, CommunityPermission permission) {
+        // Returns true without throwing — used for conditional checks
+        try {
+            requireOwnerOrPermission(userId, communityId, permission);
+            return true;
+        } catch (ForbiddenException e) {
+            return false;
+        }
+    }
 }

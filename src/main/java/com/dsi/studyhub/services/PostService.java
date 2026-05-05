@@ -25,4 +25,8 @@ public interface PostService {
     void moderatorDeletePost(Long postId);
     Map<String, Long> getPostStats();
     Page<PostResDto> getPostsByStatus(String status, int page, int size);
+    List<PostResDto> getPendingPosts(Long communityId);
+    void rejectPost(Long id);
+    void clearAllSeenPosts();
+
 }

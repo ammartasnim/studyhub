@@ -6,7 +6,7 @@ import com.dsi.studyhub.dtos.MessageResDto;
 import com.dsi.studyhub.dtos.MessageSendDto;
 import com.dsi.studyhub.entities.Conversation;
 import com.dsi.studyhub.entities.Message;
-import com.dsi.studyhub.entities.MessageStatus;
+import com.dsi.studyhub.enums.MessageStatus;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.ResourceNotFoundException;

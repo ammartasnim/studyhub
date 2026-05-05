@@ -1,4 +1,4 @@
-package com.dsi.studyhub.entities;
+package com.dsi.studyhub.enums;
 
 public enum MessageStatus {
     SENT,

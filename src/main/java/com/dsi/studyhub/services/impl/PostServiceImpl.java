@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,17 +50,19 @@ public class PostServiceImpl implements PostService {
     @Autowired private FileStorageService fileStorageService;
     @Autowired private CommunityAuthService communityAuthService;
 
+    // ─── CREATE ───────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public PostResDto createPost(PostReqDto request) {
         User user = authenticatedUserService.getAuthenticatedUser();
+
         List<String> imgPaths = new ArrayList<>();
-        if (request.imgs() != null && !request.imgs().isEmpty()) {
+        if (request.imgs() != null) {
             for (MultipartFile file : request.imgs()) {
                 if (file != null && !file.isEmpty()) {
                     try {
-                        String path = fileStorageService.storeFile(file, "posts");
-                        imgPaths.add(path);
+                        imgPaths.add(fileStorageService.storeFile(file, "posts"));
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to store image: " + e.getMessage());
                     }
@@ -87,11 +90,15 @@ public class PostServiceImpl implements PostService {
 
             post.setCommunity(community);
 
-            if (isOwner) {
+            // Owner or mod with APPROVE_POST → auto-approve, otherwise stays Pending
+            boolean canApprove = isOwner || communityAuthService.hasPermission(
+                    user.getId(), community.getId(), CommunityPermission.APPROVE_POST);
+            if (canApprove) {
                 post.setStatus(PostStatus.Approved);
             }
         } else {
-            post.setCommunity(null);
+            // Posts outside a community are always auto-approved
+            post.setStatus(PostStatus.Approved);
         }
 
         Post savedPost = postRepository.save(post);
@@ -99,12 +106,14 @@ public class PostServiceImpl implements PostService {
         return postMapper.toDto(savedPost);
     }
 
+    // ─── READ ─────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public PostResDto getPostById(Long id) {
         return postRepository.findById(id)
                 .map(postMapper::toDto)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
     }
 
     @Override
@@ -119,13 +128,30 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Page<PostResDto> getPostsByCommunity(Long communityId, Pageable pageable) {
-        return postRepository.findByCommunityId(communityId, pageable).map(postMapper::toDto);
+        // Regular users only see Approved posts
+        return postRepository
+                .findByCommunityIdAndStatus(communityId, PostStatus.Approved, pageable)
+                .map(postMapper::toDto);
+    }
+
+    @Override
+    @Transactional
+    public List<PostResDto> getPendingPosts(Long communityId) {
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        communityAuthService.requireOwnerOrPermission(
+                currentUser.getId(), communityId, CommunityPermission.APPROVE_POST);
+
+        return postRepository
+                .findByCommunityIdAndStatus(communityId, PostStatus.Pending)
+                .stream()
+                .map(postMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public Page<PostResDto> getPostsByUserId(Long userId, Pageable pageable) {
-        if (!userRepository.existsById(userId)) throw new RuntimeException("User not found");
+        if (!userRepository.existsById(userId)) throw new ResourceNotFoundException("User not found");
         return postRepository.findByUserId(userId, pageable).map(postMapper::toDto);
     }
 
@@ -138,35 +164,90 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
+    public Page<PostResDto> getPostsByStatus(String status, int page, int size) {
+        PostStatus postStatus = PostStatus.valueOf(status);
+        Pageable pageable = PageRequest.of(page, size);
+        return postRepository.findByStatus(postStatus, pageable).map(postMapper::toDto);
+    }
+
+    @Override
+    public Map<String, Long> getPostStats() {
+        return Map.of(
+                "total",   postRepository.count(),
+                "flagged", postRepository.countByStatus(PostStatus.Flagged),
+                "pending", postRepository.countByStatus(PostStatus.Pending)
+        );
+    }
+
+    // ─── UPDATE ───────────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
     public PostResDto updatePost(Long id, PostReqDto request) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        postMapper.partialUpdate(request, post);
+
+        if (request.title() != null && !request.title().isBlank()) {
+            post.setTitle(request.title());
+        }
+        if (request.content() != null && !request.content().isBlank()) {
+            post.setContent(request.content());
+        }
+        if (request.imgs() != null && !request.imgs().isEmpty()) {
+            List<String> imgPaths = new ArrayList<>();
+            for (MultipartFile file : request.imgs()) {
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        imgPaths.add(fileStorageService.storeFile(file, "posts"));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to store image: " + e.getMessage());
+                    }
+                }
+            }
+            post.setImgs(imgPaths);
+        }
+
+        return postMapper.toDto(postRepository.save(post));
+    }
+    @Override
+    @Transactional
+    public PostResDto approvePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        if (post.getCommunity() == null) {
+            throw new ForbiddenException("Post does not belong to a community.");
+        }
+
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        communityAuthService.requireOwnerOrPermission(
+                currentUser.getId(), post.getCommunity().getId(), CommunityPermission.APPROVE_POST);
+
+        post.setStatus(PostStatus.Approved);
         return postMapper.toDto(postRepository.save(post));
     }
 
     @Override
     @Transactional
-    public void deletePost(Long id) {
+    public PostResDto flagPost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-        User user = authenticatedUserService.getAuthenticatedUser();
-        postRepository.deleteById(id);
-        gamificationService.awardXp(user.getId(), XpConfig.POST_DELETED);
-    }
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
-    @Override
-    @Transactional
-    public void moderatorDeletePost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
         User currentUser = authenticatedUserService.getAuthenticatedUser();
-        Long communityId = post.getCommunity() != null ? post.getCommunity().getId() : null;
-        if (communityId == null) {
-            throw new ForbiddenException("Post does not belong to a community.");
+        Long currentUserId = currentUser.getId();
+
+        if (post.getFlaggedByUserIds().contains(currentUserId)) {
+            throw new ForbiddenException("You have already flagged this post.");
         }
-        communityAuthService.requireOwnerOrPermission(currentUser.getId(), communityId, CommunityPermission.DELETE_POST);
-        postRepository.deleteById(postId);
+
+        post.getFlaggedByUserIds().add(currentUserId);
+        post.setFlagCount(post.getFlaggedByUserIds().size());
+
+        if (post.getFlagCount() >= 3) {
+            post.setStatus(PostStatus.Flagged);
+        }
+
+        return postMapper.toDto(postRepository.save(post));
     }
 
     @Override
@@ -191,6 +272,60 @@ public class PostServiceImpl implements PostService {
         userRepository.save(user);
     }
 
+    // ─── DELETE ───────────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        User user = authenticatedUserService.getAuthenticatedUser();
+        postRepository.deleteById(id);
+        gamificationService.awardXp(user.getId(), XpConfig.POST_DELETED);
+    }
+
+    @Override
+    @Transactional
+    public void rejectPost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        if (post.getCommunity() == null) {
+            throw new ForbiddenException("Post does not belong to a community.");
+        }
+
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        communityAuthService.requireOwnerOrPermission(
+                currentUser.getId(), post.getCommunity().getId(), CommunityPermission.APPROVE_POST);
+
+        postRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void moderatorDeletePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+
+        if (post.getCommunity() == null) {
+            throw new ForbiddenException("Post does not belong to a community.");
+        }
+
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        communityAuthService.requireOwnerOrPermission(
+                currentUser.getId(), post.getCommunity().getId(), CommunityPermission.DELETE_POST);
+
+        postRepository.deleteById(postId);
+    }
+
+    @Override
+    @Transactional
+    public void clearAllSeenPosts() {
+        seenPostRepository.deleteAll();
+    }
+
+    // ─── FEED ─────────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public Page<PostResDto> getFeed(Pageable pageable) {
@@ -199,84 +334,114 @@ public class PostServiceImpl implements PostService {
 
         Set<Long> seenIds = seenPostRepository.findSeenPostIdsByUserId(userId);
 
-        List<String> userCategories = currentUser.getJoinedCommunities().stream()
+        // Collect all categories from communities the user is part of
+        List<String> userCategories = new ArrayList<>();
+        currentUser.getJoinedCommunities().stream()
                 .map(Community::getCategory)
                 .filter(cat -> cat != null && !cat.trim().isEmpty())
-                .distinct()
-                .collect(Collectors.toList());
+                .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
         currentUser.getOwnedCommunities().stream()
                 .map(Community::getCategory)
                 .filter(cat -> cat != null && !cat.trim().isEmpty())
                 .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
 
-        // All posts from user's communities (excluding user's own posts)
+        // Bucket A+B — community + discovery posts
         List<Post> communityPosts = postRepository.findCommunityFeedPosts(userId);
-
-        // Discovery posts — from communities user is NOT in
         List<Post> discoveryPosts = userCategories.isEmpty()
                 ? postRepository.findAllApprovedExcludingUser(userId)
                 : postRepository.findDiscoveryPostsByCategories(userId, userCategories);
 
-        // If both are empty, fall back to ALL approved posts excluding user's own
+        // Bucket E — friends posts (merge both sides of friendship, deduplicated)
+        Set<Long> friendPostIds = new LinkedHashSet<>();
+        List<Post> friendPosts = new ArrayList<>();
+        for (Post p : postRepository.findPostsByFriendsAsRequester(userId)) {
+            if (friendPostIds.add(p.getId())) friendPosts.add(p);
+        }
+        for (Post p : postRepository.findPostsByFriendsAsAddressee(userId)) {
+            if (friendPostIds.add(p.getId())) friendPosts.add(p);
+        }
+
+        // If community + discovery both empty, fall back to all approved
         if (communityPosts.isEmpty() && discoveryPosts.isEmpty()) {
             discoveryPosts = postRepository.findAllApprovedExcludingUser(userId);
         }
 
-        List<Post> unseenCommunity = communityPosts.stream()
-                .filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
-        List<Post> seenCommunity = communityPosts.stream()
-                .filter(p -> seenIds.contains(p.getId())).collect(Collectors.toList());
-        List<Post> unseenDiscovery = discoveryPosts.stream()
-                .filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
-        List<Post> seenDiscovery = discoveryPosts.stream()
-                .filter(p -> seenIds.contains(p.getId())).collect(Collectors.toList());
+        // Split into unseen / seen
+        List<Post> unseenCommunity = communityPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenCommunity   = communityPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> unseenDiscovery = discoveryPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenDiscovery   = discoveryPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> unseenFriends   = friendPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
+        List<Post> seenFriends     = friendPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
 
-        List<Post> sorted1 = sortByScore(unseenCommunity);
-        List<Post> sorted2 = sortByScore(unseenDiscovery);
-        List<Post> sorted3 = sortByScore(seenCommunity);
-        List<Post> sorted4 = sortByScore(seenDiscovery);
+        // Score each bucket
+        List<Post> bucketA = sortByScore(unseenCommunity);
+        List<Post> bucketB = sortByScore(unseenDiscovery);
+        List<Post> bucketC = sortByScore(seenCommunity);
+        List<Post> bucketD = sortByScore(seenDiscovery);
+        List<Post> bucketE = sortByScore(unseenFriends);
+        List<Post> bucketF = sortByScore(seenFriends);
 
         List<Post> merged = new ArrayList<>();
         Set<Long> addedIds = new LinkedHashSet<>();
 
-        java.util.function.Consumer<List<Post>> addAll = list -> {
-            for (Post p : list) {
-                if (addedIds.add(p.getId())) merged.add(p);
-            }
-        };
-
+        // 70/30 interleave of unseen community vs discovery
         int ci = 0, di = 0;
-        while (ci < sorted1.size() || di < sorted2.size()) {
-            for (int i = 0; i < 7 && ci < sorted1.size(); i++, ci++) {
-                if (addedIds.add(sorted1.get(ci).getId())) merged.add(sorted1.get(ci));
+        while (ci < bucketA.size() || di < bucketB.size()) {
+            for (int i = 0; i < 7 && ci < bucketA.size(); i++, ci++) {
+                if (addedIds.add(bucketA.get(ci).getId())) merged.add(bucketA.get(ci));
             }
-            for (int i = 0; i < 3 && di < sorted2.size(); i++, di++) {
-                if (addedIds.add(sorted2.get(di).getId())) merged.add(sorted2.get(di));
+            for (int i = 0; i < 3 && di < bucketB.size(); i++, di++) {
+                if (addedIds.add(bucketB.get(di).getId())) merged.add(bucketB.get(di));
             }
         }
 
-        addAll.accept(sorted3);
-        addAll.accept(sorted4);
-
-        // If still empty after all that, show everything approved excluding user's own
-        if (merged.isEmpty()) {
-            List<Post> fallback = sortByScore(postRepository.findAllApprovedExcludingUser(userId));
-            merged.addAll(fallback);
+        // Interleave unseen friends posts throughout (every 5 posts insert 1 friend post)
+        List<Post> interleaved = new ArrayList<>();
+        int fi = 0;
+        for (int i = 0; i < merged.size(); i++) {
+            interleaved.add(merged.get(i));
+            if ((i + 1) % 5 == 0 && fi < bucketE.size()) {
+                Post fp = bucketE.get(fi++);
+                if (addedIds.add(fp.getId())) interleaved.add(fp);
+            }
         }
+        // Append any remaining unseen friend posts
+        while (fi < bucketE.size()) {
+            Post fp = bucketE.get(fi++);
+            if (addedIds.add(fp.getId())) interleaved.add(fp);
+        }
+
+        // Fallback buckets — seen posts
+        for (Post p : bucketC) { if (addedIds.add(p.getId())) interleaved.add(p); }
+        for (Post p : bucketD) { if (addedIds.add(p.getId())) interleaved.add(p); }
+        for (Post p : bucketF) { if (addedIds.add(p.getId())) interleaved.add(p); }
+
+        // Last resort — show ALL approved posts including user's own
+        if (interleaved.isEmpty()) {
+            sortByScore(postRepository.findAllApproved())
+                    .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
+        }
+
+// Always append any remaining approved posts not yet shown
+        sortByScore(postRepository.findAllApproved())
+                .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
 
         int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), merged.size());
+        int end   = Math.min(start + pageable.getPageSize(), interleaved.size());
 
-        if (start >= merged.size()) {
-            return new PageImpl<>(List.of(), pageable, merged.size());
+        if (start >= interleaved.size()) {
+            return new PageImpl<>(List.of(), pageable, interleaved.size());
         }
 
-        List<PostResDto> pageDtos = merged.subList(start, end).stream()
+        List<PostResDto> pageDtos = interleaved.subList(start, end).stream()
                 .map(postMapper::toDto)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(pageDtos, pageable, merged.size());
+        return new PageImpl<>(pageDtos, pageable, interleaved.size());
     }
+
+    // ─── SEEN POSTS ───────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -299,74 +464,16 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    @Override
-    @Transactional
-    public PostResDto approvePost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        User currentUser = authenticatedUserService.getAuthenticatedUser();
-        if (post.getCommunity() == null) throw new ForbiddenException("Post does not belong to a community");
-        if (!post.getCommunity().getOwner().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the community owner can approve posts");
-        }
-        post.setStatus(PostStatus.Approved);
-        return postMapper.toDto(postRepository.save(post));
-    }
-
-    @Override
-    @Transactional
-    public PostResDto flagPost(Long id) {
-        // 1. Fetch the post or throw error
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-
-        // 2. Get the current user trying to flag the post
-        User currentUser = authenticatedUserService.getAuthenticatedUser();
-        Long currentUserId = currentUser.getId();
-
-        // 3. Check if this user has already flagged this post
-        if (post.getFlaggedByUserIds().contains(currentUserId)) {
-            throw new ForbiddenException("You have already flagged this post");
-        }
-
-        // 4. Add the user to the set and update the count
-        post.getFlaggedByUserIds().add(currentUserId);
-        post.setFlagCount(post.getFlaggedByUserIds().size());
-
-        // 5. Check the threshold (3 flags)
-        // If it hits 3, change the status to Flagged
-        if (post.getFlagCount() >= 3) {
-            post.setStatus(PostStatus.Flagged);
-        }
-
-        // 6. Save and return the DTO
-        return postMapper.toDto(postRepository.save(post));
-    }
-
-    @Override
-    public Page<PostResDto> getPostsByStatus(String status, int page, int size) {
-        PostStatus postStatus = PostStatus.valueOf(status);
-        Pageable pageable = PageRequest.of(page, size);
-        return postRepository.findByStatus(postStatus, pageable).map(postMapper::toDto);
-    }
-
-    @Override
-    public Map<String, Long> getPostStats() {
-        return Map.of(
-                "total",   postRepository.count(),
-                "flagged", postRepository.countByStatus(PostStatus.Flagged),
-                "pending", postRepository.countByStatus(PostStatus.Pending)
-        );
-    }
-
-    @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void cleanupOldSeenPosts() {
         seenPostRepository.deleteOlderThan(LocalDateTime.now().minusDays(30));
     }
 
+    // ─── HELPERS ──────────────────────────────────────────────────────────────
+
     private double scorePost(Post post) {
-        int likes = post.getLikes() == null ? 0 : post.getLikes().size();
+        int likes    = post.getLikes()    == null ? 0 : post.getLikes().size();
         int comments = post.getComments() == null ? 0 : post.getComments().size();
         long ageInHours = ChronoUnit.HOURS.between(post.getCreatedAt(), LocalDateTime.now());
         double recencyScore = Math.max(0, 100 - (ageInHours * 0.5));

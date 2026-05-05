@@ -1,7 +1,7 @@
 package com.dsi.studyhub.repositories;
 
 import com.dsi.studyhub.entities.Message;
-import com.dsi.studyhub.entities.MessageStatus;
+import com.dsi.studyhub.enums.MessageStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
