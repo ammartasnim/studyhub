@@ -111,9 +111,12 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostResDto getPostById(Long id) {
-        return postRepository.findById(id)
-                .map(postMapper::toDto)
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        if (post.getStatus() == PostStatus.Flagged) {
+            throw new ResourceNotFoundException("Post not found");
+        }
+        return postMapper.toDto(post);
     }
 
     @Override
@@ -173,7 +176,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Map<String, Long> getPostStats() {
         return Map.of(
-                "total",   postRepository.count(),
+                "total",   postRepository.countByStatusNot(PostStatus.Flagged),
                 "flagged", postRepository.countByStatus(PostStatus.Flagged),
                 "pending", postRepository.countByStatus(PostStatus.Pending)
         );

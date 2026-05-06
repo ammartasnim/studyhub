@@ -1,11 +1,9 @@
 package com.dsi.studyhub.controllers;
 
-import com.dsi.studyhub.dtos.CommentReqDto;
-import com.dsi.studyhub.dtos.CommentResDto;
-import com.dsi.studyhub.dtos.PostReqDto;
-import com.dsi.studyhub.dtos.PostResDto;
+import com.dsi.studyhub.dtos.*;
 import com.dsi.studyhub.services.CommentService;
 import com.dsi.studyhub.services.PostService;
+import com.dsi.studyhub.services.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +26,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final ReportService reportService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResDto> createPost(
@@ -169,5 +168,10 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(postService.getPostsByStatus(status, page, size));
+    }
+    @GetMapping("/posts/{postId}")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<List<ReportResDto>> getReportsForPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(reportService.getReportsForPost(postId));
     }
 }

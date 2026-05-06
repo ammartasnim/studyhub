@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
@@ -47,4 +48,31 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             @Param("targetType") ReportTargetType targetType,
             @Param("targetId") Long targetId);
     Page<Report> findByReporter(User reporter, Pageable pageable);
+    //refine
+    @Query("""
+SELECT r.targetId as postId,
+       COUNT(r) as totalReports,
+       SUM(CASE WHEN r.status = 'APPROVED' THEN 1 ELSE 0 END) as approvedReports
+FROM Report r
+WHERE r.targetType = 'POST'
+GROUP BY r.targetId
+""")
+    List<Object[]> groupPostReports();
+    Optional<Report> findTopByTargetTypeAndTargetIdOrderByCreatedAtDesc(
+            ReportTargetType targetType,
+            Long targetId
+    );
+    List<Report> findByTargetTypeAndTargetId(
+            ReportTargetType targetType,
+            Long targetId
+    );
+    long countByTargetTypeAndTargetIdAndStatus(
+            ReportTargetType targetType, Long targetId, ReportStatus status);
+    @Query("""
+    SELECT r.targetId, COUNT(r), SUM(CASE WHEN r.status = 'APPROVED' THEN 1 ELSE 0 END)
+    FROM Report r
+    WHERE r.targetType = 'COMMENT'
+    GROUP BY r.targetId
+""")
+    List<Object[]> groupCommentReports();
 }

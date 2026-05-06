@@ -1,5 +1,7 @@
 package com.dsi.studyhub.controllers;
 
+import com.dsi.studyhub.dtos.CommentReportGroupDto;
+import com.dsi.studyhub.dtos.PostReportGroupDto;
 import com.dsi.studyhub.dtos.ReportReqDto;
 import com.dsi.studyhub.dtos.ReportResDto;
 import com.dsi.studyhub.services.ReportService;
@@ -10,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -39,6 +43,11 @@ public class ReportController {
     public ResponseEntity<Page<ReportResDto>> getMyReports(Pageable pageable) {
         return ResponseEntity.ok(reportService.getMyReports(pageable));
     }
+    @GetMapping("/posts/grouped")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<List<PostReportGroupDto>> getGroupedPostReports() {
+        return ResponseEntity.ok(reportService.getGroupedPostReports());
+    }
 
     // ─── ADMIN ONLY ───────────────────────────────────────────────────────────
 
@@ -60,5 +69,21 @@ public class ReportController {
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<ReportResDto> rejectReport(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.rejectReport(id));
+    }
+    @GetMapping("/posts/{postId}")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<List<ReportResDto>> getReportsForPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(reportService.getReportsForPost(postId));
+    }
+    @GetMapping("/comments/grouped")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<List<CommentReportGroupDto>> getGroupedCommentReports() {
+        return ResponseEntity.ok(reportService.getGroupedCommentReports());
+    }
+
+    @GetMapping("/comments/{commentId}")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<List<ReportResDto>> getReportsForComment(@PathVariable Long commentId) {
+        return ResponseEntity.ok(reportService.getReportsForComment(commentId));
     }
 }

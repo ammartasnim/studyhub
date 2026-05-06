@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.entities.Comment;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.CommentStatus;
 import com.dsi.studyhub.enums.CommunityPermission;
 import com.dsi.studyhub.enums.UserRole;
 import com.dsi.studyhub.exceptions.ForbiddenException;
@@ -143,9 +144,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable) {
-        User user = authenticatedUserService.getAuthenticatedUser();
         return commentRepository.findByPostIdAndParentCommentIsNull(postId, pageable)
-                .map(c -> commentMapper.toDto(c));
+                .map(commentMapper::toDto);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Map<String, Long> getCommentStats() {
-        return Map.of("total", commentRepository.count());
+        return Map.of("total", commentRepository.countByStatusNot(CommentStatus.Flagged));
     }
 
     @Override

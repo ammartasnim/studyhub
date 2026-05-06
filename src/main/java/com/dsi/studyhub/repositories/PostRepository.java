@@ -16,7 +16,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findById(long id);
     Page<Post> findAll(Pageable pageable);
     Page<Post> findByCommunityId(Long communityId, Pageable pageable);
-    Page<Post> findByUserId(Long userId, Pageable pageable);
+    @Query("SELECT p FROM Post p WHERE p.user.id = :userId AND p.status != com.dsi.studyhub.enums.PostStatus.Flagged")
+    Page<Post> findByUserId(@Param("userId") Long userId, Pageable pageable);
     Page<Post> findByTitleContainingIgnoreCase(String title, Pageable pageable);
     long countByStatus(PostStatus status);
 
@@ -66,4 +67,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findPostsByFriendsAsAddressee(@Param("userId") Long userId);
     @Query("SELECT p FROM Post p WHERE p.status = com.dsi.studyhub.enums.PostStatus.Approved")
     List<Post> findAllApproved();
+
+    Long countByStatusNot(PostStatus postStatus);
 }

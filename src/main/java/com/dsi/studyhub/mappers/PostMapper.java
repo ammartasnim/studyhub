@@ -4,6 +4,7 @@ import com.dsi.studyhub.dtos.PostReqDto;
 import com.dsi.studyhub.dtos.PostResDto;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.enums.CommentStatus;
 import com.dsi.studyhub.enums.ReportTargetType;
 import com.dsi.studyhub.repositories.ReportRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
@@ -39,7 +40,9 @@ public abstract class PostMapper {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
 
         builder.likeCount(post.getLikes() == null ? 0 : post.getLikes().size());
-        builder.commentCount(post.getComments() == null ? 0 : post.getComments().size());
+        builder.commentCount((int) post.getComments().stream()
+                .filter(c -> c.getStatus() != CommentStatus.Flagged)
+                .count());
         builder.isLiked(post.getLikes() != null && post.getLikes().stream()
                 .anyMatch(u -> u.getId().equals(currentUser.getId())));
         builder.isReportedByCurrentUser(

@@ -1,5 +1,6 @@
 package com.dsi.studyhub.entities;
 
+import com.dsi.studyhub.enums.CommentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +40,11 @@ public class Comment {
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CommentStatus status = CommentStatus.Active;
 
+    private LocalDateTime flaggedAt;
     @ManyToMany(mappedBy = "likedComments")
     private Set<User> likedByUsers = new HashSet<>();
 

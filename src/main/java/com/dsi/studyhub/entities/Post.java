@@ -42,6 +42,9 @@ public class Post {
     @Column(nullable = false)
     private PostStatus status = PostStatus.Pending;
 
+    @Column(updatable = false)
+    private LocalDateTime flaggedAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
