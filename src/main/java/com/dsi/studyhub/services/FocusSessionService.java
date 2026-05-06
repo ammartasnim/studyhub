@@ -22,4 +22,5 @@ public interface FocusSessionService {
     void deleteSession(Long id);
     Map<String, Long> getFocusStats();
     List<UserFocusRankDto> getTopFocusUsers();
+    List<Map<String, Object>> getUserGrowth();
 }

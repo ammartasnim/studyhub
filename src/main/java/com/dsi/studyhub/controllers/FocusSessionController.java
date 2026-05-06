@@ -105,4 +105,10 @@ public class FocusSessionController {
     public ResponseEntity<List<UserFocusRankDto>> getTopFocusUsers() {
         return ResponseEntity.ok(focusSessionService.getTopFocusUsers());
     }
+
+    @GetMapping("/stats/trends")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Map<String, Object>>> getUserGrowth() {
+        return ResponseEntity.ok(focusSessionService.getUserGrowth());
+    }
 }

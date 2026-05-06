@@ -19,7 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -186,5 +188,20 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
     @Override
     public List<UserFocusRankDto> getTopFocusUsers() {
         return focusSessionRepository.findTopUsersByFocusTime(PageRequest.of(0, 5));
+    }
+
+
+    @Override
+    public List<Map<String, Object>> getUserGrowth() {
+        LocalDate today = LocalDate.now();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            long count = focusSessionRepository.countByStatusAndLastUpdatedBetween(SessionStatus.COMPLETED,
+                    date.atStartOfDay(), date.plusDays(1).atStartOfDay()
+            );
+            result.add(Map.of("date", date.toString(), "count", count));
+        }
+        return result;
     }
 }

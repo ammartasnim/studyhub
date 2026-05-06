@@ -21,6 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -180,6 +182,18 @@ public class UserService {
     }
 
 
+    public List<Map<String, Object>> getUserGrowth() {
+        LocalDate today = LocalDate.now();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            long count = userRepository.countByCreatedAtBetween(
+                    date.atStartOfDay(), date.plusDays(1).atStartOfDay()
+            );
+            result.add(Map.of("date", date.toString(), "count", count));
+        }
+        return result;
+    }
 
 
 }
