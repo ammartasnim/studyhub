@@ -1,6 +1,7 @@
 package com.dsi.studyhub.services;
 
 import com.dsi.studyhub.dtos.CommunityMemberResDto;
+import com.dsi.studyhub.dtos.CommunityModerationDto;
 import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.Community;
@@ -34,4 +35,6 @@ public interface CommunityService {
     List<CommunityMemberResDto> getBannedMembers(Long communityId);
     List<CommunityMemberResDto> getMembersPreview(Long communityId);
     Page<CommunityMemberResDto> getMembersPublic(Long communityId, Pageable pageable);
+
+    CommunityModerationDto getCommunityModeration(Long communityId);
 }

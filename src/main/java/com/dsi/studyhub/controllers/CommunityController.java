@@ -1,6 +1,7 @@
 package com.dsi.studyhub.controllers;
 
 import com.dsi.studyhub.dtos.CommunityMemberResDto;
+import com.dsi.studyhub.dtos.CommunityModerationDto;
 import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.Community;
@@ -202,5 +203,11 @@ public class CommunityController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(communityService.getMembersPublic(id, PageRequest.of(page, size)));
+    }
+    @GetMapping("/{communityId}/moderation")
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<CommunityModerationDto> getCommunityModeration(
+            @PathVariable Long communityId) {
+        return ResponseEntity.ok(communityService.getCommunityModeration(communityId));
     }
 }
