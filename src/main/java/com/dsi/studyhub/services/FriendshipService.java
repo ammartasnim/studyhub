@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FriendshipService {
@@ -192,7 +194,14 @@ public class FriendshipService {
 
         return toUserSummaryDto(userRepository.findById(targetUserId).orElseThrow());
     }
-
+    public List<UserSummaryDto> searchFriends(Long userId, String query) {
+        String q = query == null ? "" : query;
+        return friendshipRepository.searchAcceptedFriends(userId, q)
+                .stream()
+                .map(f -> f.getRequester().getId().equals(userId) ? f.getAddressee() : f.getRequester())
+                .map(this::toUserSummaryDto)
+                .toList();
+    }
 
 
 }
