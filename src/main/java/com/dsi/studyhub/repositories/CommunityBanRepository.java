@@ -11,4 +11,5 @@ public interface CommunityBanRepository extends JpaRepository<CommunityBan, Long
     Optional<CommunityBan> findByUserIdAndCommunityId(Long userId, Long communityId);
     void deleteByUserIdAndCommunityId(Long userId, Long communityId);
     List<CommunityBan> findByCommunityId(Long communityId);
+
 }

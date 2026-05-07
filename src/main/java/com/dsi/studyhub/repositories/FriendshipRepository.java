@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, FriendshipId> {
@@ -55,4 +56,15 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
     """)
     Page<Friendship> findBlockedByRequester(@Param("userId") Long userId,
                                             Pageable pageable);
+    @Query("""
+    SELECT f FROM Friendship f
+    WHERE (f.requester.id = :userId OR f.addressee.id = :userId)
+    AND f.status = 'ACCEPTED'
+    AND (
+        LOWER(f.requester.username) LIKE LOWER(CONCAT('%', :q, '%')) OR
+        LOWER(f.addressee.username) LIKE LOWER(CONCAT('%', :q, '%'))
+    )
+""")
+    List<Friendship> searchAcceptedFriends(@Param("userId") Long userId, @Param("q") String q);
 }
+

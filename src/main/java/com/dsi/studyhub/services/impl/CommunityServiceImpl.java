@@ -1,6 +1,7 @@
 package com.dsi.studyhub.services.impl;
 
 import com.dsi.studyhub.dtos.CommunityMemberResDto;
+import com.dsi.studyhub.dtos.CommunityModerationDto;
 import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.*;
@@ -471,6 +472,40 @@ public class CommunityServiceImpl implements CommunityService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(dtos, pageable, allMembers.size());
+    }
+    @Override
+    @Transactional
+    public CommunityModerationDto getCommunityModeration(Long communityId) {
+        List<CommunityModerationDto.BanEntry> bans = communityBanRepository
+                .findByCommunityId(communityId)
+                .stream()
+                .map(b -> CommunityModerationDto.BanEntry.builder()
+                        .id(b.getId())
+                        .username(b.getUser().getUsername())
+                        .firstName(b.getUser().getFirstName())
+                        .lastName(b.getUser().getLastName())
+                        .reason(b.getReason())
+                        .bannedAt(b.getBannedAt())
+                        .build())
+                .toList();
+
+        List<CommunityModerationDto.WarningEntry> warnings = communityWarningRepository
+                .findByCommunityId(communityId)
+                .stream()
+                .map(w -> CommunityModerationDto.WarningEntry.builder()
+                        .id(w.getId())
+                        .username(w.getUser().getUsername())
+                        .firstName(w.getUser().getFirstName())
+                        .lastName(w.getUser().getLastName())
+                        .reason(w.getReason())
+                        .warnedAt(w.getWarnedAt())
+                        .build())
+                .toList();
+
+        return CommunityModerationDto.builder()
+                .bans(bans)
+                .warnings(warnings)
+                .build();
     }
 
 }
