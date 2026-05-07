@@ -13,6 +13,7 @@ import com.dsi.studyhub.repositories.*;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommunityAuthService;
 import com.dsi.studyhub.services.CommunityService;
+import com.dsi.studyhub.services.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Autowired private CommunityAuthService communityAuthService;
     @Autowired private UserRepository userRepository;
     @Autowired private CommunityModeratorRepository communityModeratorRepository;
+    @Autowired private NotificationService notificationService;
 
     public CommunityServiceImpl(CommunityRepository communityRepository,
                                 CommunityMapper communityMapper,
@@ -190,6 +192,14 @@ public class CommunityServiceImpl implements CommunityService {
                 request.permissions() != null ? request.permissions() : Set.of()
         );
         communityModeratorRepository.save(mod);
+
+        notificationService.createNotification(
+                newMod.getId(),
+                "MODERATOR",
+                "You have been added as a moderator of the community: " + community.getTitle(),
+                null,
+                communityId
+        );
     }
 
     @Override
@@ -241,6 +251,14 @@ public class CommunityServiceImpl implements CommunityService {
 
         community.setOwner(newOwner);
         communityRepository.save(community);
+
+        notificationService.createNotification(
+                newOwner.getId(),
+                "OWNERSHIP",
+                "You are now the owner of the community: " + community.getTitle(),
+                null,
+                communityId
+        );
     }
 
     @Override
@@ -312,6 +330,14 @@ public class CommunityServiceImpl implements CommunityService {
                 .ifPresent(communityModeratorRepository::delete);
 
         communityBanRepository.save(new CommunityBan(target, community, request.reason()));
+
+        notificationService.createNotification(
+                target.getId(),
+                "BAN",
+                "You have been banned from the community: " + community.getTitle(),
+                null,
+                communityId
+        );
     }
 
     @Override
@@ -344,6 +370,14 @@ public class CommunityServiceImpl implements CommunityService {
         }
 
         communityWarningRepository.save(new CommunityWarning(target, community, request.reason()));
+
+        notificationService.createNotification(
+                target.getId(),
+                "WARNING",
+                "You have received a warning in the community: " + community.getTitle(),
+                null,
+                communityId
+        );
 
         long warningCount = communityWarningRepository.countByUserIdAndCommunityId(target.getId(), communityId);
         if (warningCount >= 3 && !communityBanRepository.existsByUserIdAndCommunityId(target.getId(), communityId)) {

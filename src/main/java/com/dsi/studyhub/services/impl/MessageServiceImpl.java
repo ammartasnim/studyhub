@@ -40,35 +40,35 @@ public class MessageServiceImpl implements MessageService {
     private FriendshipService friendshipService;
 
     @Override
-    @Transactional
-    public MessageResDto sendMessage(MessageSendDto request) {
-        User sender = authenticatedUserService.getAuthenticatedUser();
-        if (sender.getId().equals(request.recipientId())) {
-            throw new IllegalArgumentException("You cannot message yourself.");
+        @Transactional
+        public MessageResDto sendMessage(MessageSendDto request) {
+            User sender = authenticatedUserService.getAuthenticatedUser();
+            if (sender.getId().equals(request.recipientId())) {
+                throw new IllegalArgumentException("You cannot message yourself.");
+            }
+
+            User recipient = userRepository.findById(request.recipientId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+            if (!friendshipService.isFriend(sender.getId(), recipient.getId())) {
+                throw new ForbiddenException("You can only message friends.");
+            }
+
+            Conversation conversation = conversationRepository
+                    .findBetweenUsers(sender.getId(), recipient.getId())
+                    .orElseGet(() -> createConversation(sender.getId(), recipient.getId()));
+
+            Message message = new Message();
+            message.setConversation(conversation);
+            message.setSender(sender);
+            message.setContent(request.content());
+
+            Message saved = messageRepository.save(message);
+            conversation.setUpdatedAt(saved.getCreatedAt());
+            conversationRepository.save(conversation);
+
+            return toMessageDto(saved, recipient);
         }
-
-        User recipient = userRepository.findById(request.recipientId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        if (!friendshipService.isFriend(sender.getId(), recipient.getId())) {
-            throw new ForbiddenException("You can only message friends.");
-        }
-
-        Conversation conversation = conversationRepository
-                .findBetweenUsers(sender.getId(), recipient.getId())
-                .orElseGet(() -> createConversation(sender.getId(), recipient.getId()));
-
-        Message message = new Message();
-        message.setConversation(conversation);
-        message.setSender(sender);
-        message.setContent(request.content());
-
-        Message saved = messageRepository.save(message);
-        conversation.setUpdatedAt(saved.getCreatedAt());
-        conversationRepository.save(conversation);
-
-        return toMessageDto(saved, recipient);
-    }
 
     @Override
     @Transactional

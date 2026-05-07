@@ -20,6 +20,7 @@ import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommunityAuthService;
 import com.dsi.studyhub.services.FileStorageService;
+import com.dsi.studyhub.services.NotificationService;
 import com.dsi.studyhub.services.PostService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ public class PostServiceImpl implements PostService {
     @Autowired private AuthenticatedUserService authenticatedUserService;
     @Autowired private GamificationService gamificationService;
     @Autowired private FileStorageService fileStorageService;
+    @Autowired private NotificationService notificationService;
     @Autowired private CommunityAuthService communityAuthService;
 
     // ─── CREATE ───────────────────────────────────────────────────────────────
@@ -248,7 +250,16 @@ public class PostServiceImpl implements PostService {
             if (!isOwnPost) gamificationService.awardXp(postOwnerId, XpConfig.LIKE_REMOVED);
         } else {
             user.getLikedPosts().add(post);
-            if (!isOwnPost) gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
+            if (!isOwnPost) {
+                gamificationService.awardXp(postOwnerId, XpConfig.LIKE_RECEIVED);
+                notificationService.createNotification(
+                        postOwnerId,
+                        "LIKE",
+                        user.getUsername() + " liked your post",
+                        null,
+                        postId
+                );
+            }
         }
         userRepository.save(user);
     }

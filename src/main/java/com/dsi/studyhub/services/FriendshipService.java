@@ -7,6 +7,7 @@ import com.dsi.studyhub.entities.FriendshipId;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.FriendshipStatus;
 import com.dsi.studyhub.repositories.UserRepository;
+import com.dsi.studyhub.services.NotificationService;
 import com.dsi.studyhub.dtos.FriendshipResDto;
 import com.dsi.studyhub.dtos.UserSummaryDto;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     @Autowired
     private UserRepository UserRepository;
 
@@ -35,8 +37,12 @@ public class FriendshipService {
 
 
 
-        User requester = userRepository.findById(requesterId).orElseThrow();
-        User addressee = userRepository.findById(addresseeId).orElseThrow();
+        User requester = userRepository.findById(requesterId).orElseThrow(
+                () -> new ResourceNotFoundException("User not found")
+        );
+        User addressee = userRepository.findById(addresseeId).orElseThrow(
+                () -> new ResourceNotFoundException("User not found")
+        );
 
         FriendshipId id = new FriendshipId();
         id.setRequesterId(requesterId);
@@ -47,7 +53,16 @@ public class FriendshipService {
         friendship.setRequester(requester);
         friendship.setAddressee(addressee);
 
-        return toResDto(friendshipRepository.save(friendship));
+        Friendship saved = friendshipRepository.save(friendship);
+        notificationService.createNotification(
+                addresseeId,
+                "FRIEND_REQUEST",
+                requester.getUsername() + " sent you a friend request",
+                null,
+                requesterId
+        );
+
+        return toResDto(saved);
     }
 
     public FriendshipResDto acceptRequest(Long addresseeId, Long requesterId) {
@@ -61,6 +76,19 @@ public class FriendshipService {
             throw new IllegalStateException("Request is not pending.");
 
         friendship.setStatus(FriendshipStatus.ACCEPTED);
+        User requester = userRepository.findById(requesterId).orElseThrow(
+                () -> new ResourceNotFoundException("User not found")
+        );
+        notificationService.createNotification(
+                requesterId,
+                "FRIEND_REQUEST_ACCEPTED",
+                requester.getUsername() + " accepted your friend request",
+                null,
+                requesterId
+
+
+
+        );
         return toResDto(friendshipRepository.save(friendship));
     }
 

@@ -4,6 +4,7 @@ import com.dsi.studyhub.entities.Badge;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.BadgeType;
 import com.dsi.studyhub.repositories.UserRepository;
+import com.dsi.studyhub.services.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class GamificationService {
 
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationService notificationService;
 
     // Called by other services to award XP
     public void awardXp(Long userId, int amount) {
@@ -50,8 +52,14 @@ public class GamificationService {
             badgeEntity.setUser(user);
 
             user.getBadges().add(badgeEntity);
-            // TODO: push a notification to the user via WebSocket or save to DB
-            // e.g. notificationService.send(user.getId(), "You've earned the " + newBadge + " badge!");
+
+            notificationService.createNotification(
+                    user.getId(),
+                    "BADGE",
+                    "You earned the " + newBadgeType.name() + " badge!",
+                    null,
+                    user.getId()
+            );
         }
 
         userRepository.save(user);

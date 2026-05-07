@@ -19,6 +19,7 @@ import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.services.AuthenticatedUserService;
 import com.dsi.studyhub.services.CommentService;
 import com.dsi.studyhub.services.CommunityAuthService;
+import com.dsi.studyhub.services.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,8 @@ public class CommentServiceImpl implements CommentService {
     private GamificationService gamificationService;
     @Autowired
     private CommunityAuthService communityAuthService;
+    @Autowired
+    private NotificationService notificationService;
 
 
     @Override
@@ -65,7 +68,17 @@ public class CommentServiceImpl implements CommentService {
 
         // No XP when commenting on your own post
         boolean isOwnPost = post.getUser().getId().equals(user.getId());
-        if (!isOwnPost) gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+        if (!isOwnPost) {
+            gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+
+            notificationService.createNotification(
+                    post.getUser().getId(),
+                    "COMMENT",
+                    user.getUsername() + " commented on your post",
+                    null,
+                    post.getId()
+            );
+        }
 
         return commentMapper.toDto(fresh);
     }
@@ -103,7 +116,16 @@ public class CommentServiceImpl implements CommentService {
             if (!isOwnComment) gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_REMOVED);
         } else {
             user.getLikedComments().add(comment);
-            if (!isOwnComment) gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_RECEIVED);
+            if (!isOwnComment) {
+                gamificationService.awardXp(commentOwnerId, XpConfig.LIKE_RECEIVED);
+                notificationService.createNotification(
+                        commentOwnerId,
+                        "LIKE",
+                        user.getUsername() + " liked your comment",
+                        null,
+                        commentId
+                );
+            }
         }
 
         userRepository.save(user);

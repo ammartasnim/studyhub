@@ -43,6 +43,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private NotificationService notificationService;
 
 
         @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -97,6 +99,14 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("user not found with id: " + userId));
         user.setBanned(true);
         userRepository.save(user);
+
+        notificationService.createNotification(
+                userId,
+                "BAN",
+                "Your account has been banned.",
+                null,
+                userId
+        );
     }
 
     public void unbanUser(Long userId) {

@@ -88,6 +88,7 @@ public class MessageSocketController {
         }
     }
 
+
     private void bindSecurityContext(Principal principal) {
         if (principal instanceof Authentication authentication) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
