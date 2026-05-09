@@ -1,7 +1,7 @@
 package com.dsi.studyhub.controllers;
 
-import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.dtos.CommentReqDto;
+import com.dsi.studyhub.dtos.CommentResDto;
 import com.dsi.studyhub.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.Map;
 
 @RestController
@@ -21,6 +21,7 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+    // Comment creation and updates
     @PostMapping
     public ResponseEntity<CommentResDto> createComment(@RequestBody CommentReqDto request) {
         return new ResponseEntity<>(commentService.createComment(request), HttpStatus.CREATED);
@@ -40,12 +41,14 @@ public class CommentController {
         return ResponseEntity.ok(commentService.editComment(commentId, request));
     }
 
+    // Comment deletion and moderation
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
     }
 
+    // Comment queries
     @GetMapping("/post/{postId}")
     public ResponseEntity<Page<CommentResDto>> getCommentsByPost(
             @PathVariable Long postId,
@@ -82,6 +85,8 @@ public class CommentController {
     public ResponseEntity<Map<String, Long>> getCommentStats() {
         return ResponseEntity.ok(commentService.getCommentStats());
     }
+
+    // Comment interactions and replies
     @PostMapping("/{commentId}/like")
     public ResponseEntity<Void> toggleLike(@PathVariable Long commentId) {
         commentService.toggleLike(commentId);
@@ -94,6 +99,7 @@ public class CommentController {
     ) {
         return ResponseEntity.ok(commentService.createReply(commentId, request));
     }
+
     @GetMapping("/{commentId}/replies")
     public ResponseEntity<Page<CommentResDto>> getReplies(
             @PathVariable Long commentId,
@@ -102,6 +108,7 @@ public class CommentController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return ResponseEntity.ok(commentService.getReplies(commentId, pageable));
     }
+
     @DeleteMapping("/{commentId}/moderate")
     public ResponseEntity<Void> moderatorDeleteComment(@PathVariable Long commentId) {
         commentService.moderatorDeleteComment(commentId);

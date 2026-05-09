@@ -31,20 +31,20 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        // Resolves a WebSocket user from session or Authorization header.
         StompHeaderAccessor accessor =
-                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class); // ✅ mutable
+                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor == null) return message;
 
         Authentication authentication = null;
         Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
 
-        // 1. Try principal already bound to session
+        // Authentication resolution
         if (accessor.getUser() instanceof Authentication existing) {
             authentication = existing;
         }
 
-        // 2. Try session attributes (persists across frames for same session)
         if (authentication == null && sessionAttributes != null) {
             if (sessionAttributes.get(SESSION_AUTH_KEY) instanceof Authentication stored) {
                 authentication = stored;
@@ -52,7 +52,6 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             }
         }
 
-        // 3. Try Authorization header (mainly for CONNECT frame)
         if (authentication == null) {
             String token = extractBearer(accessor.getNativeHeader("Authorization"));
             if (token == null) {
@@ -66,13 +65,13 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                             user, null, user.getAuthorities());
                     accessor.setUser(authentication);
                     if (sessionAttributes != null) {
-                        sessionAttributes.put(SESSION_AUTH_KEY, authentication); // persist for next frames
+                        sessionAttributes.put(SESSION_AUTH_KEY, authentication);
                     }
                 }
             }
         }
 
-        // 4. Always push into SecurityContextHolder for this thread
+        // Thread context binding
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

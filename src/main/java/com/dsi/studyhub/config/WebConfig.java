@@ -16,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     private final CustomUserDetailsService userDetailsService;
 
-    // Inject your service here
     public WebConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
@@ -42,7 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService); // Now it's available!
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

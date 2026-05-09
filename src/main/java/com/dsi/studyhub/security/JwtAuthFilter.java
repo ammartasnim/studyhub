@@ -38,6 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // Resolves JWT from Authorization header and builds the SecurityContext.
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -48,15 +49,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token = authHeader.substring(7);
 
         try {
-            // 1. Get claims instead of just username so we can check the 'issuer'
+            // Claims parsing
             Claims claims = jwtService.extractAllClaims(token);
 
             if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails;
 
-                // 2. Identify the Token Source
+                // Token source
                 if (jwtService.isSupabaseToken(claims)) {
-                    // If it's Supabase, use our 'Silent Sync' method
+                    // Supabase sync
                     String uid = claims.getSubject();
                     String email = claims.get("email", String.class);
                     String firstName = null;
@@ -78,7 +79,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                     userDetails = authService.syncAndReturnUserDetails(uid, email, firstName, lastName);
                 } else {
-                    // If it's local, use your standard DB lookup
+                    // Local user lookup
                     String username = claims.getSubject();
                     userDetails = userDetailsService.loadUserByUsername(username);
                 }

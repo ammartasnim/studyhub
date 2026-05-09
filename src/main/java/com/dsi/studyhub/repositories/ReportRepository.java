@@ -15,17 +15,13 @@ import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    // Check if user already reported this target
     Optional<Report> findByReporterIdAndTargetTypeAndTargetId(
             Long reporterId, ReportTargetType targetType, Long targetId);
 
-    // Get all reports filtered by status (admin)
     Page<Report> findByStatus(ReportStatus status, Pageable pageable);
 
-    // Get all reports regardless of status (admin)
     Page<Report> findAll(Pageable pageable);
 
-    // Count approved reports for a specific target
     @Query("""
         SELECT COUNT(r) FROM Report r
         WHERE r.targetType = :targetType
@@ -36,7 +32,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             @Param("targetType") ReportTargetType targetType,
             @Param("targetId") Long targetId);
 
-    // Check if a user has already reported a specific target
     @Query("""
         SELECT COUNT(r) > 0 FROM Report r
         WHERE r.reporter.id = :reporterId
@@ -48,12 +43,11 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             @Param("targetType") ReportTargetType targetType,
             @Param("targetId") Long targetId);
     Page<Report> findByReporter(User reporter, Pageable pageable);
-    //refine
     @Query("""
-SELECT r.targetId as postId,
-       COUNT(r) as totalReports,
-       SUM(CASE WHEN r.status = 'APPROVED' THEN 1 ELSE 0 END) as approvedReports
-FROM Report r
+ SELECT r.targetId as postId,
+        COUNT(r) as totalReports,
+        SUM(CASE WHEN r.status = 'APPROVED' THEN 1 ELSE 0 END) as approvedReports
+ FROM Report r
 WHERE r.targetType = 'POST'
 GROUP BY r.targetId
 """)

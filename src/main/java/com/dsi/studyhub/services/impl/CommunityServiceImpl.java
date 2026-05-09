@@ -48,6 +48,7 @@ public class CommunityServiceImpl implements CommunityService {
         this.authenticatedUserService = authenticatedUserService;
     }
 
+    // Community creation and updates
     @Override
     public Community createCommunity(CommunityReqDto community) {
         User moderator = authenticatedUserService.getAuthenticatedUser();
@@ -126,6 +127,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .toList();
     }
 
+    // Membership management
     @Override
     @Transactional
     public void joinCommunity(Long communityId) {
@@ -168,6 +170,7 @@ public class CommunityServiceImpl implements CommunityService {
         communityRepository.save(community);
     }
 
+    // Moderator management
     @Override
     @Transactional
     public void addModerator(Long communityId, CommunityReqDto.AddModeratorReq request) {
@@ -233,6 +236,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     @Transactional
     public void transferOwnership(Long communityId, CommunityReqDto.TransferOwnershipReq request) {
+        // Transfers ownership and updates moderator roles if needed.
         User currentUser = authenticatedUserService.getAuthenticatedUser();
         communityAuthService.requireOwner(currentUser.getId(), communityId);
 
@@ -262,6 +266,7 @@ public class CommunityServiceImpl implements CommunityService {
         );
     }
 
+    // Member listings
     @Override
     public Page<CommunityMemberResDto> getMembers(Long communityId, Pageable pageable) {
         User currentUser = authenticatedUserService.getAuthenticatedUser();
@@ -272,7 +277,6 @@ public class CommunityServiceImpl implements CommunityService {
 
         User owner = community.getOwner();
 
-        // Build full list: owner first, then members excluding owner
         List<User> allMembers = new ArrayList<>();
         allMembers.add(owner);
         community.getMembers().stream()
@@ -302,6 +306,7 @@ public class CommunityServiceImpl implements CommunityService {
         return new PageImpl<>(dtos, pageable, allMembers.size());
     }
 
+    // Member moderation
     @Override
     @Transactional
     public void banMember(Long communityId, CommunityReqDto.BanMemberReq request) {

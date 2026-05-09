@@ -32,6 +32,7 @@ public class CommunityController {
         this.communityMapper = communityMapper;
     }
 
+    // Community creation and updates
     @PostMapping
     public ResponseEntity<CommunityResDto> createCommunity(@Valid @RequestBody CommunityReqDto requestDTO) {
         Community savedCommunity = communityService.createCommunity(requestDTO);
@@ -146,6 +147,7 @@ public class CommunityController {
         return ResponseEntity.noContent().build();
     }
 
+    // Community stats
     @GetMapping("/stats/count")
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getCommunityStats() {
@@ -157,6 +159,8 @@ public class CommunityController {
     public ResponseEntity<List<CommunityResDto>> getTopCommunities() {
         return ResponseEntity.ok(communityService.getTopCommunities());
     }
+
+    // Member listings
     @GetMapping("/{id}/members")
     public ResponseEntity<Page<CommunityMemberResDto>> getMembers(
             @PathVariable Long id,
@@ -204,6 +208,8 @@ public class CommunityController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(communityService.getMembersPublic(id, PageRequest.of(page, size)));
     }
+
+    // Admin moderation views
     @GetMapping("/{communityId}/moderation")
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<CommunityModerationDto> getCommunityModeration(

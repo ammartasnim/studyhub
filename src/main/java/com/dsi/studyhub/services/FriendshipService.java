@@ -1,18 +1,16 @@
 package com.dsi.studyhub.services;
 
-import com.dsi.studyhub.exceptions.ResourceNotFoundException;
-import com.dsi.studyhub.repositories.FriendshipRepository;
+import com.dsi.studyhub.dtos.FriendshipResDto;
+import com.dsi.studyhub.dtos.UserSummaryDto;
 import com.dsi.studyhub.entities.Friendship;
 import com.dsi.studyhub.entities.FriendshipId;
 import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.FriendshipStatus;
+import com.dsi.studyhub.exceptions.ResourceNotFoundException;
+import com.dsi.studyhub.repositories.FriendshipRepository;
 import com.dsi.studyhub.repositories.UserRepository;
-import com.dsi.studyhub.services.NotificationService;
-import com.dsi.studyhub.dtos.FriendshipResDto;
-import com.dsi.studyhub.dtos.UserSummaryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Block;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,9 +24,8 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
-    @Autowired
-    private UserRepository UserRepository;
 
+    // Public friendship actions
     public FriendshipResDto sendRequest(Long requesterId, Long addresseeId) {
         if (requesterId.equals(addresseeId))
             throw new IllegalArgumentException("You cannot send a friend request to yourself.");
@@ -148,6 +145,7 @@ public class FriendshipService {
                 .map(this::toUserSummaryDto);
     }
 
+    // Mapping helpers
     private FriendshipResDto toResDto(Friendship friendship) {
         User requester = friendship.getRequester();
         User addressee = friendship.getAddressee();
@@ -170,6 +168,7 @@ public class FriendshipService {
                 user.getLastName()
         );
     }
+    // Blocking and unblocking
     public UserSummaryDto blockUser(Long currentUserId, Long targetUserId) {
         if (currentUserId.equals(targetUserId))
             throw new IllegalArgumentException("You cannot block yourself.");
@@ -189,13 +188,9 @@ public class FriendshipService {
             friendship.getRequester();
             friendshipRepository.save(friendship);
         } else {
-            // no prior friendship — create a new blocked row
             FriendshipId id = new FriendshipId();
             id.setRequesterId(currentUserId);
             id.setAddresseeId(targetUserId);
-            User u =userRepository.findById(targetUserId).orElseThrow(
-                    () -> new ResourceNotFoundException("User not found")
-            );
 
             Friendship blocked = new Friendship();
             blocked.setId(id);
@@ -222,6 +217,7 @@ public class FriendshipService {
 
         return toUserSummaryDto(userRepository.findById(targetUserId).orElseThrow());
     }
+    // Search
     public List<UserSummaryDto> searchFriends(Long userId, String query) {
         String q = query == null ? "" : query;
         return friendshipRepository.searchAcceptedFriends(userId, q)

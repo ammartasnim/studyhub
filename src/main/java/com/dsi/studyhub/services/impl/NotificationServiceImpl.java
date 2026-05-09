@@ -28,9 +28,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    // Notification creation
     @Override
     @Transactional
     public NotificationResDto createNotification(Long recipientId, String type, String message, String link, Long refId) {
+        // Persists and dispatches a realtime notification to the recipient.
         User recipient = userRepository.findById(recipientId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -53,6 +55,7 @@ public class NotificationServiceImpl implements NotificationService {
         return dto;
     }
 
+    // Notification retrieval
     @Override
     @Transactional
     public Page<NotificationResDto> getMyNotifications(int page, int size) {
@@ -64,6 +67,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .map(this::toDto);
     }
 
+    // Read tracking
     @Override
     @Transactional
     public void markRead(Long notificationId) {
@@ -88,6 +92,7 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.markAllRead(currentUser.getId());
     }
 
+    // Unread counts
     @Override
     @Transactional
     public long countUnread() {
@@ -95,6 +100,7 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.countByRecipientIdAndIsReadFalse(currentUser.getId());
     }
 
+    // Mapping helper
     private NotificationResDto toDto(Notification notification) {
         return new NotificationResDto(
                 notification.getId(),

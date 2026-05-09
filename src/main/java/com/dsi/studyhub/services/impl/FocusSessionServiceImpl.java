@@ -35,21 +35,10 @@ public class FocusSessionServiceImpl implements FocusSessionService {
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
 
-//    @Override
-//    public FocusSessionResDto saveSession(FocusSessionReqDto request) {
-//        User user = authenticatedUserService.getAuthenticatedUser();
-//
-//        FocusSession session = new FocusSession();
-//        session.setTitle(request.title());
-//        session.setTimer(request.timer());
-//        session.setUser(user);
-//
-//        FocusSession saved = focusSessionRepository.save(session);
-//        return focusSessionMapper.toDto(saved);
-//    }
-@Override
-@Transactional
-public FocusSessionResDto startSession(FocusSessionReqDto request) {
+    // Session lifecycle
+    @Override
+    @Transactional
+    public FocusSessionResDto startSession(FocusSessionReqDto request) {
     User user = authenticatedUserService.getAuthenticatedUser();
 
     boolean hasActive = focusSessionRepository
@@ -57,7 +46,6 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
                     user.getId(), List.of(SessionStatus.ACTIVE, SessionStatus.PAUSED))
             .isPresent();
     if (hasActive) {
-//        throw new IllegalStateException("You already have an active or paused session.");
         throw new org.springframework.web.server.ResponseStatusException(
                 HttpStatus.CONFLICT, "You already have a session in progress."
         );
@@ -65,7 +53,6 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
 
     FocusSession session = new FocusSession();
     session.setTitle(request.title());
-    // We set the initial countdown (e.g., 1500 for 25 mins)
     session.setRemainingSeconds(request.remainingSeconds());
     session.setLastUpdated(LocalDateTime.now());
     session.setStatus(SessionStatus.ACTIVE);
@@ -95,7 +82,7 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
 
         session.setStatus(SessionStatus.ACTIVE);
         session.setRemainingSeconds(remainingSeconds);
-        session.setLastUpdated(LocalDateTime.now()); // resets the clock baseline
+        session.setLastUpdated(LocalDateTime.now());
 
         return focusSessionMapper.toDto(focusSessionRepository.save(session));
     }
@@ -103,12 +90,12 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
     @Override
     @Transactional
     public Optional<FocusSessionResDto> getActiveSession() {
+        // Recomputes remaining time when resuming an active session.
         User user = authenticatedUserService.getAuthenticatedUser();
 
         return focusSessionRepository.findFirstByUserIdAndStatusInOrderByLastUpdatedDesc(
                         user.getId(), List.of(SessionStatus.ACTIVE, SessionStatus.PAUSED))
                 .flatMap(session -> {
-                    // 2. If it was RUNNING when we left, calculate the "lost" time
                     if (session.getStatus() == SessionStatus.ACTIVE) {
                         long secondsPassed = java.time.Duration.between(
                                 session.getLastUpdated(), LocalDateTime.now()
@@ -119,14 +106,13 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
                             session.setStatus(SessionStatus.COMPLETED);
                             session.setRemainingSeconds(0);
                             session.setLastUpdated(LocalDateTime.now());
-                            focusSessionRepository.save(session); // persist the completion
-                            return Optional.<FocusSessionResDto>empty();// or return it as completed — your choice
+                            focusSessionRepository.save(session);
+                            return Optional.<FocusSessionResDto>empty();
                         }
                         session.setRemainingSeconds(Math.max(0, newRemaining));
                         session.setLastUpdated(LocalDateTime.now());
                         focusSessionRepository.save(session);
                     }
-                    // 3. If PAUSED, we just return it as is (time didn't move)
                     return Optional.of(focusSessionMapper.toDto(session));
                 });
     }
@@ -145,6 +131,7 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
         return focusSessionMapper.toDto(focusSessionRepository.save(session));
     }
 
+    // Session queries
     @Override
     public Page<FocusSessionResDto> getMySessions(Pageable pageable) {
         User user = authenticatedUserService.getAuthenticatedUser();
@@ -168,6 +155,7 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
                 .toList();
     }
 
+    // Session deletion
     @Override
     @Transactional
     public void deleteSession(Long id) {
@@ -177,6 +165,7 @@ public FocusSessionResDto startSession(FocusSessionReqDto request) {
         focusSessionRepository.deleteById(id);
     }
 
+    // Focus stats and growth
     @Override
     public Map<String, Long> getFocusStats() {
         return Map.of(

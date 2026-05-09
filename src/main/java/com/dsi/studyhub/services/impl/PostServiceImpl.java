@@ -52,8 +52,7 @@ public class PostServiceImpl implements PostService {
     @Autowired private NotificationService notificationService;
     @Autowired private CommunityAuthService communityAuthService;
 
-    // ─── CREATE ───────────────────────────────────────────────────────────────
-
+    // Post creation
     @Override
     @Transactional
     public PostResDto createPost(PostReqDto request) {
@@ -92,14 +91,12 @@ public class PostServiceImpl implements PostService {
 
             post.setCommunity(community);
 
-            // Owner or mod with APPROVE_POST → auto-approve, otherwise stays Pending
             boolean canApprove = isOwner || communityAuthService.hasPermission(
                     user.getId(), community.getId(), CommunityPermission.APPROVE_POST);
             if (canApprove) {
                 post.setStatus(PostStatus.Approved);
             }
         } else {
-            // Posts outside a community are always auto-approved
             post.setStatus(PostStatus.Approved);
         }
 
@@ -108,8 +105,7 @@ public class PostServiceImpl implements PostService {
         return postMapper.toDto(savedPost);
     }
 
-    // ─── READ ─────────────────────────────────────────────────────────────────
-
+    // Post reads
     @Override
     @Transactional
     public PostResDto getPostById(Long id) {
@@ -133,7 +129,6 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Page<PostResDto> getPostsByCommunity(Long communityId, Pageable pageable) {
-        // Regular users only see Approved posts
         return postRepository
                 .findByCommunityIdAndStatus(communityId, PostStatus.Approved, pageable)
                 .map(postMapper::toDto);
@@ -184,8 +179,7 @@ public class PostServiceImpl implements PostService {
         );
     }
 
-    // ─── UPDATE ───────────────────────────────────────────────────────────────
-
+    // Post updates
     @Override
     @Transactional
     public PostResDto updatePost(Long id, PostReqDto request) {
@@ -264,8 +258,7 @@ public class PostServiceImpl implements PostService {
         userRepository.save(user);
     }
 
-    // ─── DELETE ───────────────────────────────────────────────────────────────
-
+    // Post deletion and moderation
     @Override
     @Transactional
     public void deletePost(Long id) {
@@ -316,17 +309,16 @@ public class PostServiceImpl implements PostService {
         seenPostRepository.deleteAll();
     }
 
-    // ─── FEED ─────────────────────────────────────────────────────────────────
-
+    // Feed composition
     @Override
     @Transactional
     public Page<PostResDto> getFeed(Pageable pageable) {
+        // Builds a mixed feed from community, discovery, and friend posts with seen/unseen weighting.
         User currentUser = authenticatedUserService.getAuthenticatedUser();
         Long userId = currentUser.getId();
 
         Set<Long> seenIds = seenPostRepository.findSeenPostIdsByUserId(userId);
 
-        // Collect all categories from communities the user is part of
         List<String> userCategories = new ArrayList<>();
         currentUser.getJoinedCommunities().stream()
                 .map(Community::getCategory)
@@ -337,13 +329,11 @@ public class PostServiceImpl implements PostService {
                 .filter(cat -> cat != null && !cat.trim().isEmpty())
                 .forEach(cat -> { if (!userCategories.contains(cat)) userCategories.add(cat); });
 
-        // Bucket A+B — community + discovery posts
         List<Post> communityPosts = postRepository.findCommunityFeedPosts(userId);
         List<Post> discoveryPosts = userCategories.isEmpty()
                 ? postRepository.findAllApprovedExcludingUser(userId)
                 : postRepository.findDiscoveryPostsByCategories(userId, userCategories);
 
-        // Bucket E — friends posts (merge both sides of friendship, deduplicated)
         Set<Long> friendPostIds = new LinkedHashSet<>();
         List<Post> friendPosts = new ArrayList<>();
         for (Post p : postRepository.findPostsByFriendsAsRequester(userId)) {
@@ -353,12 +343,10 @@ public class PostServiceImpl implements PostService {
             if (friendPostIds.add(p.getId())) friendPosts.add(p);
         }
 
-        // If community + discovery both empty, fall back to all approved
         if (communityPosts.isEmpty() && discoveryPosts.isEmpty()) {
             discoveryPosts = postRepository.findAllApprovedExcludingUser(userId);
         }
 
-        // Split into unseen / seen
         List<Post> unseenCommunity = communityPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
         List<Post> seenCommunity   = communityPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
         List<Post> unseenDiscovery = discoveryPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
@@ -366,7 +354,6 @@ public class PostServiceImpl implements PostService {
         List<Post> unseenFriends   = friendPosts.stream().filter(p -> !seenIds.contains(p.getId())).collect(Collectors.toList());
         List<Post> seenFriends     = friendPosts.stream().filter(p ->  seenIds.contains(p.getId())).collect(Collectors.toList());
 
-        // Score each bucket
         List<Post> bucketA = sortByScore(unseenCommunity);
         List<Post> bucketB = sortByScore(unseenDiscovery);
         List<Post> bucketC = sortByScore(seenCommunity);
@@ -377,7 +364,6 @@ public class PostServiceImpl implements PostService {
         List<Post> merged = new ArrayList<>();
         Set<Long> addedIds = new LinkedHashSet<>();
 
-        // 70/30 interleave of unseen community vs discovery
         int ci = 0, di = 0;
         while (ci < bucketA.size() || di < bucketB.size()) {
             for (int i = 0; i < 7 && ci < bucketA.size(); i++, ci++) {
@@ -388,7 +374,6 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        // Interleave unseen friends posts throughout (every 5 posts insert 1 friend post)
         List<Post> interleaved = new ArrayList<>();
         int fi = 0;
         for (int i = 0; i < merged.size(); i++) {
@@ -398,24 +383,20 @@ public class PostServiceImpl implements PostService {
                 if (addedIds.add(fp.getId())) interleaved.add(fp);
             }
         }
-        // Append any remaining unseen friend posts
         while (fi < bucketE.size()) {
             Post fp = bucketE.get(fi++);
             if (addedIds.add(fp.getId())) interleaved.add(fp);
         }
 
-        // Fallback buckets — seen posts
         for (Post p : bucketC) { if (addedIds.add(p.getId())) interleaved.add(p); }
         for (Post p : bucketD) { if (addedIds.add(p.getId())) interleaved.add(p); }
         for (Post p : bucketF) { if (addedIds.add(p.getId())) interleaved.add(p); }
 
-        // Last resort — show ALL approved posts including user's own
         if (interleaved.isEmpty()) {
             sortByScore(postRepository.findAllApproved())
                     .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
         }
 
-// Always append any remaining approved posts not yet shown
         sortByScore(postRepository.findAllApproved())
                 .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
 
@@ -433,8 +414,7 @@ public class PostServiceImpl implements PostService {
         return new PageImpl<>(pageDtos, pageable, interleaved.size());
     }
 
-    // ─── SEEN POSTS ───────────────────────────────────────────────────────────
-
+    // Seen posts
     @Override
     @Transactional
     public void markPostsSeen(List<Long> postIds) {
@@ -462,8 +442,7 @@ public class PostServiceImpl implements PostService {
         seenPostRepository.deleteOlderThan(LocalDateTime.now().minusDays(30));
     }
 
-    // ─── HELPERS ──────────────────────────────────────────────────────────────
-
+    // Scoring helpers
     private double scorePost(Post post) {
         int likes    = post.getLikes()    == null ? 0 : post.getLikes().size();
         int comments = post.getComments() == null ? 0 : post.getComments().size();

@@ -28,6 +28,7 @@ public class PostController {
     private final CommentService commentService;
     private final ReportService reportService;
 
+    // Post creation and updates
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResDto> createPost(
             @RequestPart("title") String title,
@@ -97,6 +98,8 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    // Post interactions
+
     @PostMapping("/{postId}/like")
     public ResponseEntity<Void> toggleLike(@PathVariable Long postId) {
         postService.toggleLike(postId);
@@ -107,6 +110,8 @@ public class PostController {
     public ResponseEntity<Page<PostResDto>> getFeed(Pageable pageable) {
         return ResponseEntity.ok(postService.getFeed(pageable));
     }
+
+    // Post comments
 
     @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentResDto> createCommentForPost(
@@ -125,6 +130,8 @@ public class PostController {
         return ResponseEntity.ok(commentService.getCommentsByPost(postId, pageable));
     }
 
+    // Post moderation
+
     @PatchMapping("/{id}/approve")
     public ResponseEntity<PostResDto> approvePost(@PathVariable Long id) {
         return ResponseEntity.ok(postService.approvePost(id));
@@ -135,14 +142,11 @@ public class PostController {
         postService.rejectPost(id);
         return ResponseEntity.noContent().build();
     }
-
-
     @PostMapping("/seen")
     public ResponseEntity<Void> markPostsSeen(@RequestBody List<Long> postIds) {
         postService.markPostsSeen(postIds);
         return ResponseEntity.ok().build();
     }
-    // ONLY FOR TESTING WILL BE REMOVED AFTER
     @DeleteMapping("/seen/all")
     public ResponseEntity<Void> clearAllSeenPosts() {
         postService.clearAllSeenPosts();
@@ -154,6 +158,8 @@ public class PostController {
         postService.moderatorDeletePost(postId);
         return ResponseEntity.noContent().build();
     }
+
+    // Admin stats and reports
 
     @GetMapping("/stats/count")
     @PreAuthorize("hasRole('Admin')")

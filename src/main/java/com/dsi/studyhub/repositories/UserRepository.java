@@ -8,10 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -69,13 +67,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     long countByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
 
-    // For growth chart — requires createdAt on User entity
-//    @Query(value = """
-//    SELECT CAST(created_at AS DATE) as date, COUNT(*) as count
-//    FROM users
-//    WHERE created_at BETWEEN :from AND :to
-//    GROUP BY CAST(created_at AS DATE)
-//    ORDER BY date
-//    """, nativeQuery = true)
-//    List<DailyCountDto> countByCreatedAtBetweenGroupByDay(LocalDate from, LocalDate to);
 }

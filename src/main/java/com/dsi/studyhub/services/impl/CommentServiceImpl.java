@@ -50,6 +50,7 @@ public class CommentServiceImpl implements CommentService {
     private NotificationService notificationService;
 
 
+    // Comment creation and updates
     @Override
     @Transactional
     public CommentResDto createComment(CommentReqDto request) {
@@ -66,7 +67,6 @@ public class CommentServiceImpl implements CommentService {
         Comment fresh = commentRepository.findById(saved.getId())
                 .orElseThrow(() -> new RuntimeException("Comment not found after save"));
 
-        // No XP when commenting on your own post
         boolean isOwnPost = post.getUser().getId().equals(user.getId());
         if (!isOwnPost) {
             gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
@@ -97,6 +97,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(request.content());
         return commentMapper.toDto(commentRepository.save(comment));
     }
+    // Comment interactions
     @Override
     @Transactional
     public void toggleLike(Long commentId) {
@@ -105,7 +106,6 @@ public class CommentServiceImpl implements CommentService {
         User user = authenticatedUserService.getAuthenticatedUser();
         Long commentOwnerId = comment.getUser().getId();
 
-        // No XP when liking your own comment
         boolean isOwnComment = commentOwnerId.equals(user.getId());
 
         boolean alreadyLiked = user.getLikedComments().stream()
@@ -131,9 +131,11 @@ public class CommentServiceImpl implements CommentService {
         userRepository.save(user);
     }
 
+    // Comment deletion
     @Override
     @Transactional
     public void deleteComment(Long commentId) {
+        // Removes comment and associated likes for replies and the root comment.
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
         User user = authenticatedUserService.getAuthenticatedUser();
@@ -142,7 +144,6 @@ public class CommentServiceImpl implements CommentService {
             throw new ForbiddenException("You don't own this comment!");
         }
 
-        // Clean up likes on all replies first
         for (Comment reply : comment.getReplies()) {
             for (User u : new HashSet<>(reply.getLikedByUsers())) {
                 u.getLikedComments().remove(reply);
@@ -152,7 +153,6 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(reply);
         }
 
-        // Clean up likes on the comment itself
         for (User u : new HashSet<>(comment.getLikedByUsers())) {
             u.getLikedComments().remove(comment);
             userRepository.save(u);
@@ -164,6 +164,7 @@ public class CommentServiceImpl implements CommentService {
         gamificationService.awardXp(user.getId(), XpConfig.COMMENT_DELETED);
     }
 
+    // Comment queries
     @Override
     public Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable) {
         return commentRepository.findByPostIdAndParentCommentIsNull(postId, pageable)
@@ -188,6 +189,7 @@ public class CommentServiceImpl implements CommentService {
         return Map.of("total", commentRepository.countByStatusNot(CommentStatus.Flagged));
     }
 
+    // Replies
     @Override
     @Transactional
     public CommentResDto createReply(Long parentCommentId, CommentReqDto request) {
@@ -205,7 +207,6 @@ public class CommentServiceImpl implements CommentService {
         Comment fresh = commentRepository.findById(saved.getId())
                 .orElseThrow(() -> new RuntimeException("Reply not found after save"));
 
-        // No XP when replying on your own post or to your own comment
         boolean isOwnPost = parent.getPost().getUser().getId().equals(user.getId());
         boolean isOwnComment = parent.getUser().getId().equals(user.getId());
         if (!isOwnPost && !isOwnComment) {
@@ -218,6 +219,7 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findByParentCommentId(commentId, pageable)
                 .map(commentMapper::toDto);
     }
+    // Moderation
     @Override
     @Transactional
     public void moderatorDeleteComment(Long commentId) {

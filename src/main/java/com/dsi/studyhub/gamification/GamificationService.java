@@ -20,7 +20,7 @@ public class GamificationService {
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
 
-    // Called by other services to award XP
+    // XP awarding
     public void awardXp(Long userId, int amount) {
         eventPublisher.publishEvent(new XpEarnedEvent(userId, amount));
     }
@@ -28,21 +28,20 @@ public class GamificationService {
     @EventListener
     @Transactional
     public void handleXpEarned(XpEarnedEvent event) {
+        // Applies XP, recalculates badge/level, and notifies on new badge.
         User user = userRepository.findById(event.userId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        int newXp = Math.max(0, user.getXpPts() + event.xpAmount()); // XP can't go below 0
+        int newXp = Math.max(0, user.getXpPts() + event.xpAmount());
         user.setXpPts(newXp);
 
         BadgeType newBadgeType = calculateBadge(newXp);
         boolean alreadyEarned = user.getBadges().stream()
                 .anyMatch(b -> b.getType() == newBadgeType);
 
-//        int newLevel = newBadgeType.ordinal() + 1;
         int newLevel= calculateLevel(newXp);
         user.setLevel(newLevel);
 
-        // Debugging logs - Check these in your terminal!
         System.out.println("DEBUG: User " + user.getUsername() + " now has " + newXp + " XP");
         System.out.println("DEBUG: Calculated Level: " + newLevel);
 
@@ -88,6 +87,6 @@ public class GamificationService {
         if (totalXp >= 15)  return 4;
         if (totalXp >= 10)  return 3;
         if (totalXp >= 5)   return 2;
-        return 1; // Beginner
+        return 1;
     }
 }
