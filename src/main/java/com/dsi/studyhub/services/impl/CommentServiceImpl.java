@@ -16,10 +16,7 @@ import com.dsi.studyhub.mappers.CommentMapper;
 import com.dsi.studyhub.repositories.CommentRepository;
 import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.UserRepository;
-import com.dsi.studyhub.services.AuthenticatedUserService;
-import com.dsi.studyhub.services.CommentService;
-import com.dsi.studyhub.services.CommunityAuthService;
-import com.dsi.studyhub.services.NotificationService;
+import com.dsi.studyhub.services.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -49,8 +46,8 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private NotificationService notificationService;
 
-
-    // Comment creation and updates
+    @Autowired
+    private AiService  aiService;
     @Override
     @Transactional
     public CommentResDto createComment(CommentReqDto request) {
@@ -62,25 +59,33 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(request.content());
         comment.setUser(user);
         comment.setPost(post);
+        Boolean isSafe = aiService.isContentSafe(request.content());
 
-        Comment saved = commentRepository.save(comment);
-        Comment fresh = commentRepository.findById(saved.getId())
-                .orElseThrow(() -> new RuntimeException("Comment not found after save"));
+        if(isSafe) {
+            Comment saved = commentRepository.save(comment);
+            Comment fresh = commentRepository.findById(saved.getId())
+                    .orElseThrow(() -> new RuntimeException("Comment not found after save"));
 
-        boolean isOwnPost = post.getUser().getId().equals(user.getId());
-        if (!isOwnPost) {
-            gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+            boolean isOwnPost = post.getUser().getId().equals(user.getId());
+            if (!isOwnPost) {
+                gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
 
-            notificationService.createNotification(
-                    post.getUser().getId(),
-                    "COMMENT",
-                    user.getUsername() + " commented on your post",
-                    null,
-                    post.getId()
-            );
+                notificationService.createNotification(
+                        post.getUser().getId(),
+                        "COMMENT",
+                        user.getUsername() + " commented on your post",
+                        null,
+                        post.getId()
+                );
+            }
+
+            return commentMapper.toDto(fresh);
+
+        }
+        else {
+            throw new ForbiddenException("Your comment contains harmful content and cannot be posted.");
         }
 
-        return commentMapper.toDto(fresh);
     }
 
     @Override
@@ -196,6 +201,10 @@ public class CommentServiceImpl implements CommentService {
         User user = authenticatedUserService.getAuthenticatedUser();
         Comment parent = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+         Boolean Isvalid=aiService.isContentSafe(request.content());
+        if(!Isvalid){
+            throw new ForbiddenException("Your reply contains harmful content and cannot be posted.");
+        }
 
         Comment reply = new Comment();
         reply.setContent(request.content());

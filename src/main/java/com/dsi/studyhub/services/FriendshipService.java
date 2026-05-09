@@ -75,13 +75,13 @@ public class FriendshipService {
             throw new IllegalStateException("Request is not pending.");
 
         friendship.setStatus(FriendshipStatus.ACCEPTED);
-        User requester = userRepository.findById(requesterId).orElseThrow(
+        User Reciver = userRepository.findById(addresseeId).orElseThrow(
                 () -> new ResourceNotFoundException("User not found")
         );
         notificationService.createNotification(
                 requesterId,
                 "FRIEND_REQUEST_ACCEPTED",
-                requester.getUsername() + " accepted your friend request",
+                Reciver.getUsername() + " accepted your friend request",
                 null,
                 requesterId
 
