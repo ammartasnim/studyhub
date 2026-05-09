@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -78,6 +79,21 @@ public class CommentServiceImpl implements CommentService {
                     null,
                     post.getId()
             );
+            extractMentions(request.content()).forEach(username -> {
+                userRepository.findByUsername(username).ifPresent(mentioned -> {
+                    // don't notify yourself, don't double-notify the post owner
+                    if (!mentioned.getId().equals(user.getId()) &&
+                            !mentioned.getId().equals(post.getUser().getId())) {
+                        notificationService.createNotification(
+                                mentioned.getId(),
+                                "MENTION",
+                                user.getUsername() + " mentioned you in a comment",
+                                null,
+                                post.getId()
+                        );
+                    }
+                });
+            });
         }
 
         return commentMapper.toDto(fresh);
@@ -211,7 +227,21 @@ public class CommentServiceImpl implements CommentService {
         if (!isOwnPost && !isOwnComment) {
             gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
         }
+        extractMentions(request.content()).forEach(username -> {
+            userRepository.findByUsername(username).ifPresent(mentioned -> {
+                if (!mentioned.getId().equals(user.getId())) {
+                    notificationService.createNotification(
+                            mentioned.getId(),
+                            "MENTION",
+                            user.getUsername() + " mentioned you in a reply",
+                            null,
+                            parent.getPost().getId()
+                    );
+                }
+            });
+        });
         return commentMapper.toDto(fresh);
+
     }
     @Override
     public Page<CommentResDto> getReplies(Long commentId, Pageable pageable) {
@@ -242,5 +272,15 @@ public class CommentServiceImpl implements CommentService {
         comment.getLikedByUsers().clear();
         commentRepository.save(comment);
         commentRepository.deleteById(commentId);
+    }
+    private List<String> extractMentions(String content) {
+        if (content == null || content.isBlank()) return List.of();
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("@([a-zA-Z0-9_]+)");
+        java.util.regex.Matcher matcher = pattern.matcher(content);
+        List<String> mentions = new java.util.ArrayList<>();
+        while (matcher.find()) {
+            mentions.add(matcher.group(1));
+        }
+        return mentions;
     }
 }
