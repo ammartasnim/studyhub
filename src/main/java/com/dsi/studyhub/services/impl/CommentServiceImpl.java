@@ -23,31 +23,26 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private PostRepository postRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CommentMapper commentMapper;
-    @Autowired
-    private AuthenticatedUserService authenticatedUserService;
-    @Autowired
-    private GamificationService gamificationService;
-    @Autowired
-    private CommunityAuthService communityAuthService;
-    @Autowired
-    private NotificationService notificationService;
+    @Autowired private CommentRepository commentRepository;
+    @Autowired private PostRepository postRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private CommentMapper commentMapper;
+    @Autowired private AuthenticatedUserService authenticatedUserService;
+    @Autowired private GamificationService gamificationService;
+    @Autowired private CommunityAuthService communityAuthService;
+    @Autowired private NotificationService notificationService;
+    @Autowired private AiService aiService;
 
-    @Autowired
-    private AiService  aiService;
+    // ─── CREATE ───────────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public CommentResDto createComment(CommentReqDto request) {
@@ -55,38 +50,100 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findById(request.postId())
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + request.postId()));
 
+        // AI safety check
+        if (!aiService.isContentSafe(request.content())) {
+            throw new ForbiddenException("Your comment contains harmful content and cannot be posted.");
+        }
+
         Comment comment = new Comment();
         comment.setContent(request.content());
         comment.setUser(user);
         comment.setPost(post);
-        Boolean isSafe = aiService.isContentSafe(request.content());
 
-        if(isSafe) {
-            Comment saved = commentRepository.save(comment);
-            Comment fresh = commentRepository.findById(saved.getId())
-                    .orElseThrow(() -> new RuntimeException("Comment not found after save"));
+        Comment saved = commentRepository.save(comment);
+        Comment fresh = commentRepository.findById(saved.getId())
+                .orElseThrow(() -> new RuntimeException("Comment not found after save"));
 
-            boolean isOwnPost = post.getUser().getId().equals(user.getId());
-            if (!isOwnPost) {
-                gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+        boolean isOwnPost = post.getUser().getId().equals(user.getId());
+        if (!isOwnPost) {
+            gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
 
-                notificationService.createNotification(
-                        post.getUser().getId(),
-                        "COMMENT",
-                        user.getUsername() + " commented on your post",
-                        null,
-                        post.getId()
-                );
-            }
+            // Notify post owner
+            notificationService.createNotification(
+                    post.getUser().getId(),
+                    "COMMENT",
+                    user.getUsername() + " commented on your post",
+                    null,
+                    post.getId()
+            );
 
-            return commentMapper.toDto(fresh);
-
+            // Notify mentioned users
+            extractMentions(request.content()).forEach(username -> {
+                userRepository.findByUsername(username).ifPresent(mentioned -> {
+                    if (!mentioned.getId().equals(user.getId()) &&
+                            !mentioned.getId().equals(post.getUser().getId())) {
+                        notificationService.createNotification(
+                                mentioned.getId(),
+                                "MENTION",
+                                user.getUsername() + " mentioned you in a comment",
+                                null,
+                                post.getId()
+                        );
+                    }
+                });
+            });
         }
-        else {
-            throw new ForbiddenException("Your comment contains harmful content and cannot be posted.");
-        }
 
+        return commentMapper.toDto(fresh);
     }
+
+    @Override
+    @Transactional
+    public CommentResDto createReply(Long parentCommentId, CommentReqDto request) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        Comment parent = commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+        // AI safety check
+        if (!aiService.isContentSafe(request.content())) {
+            throw new ForbiddenException("Your reply contains harmful content and cannot be posted.");
+        }
+
+        Comment reply = new Comment();
+        reply.setContent(request.content());
+        reply.setUser(user);
+        reply.setPost(parent.getPost());
+        reply.setParentComment(parent);
+
+        Comment saved = commentRepository.save(reply);
+        Comment fresh = commentRepository.findById(saved.getId())
+                .orElseThrow(() -> new RuntimeException("Reply not found after save"));
+
+        boolean isOwnPost = parent.getPost().getUser().getId().equals(user.getId());
+        boolean isOwnComment = parent.getUser().getId().equals(user.getId());
+        if (!isOwnPost && !isOwnComment) {
+            gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
+        }
+
+        // Notify mentioned users in reply
+        extractMentions(request.content()).forEach(username -> {
+            userRepository.findByUsername(username).ifPresent(mentioned -> {
+                if (!mentioned.getId().equals(user.getId())) {
+                    notificationService.createNotification(
+                            mentioned.getId(),
+                            "MENTION",
+                            user.getUsername() + " mentioned you in a reply",
+                            null,
+                            parent.getPost().getId()
+                    );
+                }
+            });
+        });
+
+        return commentMapper.toDto(fresh);
+    }
+
+    // ─── EDIT ─────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -102,7 +159,71 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(request.content());
         return commentMapper.toDto(commentRepository.save(comment));
     }
-    // Comment interactions
+
+    // ─── DELETE ───────────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
+        User user = authenticatedUserService.getAuthenticatedUser();
+
+        if (!comment.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.Admin) {
+            throw new ForbiddenException("You don't own this comment!");
+        }
+
+        // Clean up likes on replies first
+        for (Comment reply : comment.getReplies()) {
+            for (User u : new HashSet<>(reply.getLikedByUsers())) {
+                u.getLikedComments().remove(reply);
+                userRepository.save(u);
+            }
+            reply.getLikedByUsers().clear();
+            commentRepository.save(reply);
+        }
+
+        // Clean up likes on the comment itself
+        for (User u : new HashSet<>(comment.getLikedByUsers())) {
+            u.getLikedComments().remove(comment);
+            userRepository.save(u);
+        }
+        comment.getLikedByUsers().clear();
+        commentRepository.save(comment);
+
+        commentRepository.deleteById(commentId);
+        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_DELETED);
+    }
+
+    @Override
+    @Transactional
+    public void moderatorDeleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found: " + commentId));
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+
+        Long communityId = comment.getPost() != null && comment.getPost().getCommunity() != null
+                ? comment.getPost().getCommunity().getId()
+                : null;
+
+        if (communityId == null) {
+            throw new ForbiddenException("Comment does not belong to a community post.");
+        }
+
+        communityAuthService.requireOwnerOrPermission(
+                currentUser.getId(), communityId, CommunityPermission.DELETE_COMMENT);
+
+        for (User u : new HashSet<>(comment.getLikedByUsers())) {
+            u.getLikedComments().remove(comment);
+            userRepository.save(u);
+        }
+        comment.getLikedByUsers().clear();
+        commentRepository.save(comment);
+        commentRepository.deleteById(commentId);
+    }
+
+    // ─── INTERACTIONS ─────────────────────────────────────────────────────────
+
     @Override
     @Transactional
     public void toggleLike(Long commentId) {
@@ -110,7 +231,6 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
         User user = authenticatedUserService.getAuthenticatedUser();
         Long commentOwnerId = comment.getUser().getId();
-
         boolean isOwnComment = commentOwnerId.equals(user.getId());
 
         boolean alreadyLiked = user.getLikedComments().stream()
@@ -136,40 +256,8 @@ public class CommentServiceImpl implements CommentService {
         userRepository.save(user);
     }
 
-    // Comment deletion
-    @Override
-    @Transactional
-    public void deleteComment(Long commentId) {
-        // Removes comment and associated likes for replies and the root comment.
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + commentId));
-        User user = authenticatedUserService.getAuthenticatedUser();
+    // ─── QUERIES ──────────────────────────────────────────────────────────────
 
-        if (!comment.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.Admin) {
-            throw new ForbiddenException("You don't own this comment!");
-        }
-
-        for (Comment reply : comment.getReplies()) {
-            for (User u : new HashSet<>(reply.getLikedByUsers())) {
-                u.getLikedComments().remove(reply);
-                userRepository.save(u);
-            }
-            reply.getLikedByUsers().clear();
-            commentRepository.save(reply);
-        }
-
-        for (User u : new HashSet<>(comment.getLikedByUsers())) {
-            u.getLikedComments().remove(comment);
-            userRepository.save(u);
-        }
-        comment.getLikedByUsers().clear();
-        commentRepository.save(comment);
-
-        commentRepository.deleteById(commentId);
-        gamificationService.awardXp(user.getId(), XpConfig.COMMENT_DELETED);
-    }
-
-    // Comment queries
     @Override
     public Page<CommentResDto> getCommentsByPost(Long postId, Pageable pageable) {
         return commentRepository.findByPostIdAndParentCommentIsNull(postId, pageable)
@@ -190,68 +278,26 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Map<String, Long> getCommentStats() {
-        return Map.of("total", commentRepository.countByStatusNot(CommentStatus.Flagged));
-    }
-
-    // Replies
-    @Override
-    @Transactional
-    public CommentResDto createReply(Long parentCommentId, CommentReqDto request) {
-        User user = authenticatedUserService.getAuthenticatedUser();
-        Comment parent = commentRepository.findById(parentCommentId)
-                .orElseThrow(() -> new RuntimeException("Parent comment not found"));
-         Boolean Isvalid=aiService.isContentSafe(request.content());
-        if(!Isvalid){
-            throw new ForbiddenException("Your reply contains harmful content and cannot be posted.");
-        }
-
-        Comment reply = new Comment();
-        reply.setContent(request.content());
-        reply.setUser(user);
-        reply.setPost(parent.getPost());
-        reply.setParentComment(parent);
-
-        Comment saved = commentRepository.save(reply);
-        Comment fresh = commentRepository.findById(saved.getId())
-                .orElseThrow(() -> new RuntimeException("Reply not found after save"));
-
-        boolean isOwnPost = parent.getPost().getUser().getId().equals(user.getId());
-        boolean isOwnComment = parent.getUser().getId().equals(user.getId());
-        if (!isOwnPost && !isOwnComment) {
-            gamificationService.awardXp(user.getId(), XpConfig.COMMENT_CREATED);
-        }
-        return commentMapper.toDto(fresh);
-    }
-    @Override
     public Page<CommentResDto> getReplies(Long commentId, Pageable pageable) {
         return commentRepository.findByParentCommentId(commentId, pageable)
                 .map(commentMapper::toDto);
     }
-    // Moderation
+
     @Override
-    @Transactional
-    public void moderatorDeleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found: " + commentId));
-        User currentUser = authenticatedUserService.getAuthenticatedUser();
+    public Map<String, Long> getCommentStats() {
+        return Map.of("total", commentRepository.countByStatusNot(CommentStatus.Flagged));
+    }
 
-        Long communityId = comment.getPost() != null && comment.getPost().getCommunity() != null
-                ? comment.getPost().getCommunity().getId()
-                : null;
+    // ─── HELPERS ──────────────────────────────────────────────────────────────
 
-        if (communityId == null) {
-            throw new ForbiddenException("Comment does not belong to a community post.");
+    private List<String> extractMentions(String content) {
+        if (content == null || content.isBlank()) return List.of();
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("@([a-zA-Z0-9_]+)");
+        java.util.regex.Matcher matcher = pattern.matcher(content);
+        List<String> mentions = new ArrayList<>();
+        while (matcher.find()) {
+            mentions.add(matcher.group(1));
         }
-
-        communityAuthService.requireOwnerOrPermission(currentUser.getId(), communityId, CommunityPermission.DELETE_COMMENT);
-
-        for (User u : new HashSet<>(comment.getLikedByUsers())) {
-            u.getLikedComments().remove(comment);
-            userRepository.save(u);
-        }
-        comment.getLikedByUsers().clear();
-        commentRepository.save(comment);
-        commentRepository.deleteById(commentId);
+        return mentions;
     }
 }
