@@ -18,6 +18,12 @@ public class AiController {
         return ResponseEntity.ok(new ChatResponse(response));
     }
 
+    @PostMapping("/improve-description")
+    public ResponseEntity<String> improveDescription(@RequestBody String description) {
+        String improvedDescription = aiService.ImproveDescription(description);
+        return ResponseEntity.ok(improvedDescription);
+    }
+
     public record ChatRequest(String message, String systemPrompt) {}
     public record ChatResponse(String response) {}
 }

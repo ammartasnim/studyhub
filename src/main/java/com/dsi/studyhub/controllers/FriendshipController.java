@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +21,7 @@ public class FriendshipController {
 
     private final FriendshipService friendshipService;
 
+    // Friendship requests
     @PostMapping("/request/{addresseeId}")
     public ResponseEntity<FriendshipResDto> sendRequest(
             @PathVariable Long addresseeId,
@@ -38,6 +38,7 @@ public class FriendshipController {
                 friendshipService.acceptRequest(currentUser.getId(), requesterId));
     }
 
+    // Friendship deletion
     @DeleteMapping("/{friendId}")
     public ResponseEntity<Void> deleteFriendship(
             @PathVariable Long friendId,
@@ -46,6 +47,7 @@ public class FriendshipController {
         return ResponseEntity.noContent().build();
     }
 
+    // Friendship lists and search
     @GetMapping("/my-friends")
     public ResponseEntity<Page<UserSummaryDto>> getFriends(
             @AuthenticationPrincipal User currentUser,
@@ -54,6 +56,7 @@ public class FriendshipController {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(friendshipService.getFriends(currentUser.getId(), pageable));
     }
+
     @GetMapping("/pending")
     public ResponseEntity<Page<FriendshipResDto>> getPendingRequests(
             @AuthenticationPrincipal User currentUser,
@@ -62,6 +65,7 @@ public class FriendshipController {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(friendshipService.getPendingRequests(currentUser.getId(), pageable));
     }
+
     @GetMapping("/sent")
     public ResponseEntity<Page<FriendshipResDto>> getSentRequests(
             @AuthenticationPrincipal User currentUser,
@@ -70,6 +74,7 @@ public class FriendshipController {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(friendshipService.getSentRequests(currentUser.getId(), pageable));
     }
+
     @GetMapping("/blocked")
     public ResponseEntity<Page<UserSummaryDto>> getBlockedUsers(
             @AuthenticationPrincipal User currentUser,
@@ -78,6 +83,7 @@ public class FriendshipController {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(friendshipService.getBlockedUsers(currentUser.getId(), pageable));
     }
+
     @GetMapping("/is-friend/{friendId}")
     public ResponseEntity<Boolean> isFriend(
             @PathVariable Long friendId,
@@ -85,6 +91,7 @@ public class FriendshipController {
         return ResponseEntity.ok(
                 friendshipService.isFriend(currentUser.getId(), friendId));
     }
+
     @GetMapping("/requested/{userId}")
     public ResponseEntity<Boolean> hasPendingRequest(
             @PathVariable Long userId,
@@ -92,6 +99,7 @@ public class FriendshipController {
         return ResponseEntity.ok(
                 friendshipService.hasPendingRequest(currentUser.getId(), userId));
     }
+
     @GetMapping("/suggestions")
     public ResponseEntity<Page<UserSummaryDto>> getSuggestedFriends(
             @AuthenticationPrincipal User currentUser,
@@ -102,6 +110,8 @@ public class FriendshipController {
         return ResponseEntity.ok(
                 friendshipService.getSuggestedFriends(currentUser.getId(), pageable,keyword));
     }
+
+    // Blocking and unblocking
     @PutMapping("/block/{userId}")
     public  ResponseEntity<UserSummaryDto> blockFriendship(
             @PathVariable Long userId,

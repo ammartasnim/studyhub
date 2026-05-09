@@ -14,12 +14,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public WebSocketConfig(WebSocketAuthChannelInterceptor authChannelInterceptor) {
         this.authChannelInterceptor = authChannelInterceptor;
     }
-        @Override
-        public void configureMessageBroker(MessageBrokerRegistry registry) {
-            registry.enableSimpleBroker("/topic", "/queue");
-            registry.setApplicationDestinationPrefixes("/app");
-            registry.setUserDestinationPrefix("/user");
-        }
+
+    // Broker configuration
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/topic", "/queue");
+        registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
+    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -28,6 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
+    // Inbound authentication
     @Override
     public void configureClientInboundChannel(org.springframework.messaging.simp.config.ChannelRegistration registration) {
         registration.interceptors(authChannelInterceptor);

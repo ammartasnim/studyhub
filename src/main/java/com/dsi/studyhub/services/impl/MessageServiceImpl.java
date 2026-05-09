@@ -39,10 +39,12 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private FriendshipService friendshipService;
 
+    // Message sending
     @Override
-        @Transactional
-        public MessageResDto sendMessage(MessageSendDto request) {
-            User sender = authenticatedUserService.getAuthenticatedUser();
+    @Transactional
+    public MessageResDto sendMessage(MessageSendDto request) {
+        // Validates friendship and persists a message in a shared conversation.
+        User sender = authenticatedUserService.getAuthenticatedUser();
             if (sender.getId().equals(request.recipientId())) {
                 throw new IllegalArgumentException("You cannot message yourself.");
             }
@@ -70,6 +72,7 @@ public class MessageServiceImpl implements MessageService {
             return toMessageDto(saved, recipient);
         }
 
+    // Message retrieval
     @Override
     @Transactional
     public Page<MessageResDto> getConversationMessages(Long conversationId, Pageable pageable) {
@@ -95,6 +98,7 @@ public class MessageServiceImpl implements MessageService {
                 .collect(Collectors.toList());
     }
 
+    // Read tracking
     @Override
     @Transactional
     public void markConversationRead(MessageReadDto request) {
@@ -110,7 +114,9 @@ public class MessageServiceImpl implements MessageService {
         );
     }
 
+    // Conversation helpers
     private Conversation createConversation(Long userA, Long userB) {
+        // Creates a conversation with stable user ordering.
         Conversation conversation = new Conversation();
         conversation.setUserOneId(Math.min(userA, userB));
         conversation.setUserTwoId(Math.max(userA, userB));
@@ -133,6 +139,7 @@ public class MessageServiceImpl implements MessageService {
         return userRepository.findById(recipientId).orElse(null);
     }
 
+    // Mapping helpers
     private MessageResDto toMessageDto(Message message, User recipient) {
         String senderUsername = message.getSender() != null ? message.getSender().getUsername() : null;
         Long recipientId = recipient != null ? recipient.getId() : null;
@@ -151,6 +158,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private ConversationResDto toConversationDto(Conversation conversation) {
+        // Builds conversation summary including last message.
         Optional<Message> lastMessage = messageRepository.findByConversationIdOrderByCreatedAtDesc(
                         conversation.getId(),
                         Pageable.ofSize(1))

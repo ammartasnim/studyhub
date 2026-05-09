@@ -11,7 +11,6 @@ import com.dsi.studyhub.repositories.UserRepository;
 import com.dsi.studyhub.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -47,6 +46,7 @@ public class UserService {
     private NotificationService notificationService;
 
 
+        // Current user lookup
         @org.springframework.transaction.annotation.Transactional(readOnly = true)
         public UserResDto getMe() {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -78,15 +78,14 @@ public class UserService {
             UserResDto dto = userMapper.toDto(saved);
             return new ProfileUpdateResDto(dto, newToken);
      }
+    // Password and profile updates
     public void changePassword(ChangePasswordDto dto) {
         User user = authenticatedUserService.getAuthenticatedUser();
 
-        // Verify current password
         if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }
 
-        // Check new passwords match
         if (!dto.newPassword().equals(dto.confirmPassword())) {
             throw new RuntimeException("Passwords do not match");
         }
@@ -116,6 +115,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // Admin user retrieval and listing
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public UserResDto getuserById(Long userId) {
         User user = userRepository.findById(userId)
@@ -123,12 +123,6 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-//    public Page<User> getAllusers(String firstName, String lastName,
-//                                      String email, Boolean banned,
-//                                      int page, int size) {
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
-//        return userRepository.findWithFilters(firstName, lastName, email, banned, pageable);
-//    }
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Page<UserResDto> getAllusers(String firstName, String lastName,
                               String email, Boolean banned,
@@ -145,6 +139,7 @@ public class UserService {
                 .toList();
         return new PageImpl<>(dtos, pageable, userPage.getTotalElements());
     }
+    // Avatar updates
     @org.springframework.transaction.annotation.Transactional
     public UserResDto updatePfp(MultipartFile file) throws IOException {
         User currentUser = getMeEntity();
@@ -163,6 +158,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("user not found"));
     }
 
+    // Stats and badges
     public Map<String, Long> getUserStats() {
         return Map.of(
                 "total", userRepository.count(),
@@ -173,13 +169,13 @@ public class UserService {
     public Map<BadgeType, Long> getBadgeDistribution() {
         List<Object[]> results = userRepository.countGroupedByBadgeRaw();
 
-        // Convert List<Object[]> to Map<BadgeType, Long>
         return results.stream()
                 .collect(Collectors.toMap(
-                        result -> (BadgeType) result[0], // The BadgeType enum
-                        result -> (Long) result[1]       // The count
+                        result -> (BadgeType) result[0],
+                        result -> (Long) result[1]
                 ));
     }
+    // Search and growth
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Page<UserResDto> searchByUsername(String username, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("username").ascending());

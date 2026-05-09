@@ -30,11 +30,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.registerUser(request));
     }
 
+    // Password login
     @PostMapping("/login")
     public ResponseEntity<AuthResDto> login(@Valid @RequestBody LoginReqDto request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    // Social account sync
     @GetMapping("/sync")
     public ResponseEntity<AuthResDto> syncSocialUser(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -53,7 +55,6 @@ public class AuthController {
             String uid = claims.getSubject();
             String email = claims.get("email", String.class);
 
-            // Extract given_name and family_name from user_metadata (Google provides these)
             String firstName = null;
             String lastName = null;
 
@@ -62,7 +63,6 @@ public class AuthController {
                 firstName = (String) meta.get("given_name");
                 lastName  = (String) meta.get("family_name");
 
-                // fallback: if Google only gave "name" (unlikely but safe)
                 if (firstName == null) {
                     String fullName = (String) meta.get("name");
                     if (fullName != null && !fullName.isBlank()) {

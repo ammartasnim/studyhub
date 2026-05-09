@@ -45,8 +45,7 @@ public class ReportServiceImpl implements ReportService {
     private int flagThreshold;
 
 
-    // ─── SUBMIT ───────────────────────────────────────────────────────────────
-
+    // Report submission
     @Override
     @Transactional
     public ReportResDto reportPost(Long postId, ReportReqDto request) {
@@ -99,8 +98,7 @@ public class ReportServiceImpl implements ReportService {
         return toDto(reportRepository.save(report), preview);
     }
 
-    // ─── ADMIN ACTIONS ────────────────────────────────────────────────────────
-
+    // Admin actions
     @Override
     @Transactional
     public ReportResDto approveReport(Long reportId) {
@@ -148,8 +146,7 @@ public class ReportServiceImpl implements ReportService {
                 .map(r -> toDto(r, resolvePreview(r.getTargetType(), r.getTargetId())));
     }
 
-    // ─── GROUPED: POSTS ───────────────────────────────────────────────────────
-
+    // Grouped post reports
     @Override
     @Transactional
     public List<PostReportGroupDto> getGroupedPostReports() {
@@ -192,8 +189,7 @@ public class ReportServiceImpl implements ReportService {
                 .toList();
     }
 
-    // ─── GROUPED: COMMENTS ────────────────────────────────────────────────────
-
+    // Grouped comment reports
     @Override
     @Transactional
     public List<CommentReportGroupDto> getGroupedCommentReports() {
@@ -240,9 +236,9 @@ public class ReportServiceImpl implements ReportService {
                 .toList();
     }
 
-    // ─── HELPERS ──────────────────────────────────────────────────────────────
-
+    // Reporting helpers
     private void updateTargetStatus(ReportTargetType type, Long targetId) {
+        // Applies flagging/unflagging based on approved report threshold.
         long approvedCount = reportRepository.countApprovedReports(type, targetId);
 
         if (type == ReportTargetType.POST) {
@@ -278,7 +274,6 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    // single shared helper — works for both POST and COMMENT
     private LocalDateTime getLatestReportDate(Long targetId, ReportTargetType type) {
         return reportRepository
                 .findTopByTargetTypeAndTargetIdOrderByCreatedAtDesc(type, targetId)
@@ -286,7 +281,6 @@ public class ReportServiceImpl implements ReportService {
                 .orElse(null);
     }
 
-    // single shared helper — works for both POST and COMMENT
     private Map<String, Long> getReasonBreakdown(Long targetId, ReportTargetType type) {
         return reportRepository
                 .findByTargetTypeAndTargetId(type, targetId)

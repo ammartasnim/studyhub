@@ -4,9 +4,7 @@ import com.dsi.studyhub.dtos.ChangePasswordDto;
 import com.dsi.studyhub.dtos.ProfileUpdateResDto;
 import com.dsi.studyhub.dtos.UserReqDto;
 import com.dsi.studyhub.dtos.UserResDto;
-import com.dsi.studyhub.entities.User;
 import com.dsi.studyhub.enums.BadgeType;
-import com.dsi.studyhub.mappers.UserMapper;
 import com.dsi.studyhub.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,21 +26,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserMapper userMapper;
-
-
+    // Current user profile
     @GetMapping("/me")
     public ResponseEntity<UserResDto> getMe() {
         return ResponseEntity.ok(userService.getMe());
     }
 
+    // Profile updates
     @PutMapping("/edit")
     public ResponseEntity<ProfileUpdateResDto> editUser(@RequestBody @Valid UserReqDto userReqDto) {
         ProfileUpdateResDto res = userService.editUser(userReqDto);
         return ResponseEntity.ok(res);
     }
 
+    // Admin user management
     @GetMapping
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Page<UserResDto>> getAllClients(
@@ -54,7 +51,6 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.getAllusers(firstName, lastName, email, banned, page, size));
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResDto> getClientById(@PathVariable Long id) {
@@ -74,6 +70,8 @@ public class UserController {
         userService.unbanUser(id);
         return ResponseEntity.ok("User unbanned successfully");
     }
+
+    // Password and avatar updates
     @PutMapping("/me/password")
     public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordDto dto) {
         userService.changePassword(dto);
@@ -85,6 +83,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updatePfp(file));
     }
 
+    // Admin stats
     @GetMapping("/stats/count")
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Map<String, Long>> getUserStats() {
@@ -96,6 +95,8 @@ public class UserController {
     public ResponseEntity<Map<BadgeType, Long>> getBadgeDistribution() {
         return ResponseEntity.ok(userService.getBadgeDistribution());
     }
+
+    // Search and growth metrics
     @GetMapping("/search")
     public ResponseEntity<Page<UserResDto>> searchByUsername(
             @RequestParam String username,
@@ -105,7 +106,6 @@ public class UserController {
     }
 
     @GetMapping("/stats/growth")
-//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> getUserGrowth() {
         return ResponseEntity.ok(userService.getUserGrowth());
     }

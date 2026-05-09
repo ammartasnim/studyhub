@@ -20,7 +20,7 @@ public class GamificationService {
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
 
-    // Called by other services to award XP
+    // XP awarding
     public void awardXp(Long userId, int amount) {
         eventPublisher.publishEvent(new XpEarnedEvent(userId, amount));
     }
@@ -28,21 +28,20 @@ public class GamificationService {
     @EventListener
     @Transactional
     public void handleXpEarned(XpEarnedEvent event) {
+        // Applies XP, recalculates badge/level, and notifies on new badge.
         User user = userRepository.findById(event.userId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        int newXp = Math.max(0, user.getXpPts() + event.xpAmount()); // XP can't go below 0
+        int newXp = Math.max(0, user.getXpPts() + event.xpAmount());
         user.setXpPts(newXp);
 
         BadgeType newBadgeType = calculateBadge(newXp);
         boolean alreadyEarned = user.getBadges().stream()
                 .anyMatch(b -> b.getType() == newBadgeType);
 
-//        int newLevel = newBadgeType.ordinal() + 1;
         int newLevel= calculateLevel(newXp);
         user.setLevel(newLevel);
 
-        // Debugging logs - Check these in your terminal!
         System.out.println("DEBUG: User " + user.getUsername() + " now has " + newXp + " XP");
         System.out.println("DEBUG: Calculated Level: " + newLevel);
 
@@ -66,28 +65,28 @@ public class GamificationService {
     }
 
     private BadgeType calculateBadge(int totalXp) {
-        if (totalXp >= 100) return BadgeType.LEGEND;
-        if (totalXp >= 80)  return BadgeType.MENTOR;
-        if (totalXp >= 60)  return BadgeType.ACHIEVER;
-        if (totalXp >= 45)  return BadgeType.COLLABORATOR;
-        if (totalXp >= 30)  return BadgeType.CONSISTENT;
-        if (totalXp >= 20)  return BadgeType.HELPER;
-        if (totalXp >= 15)  return BadgeType.CONTRIBUTOR;
-        if (totalXp >= 10)  return BadgeType.EXPLORER;
-        if (totalXp >= 5)   return BadgeType.LEARNER;
+        if (totalXp >= 5000) return BadgeType.LEGEND;
+        if (totalXp >= 3500)  return BadgeType.MENTOR;
+        if (totalXp >= 2500)  return BadgeType.ACHIEVER;
+        if (totalXp >= 1500)  return BadgeType.COLLABORATOR;
+        if (totalXp >= 900)  return BadgeType.CONSISTENT;
+        if (totalXp >= 500)  return BadgeType.HELPER;
+        if (totalXp >= 275)  return BadgeType.CONTRIBUTOR;
+        if (totalXp >= 150)  return BadgeType.EXPLORER;
+        if (totalXp >= 75)   return BadgeType.LEARNER;
         return BadgeType.BEGINNER;
     }
 
     private int calculateLevel(int totalXp) {
-        if (totalXp >= 100) return 10;
-        if (totalXp >= 80)  return 9;
-        if (totalXp >= 60)  return 8;
-        if (totalXp >= 45)  return 7;
-        if (totalXp >= 30)  return 6;
-        if (totalXp >= 20)  return 5;
-        if (totalXp >= 15)  return 4;
-        if (totalXp >= 10)  return 3;
-        if (totalXp >= 5)   return 2;
-        return 1; // Beginner
+        if (totalXp >= 5000) return 100;
+        if (totalXp >= 3500) return 75;
+        if (totalXp >= 2500) return 50;
+        if (totalXp >= 1500) return 30;
+        if (totalXp >= 900)  return 20;
+        if (totalXp >= 500)  return 15;
+        if (totalXp >= 275)  return 10;
+        if (totalXp >= 150)  return 5;
+        if (totalXp >= 75)   return 2;
+        return 1;
     }
 }

@@ -1,7 +1,6 @@
 package com.dsi.studyhub.repositories;
 
 import com.dsi.studyhub.entities.CommunityWarning;
-import org.springframework.beans.PropertyValues;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

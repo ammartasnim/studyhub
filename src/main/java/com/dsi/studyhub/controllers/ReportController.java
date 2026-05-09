@@ -22,8 +22,7 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    // ─── SUBMIT REPORTS (any authenticated user) ──────────────────────────────
-
+    // Report submission
     @PostMapping("/post/{postId}")
     public ResponseEntity<ReportResDto> reportPost(
             @PathVariable Long postId,
@@ -39,6 +38,8 @@ public class ReportController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reportService.reportComment(commentId, request));
     }
+    
+    // User report views
     @GetMapping("/my")
     public ResponseEntity<Page<ReportResDto>> getMyReports(Pageable pageable) {
         return ResponseEntity.ok(reportService.getMyReports(pageable));
@@ -49,8 +50,7 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getGroupedPostReports());
     }
 
-    // ─── ADMIN ONLY ───────────────────────────────────────────────────────────
-
+    // Admin actions
     @GetMapping
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Page<ReportResDto>> getAllReports(
@@ -70,6 +70,8 @@ public class ReportController {
     public ResponseEntity<ReportResDto> rejectReport(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.rejectReport(id));
     }
+    
+    // Admin report views
     @GetMapping("/posts/{postId}")
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<List<ReportResDto>> getReportsForPost(@PathVariable Long postId) {

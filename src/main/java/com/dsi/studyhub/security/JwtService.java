@@ -55,7 +55,8 @@ public class JwtService {
     }
 
     public Claims extractAllClaims(String token) {
-        // Try local secret first (for locally generated tokens)
+        // Tries local JWT validation first, then falls back to Supabase JWKS.
+        // Local JWT parsing
         try {
             return Jwts.parser()
                     .verifyWith(getSigningKey())
@@ -63,12 +64,10 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (Exception e) {
-            // Not a local token, try Supabase
         }
 
-        // Try Supabase token (ES256) - use JWKS
+        // Supabase JWT parsing
         try {
-            // Manually decode the header segment to extract kid
             String[] parts = token.split("\\.");
             if (parts.length < 3) {
                 throw new RuntimeException("Invalid JWT format");
@@ -86,10 +85,8 @@ public class JwtService {
                 throw new RuntimeException("No kid found in token header");
             }
 
-            // Get public key from JWKS using the kid
             PublicKey publicKey = getSupabasePublicKey(kid);
 
-            // Verify and parse token with Supabase public key
             return Jwts.parser()
                     .verifyWith(publicKey)
                     .build()
@@ -102,8 +99,8 @@ public class JwtService {
     }
 
     private PublicKey getSupabasePublicKey(String kid) {
+        // Resolves an ES256 public key from Supabase JWKS by key id.
         try {
-            // Fetch JWKS from Supabase
             String jwksJson;
             try (InputStream is = new URL(supabaseUrl + "/auth/v1/.well-known/jwks.json").openStream();
                  Scanner s = new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A")) {
