@@ -17,11 +17,7 @@ import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.SeenPostRepository;
 import com.dsi.studyhub.repositories.UserRepository;
-import com.dsi.studyhub.services.AuthenticatedUserService;
-import com.dsi.studyhub.services.CommunityAuthService;
-import com.dsi.studyhub.services.FileStorageService;
-import com.dsi.studyhub.services.NotificationService;
-import com.dsi.studyhub.services.PostService;
+import com.dsi.studyhub.services.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,12 +47,20 @@ public class PostServiceImpl implements PostService {
     @Autowired private FileStorageService fileStorageService;
     @Autowired private NotificationService notificationService;
     @Autowired private CommunityAuthService communityAuthService;
+    @Autowired private AiService aiService;
 
     // Post creation
     @Override
     @Transactional
     public PostResDto createPost(PostReqDto request) {
         User user = authenticatedUserService.getAuthenticatedUser();
+
+        if (!aiService.isContentSafe(request.title())) {
+            throw new ForbiddenException("Your post contains  harmful content and cannot be posted.");
+        }
+        if (!aiService.isContentSafe(request.content())) {
+            throw new ForbiddenException("Your post contains  harmful content and cannot be posted.");
+        }
 
         List<String> imgPaths = new ArrayList<>();
         if (request.imgs() != null) {
