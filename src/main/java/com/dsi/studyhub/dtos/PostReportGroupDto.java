@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -27,4 +28,9 @@ public class PostReportGroupDto {
 
     private LocalDateTime latestReportDate;
     private boolean hasPendingReports;
+
+    private String content;
+    private List<String> imgs;
+    private LocalDateTime postCreatedAt;
+    private String userPfp;
 }

@@ -37,4 +37,15 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     List<Community> findTopByMemberCount(Pageable pageable);
 
     Page<Community> findByMembersId(Long userId, Pageable pageable);
+
+    @Query("SELECT c FROM Community c WHERE " +
+            "(:title IS NULL OR :title = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:description IS NULL OR :description = '' OR LOWER(c.description) LIKE LOWER(CONCAT('%', :description, '%'))) AND " +
+            "(:minMembers IS NULL OR c.nbrMembers >= :minMembers) AND " +
+            "c.id NOT IN :excludedIds")
+    Page<Community> findByFiltersExcluding(@Param("title") String title,
+                                           @Param("description") String description,
+                                           @Param("minMembers") Integer minMembers,
+                                           @Param("excludedIds") List<Long> excludedIds,
+                                           Pageable pageable);
 }

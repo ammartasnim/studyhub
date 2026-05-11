@@ -63,6 +63,39 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                     @Param("keyword") String keyword,
                                     Pageable pageable);
 
+    @Query("""
+    SELECT DISTINCT u FROM User u
+    WHERE u.id != :userId
+    AND u.role != 'Admin'
+    AND u.id NOT IN (
+        SELECT f.addressee.id FROM Friendship f WHERE f.requester.id = :userId
+        UNION
+        SELECT f.requester.id FROM Friendship f WHERE f.addressee.id = :userId
+    )
+    AND (
+        LOWER(COALESCE(u.username, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(COALESCE(u.firstName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(COALESCE(u.lastName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    )
+    AND (
+        u.id IN (
+            SELECT m.id FROM Community c JOIN c.members m
+            WHERE c.id IN (SELECT c2.id FROM Community c2 JOIN c2.members m2 WHERE m2.id = :userId)
+        )
+        OR u.id IN (
+            SELECT m.id FROM Community c JOIN c.members m
+            WHERE c.owner.id = :userId
+        )
+        OR u.id IN (
+            SELECT c4.owner.id FROM Community c4
+            WHERE c4.id IN (SELECT c5.id FROM Community c5 JOIN c5.members m3 WHERE m3.id = :userId)
+        )
+    )
+""")
+    Page<User> findSuggestedFriendsWithSharedCommunity(@Param("userId") Long userId,
+                                                        @Param("keyword") String keyword,
+                                                        Pageable pageable);
+
     Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 
     long countByCreatedAtBetween(LocalDateTime from, LocalDateTime to);

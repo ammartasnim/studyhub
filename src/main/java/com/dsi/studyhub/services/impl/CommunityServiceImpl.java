@@ -86,7 +86,13 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Page<CommunityResDto> getAllCommunities(String title, String description, Integer minMembers, Pageable pageable) {
-        return communityRepository.findByFilters(title, description, minMembers, pageable)
+        User currentUser = authenticatedUserService.getAuthenticatedUser();
+        List<Long> bannedIds = communityBanRepository.findBannedCommunityIdsByUserId(currentUser.getId());
+        if (bannedIds.isEmpty()) {
+            return communityRepository.findByFilters(title, description, minMembers, pageable)
+                    .map(communityMapper::toDto);
+        }
+        return communityRepository.findByFiltersExcluding(title, description, minMembers, bannedIds, pageable)
                 .map(communityMapper::toDto);
     }
 

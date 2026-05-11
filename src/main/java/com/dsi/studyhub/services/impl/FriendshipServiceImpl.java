@@ -142,6 +142,14 @@ public class FriendshipServiceImpl implements FriendshipService {
         userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
         String safeKeyword = keyword == null ? "" : keyword;
+
+        if (safeKeyword.isEmpty()) {
+            Page<User> shared = userRepository.findSuggestedFriendsWithSharedCommunity(userId, "", pageable);
+            if (shared.hasContent()) {
+                return shared.map(this::toUserSummaryDto);
+            }
+        }
+
         return userRepository.findSuggestedFriends(userId, safeKeyword, pageable)
                 .map(this::toUserSummaryDto);
     }

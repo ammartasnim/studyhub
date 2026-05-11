@@ -167,13 +167,17 @@ public class ReportServiceImpl implements ReportService {
                     .postId(postId)
                     .title(post.getTitle())
                     .authorUsername(post.getUser().getUsername())
-                    .communityTitle(post.getCommunity().getTitle())
+                    .communityTitle(post.getCommunity() != null ? post.getCommunity().getTitle() : null)
                     .totalReports(totalReports)
                     .approvedReports(approvedReports)
                     .hasPendingReports(pendingCount > 0)
                     .status(post.getStatus())
                     .latestReportDate(getLatestReportDate(postId, ReportTargetType.POST))
                     .reasons(getReasonBreakdown(postId, ReportTargetType.POST))
+                    .content(post.getContent())
+                    .imgs(post.getImgs() != null ? post.getImgs() : java.util.List.of())
+                    .postCreatedAt(post.getCreatedAt())
+                    .userPfp(post.getUser().getPfp())
                     .build();
 
         }).filter(Objects::nonNull).toList();

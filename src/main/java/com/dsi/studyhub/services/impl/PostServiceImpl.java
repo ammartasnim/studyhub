@@ -13,6 +13,7 @@ import com.dsi.studyhub.exceptions.ResourceNotFoundException;
 import com.dsi.studyhub.gamification.GamificationService;
 import com.dsi.studyhub.gamification.XpConfig;
 import com.dsi.studyhub.mappers.PostMapper;
+import com.dsi.studyhub.repositories.CommunityBanRepository;
 import com.dsi.studyhub.repositories.CommunityRepository;
 import com.dsi.studyhub.repositories.PostRepository;
 import com.dsi.studyhub.repositories.SeenPostRepository;
@@ -41,6 +42,7 @@ public class PostServiceImpl implements PostService {
     @Autowired private UserRepository userRepository;
     @Autowired private SeenPostRepository seenPostRepository;
     @Autowired private CommunityRepository communityRepository;
+    @Autowired private CommunityBanRepository communityBanRepository;
     @Autowired private PostMapper postMapper;
     @Autowired private AuthenticatedUserService authenticatedUserService;
     @Autowired private GamificationService gamificationService;
@@ -347,6 +349,19 @@ public class PostServiceImpl implements PostService {
             if (friendPostIds.add(p.getId())) friendPosts.add(p);
         }
 
+        Set<Long> bannedCommunityIds = new HashSet<>(communityBanRepository.findBannedCommunityIdsByUserId(userId));
+        if (!bannedCommunityIds.isEmpty()) {
+            communityPosts = communityPosts.stream()
+                    .filter(p -> p.getCommunity() == null || !bannedCommunityIds.contains(p.getCommunity().getId()))
+                    .collect(Collectors.toList());
+            discoveryPosts = discoveryPosts.stream()
+                    .filter(p -> p.getCommunity() == null || !bannedCommunityIds.contains(p.getCommunity().getId()))
+                    .collect(Collectors.toList());
+            friendPosts = friendPosts.stream()
+                    .filter(p -> p.getCommunity() == null || !bannedCommunityIds.contains(p.getCommunity().getId()))
+                    .collect(Collectors.toList());
+        }
+
         if (communityPosts.isEmpty() && discoveryPosts.isEmpty()) {
             discoveryPosts = postRepository.findAllApprovedExcludingUser(userId);
         }
@@ -397,11 +412,13 @@ public class PostServiceImpl implements PostService {
         for (Post p : bucketF) { if (addedIds.add(p.getId())) interleaved.add(p); }
         
         if (interleaved.isEmpty()) {
-            sortByScore(postRepository.findAllApprovedExcludingUser(userId))
+            sortByScore(postRepository.findAllApprovedExcludingUser(userId)).stream()
+                    .filter(p -> bannedCommunityIds.isEmpty() || p.getCommunity() == null || !bannedCommunityIds.contains(p.getCommunity().getId()))
                     .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
         }
 
-        sortByScore(postRepository.findAllApprovedExcludingUser(userId))
+        sortByScore(postRepository.findAllApprovedExcludingUser(userId)).stream()
+                .filter(p -> bannedCommunityIds.isEmpty() || p.getCommunity() == null || !bannedCommunityIds.contains(p.getCommunity().getId()))
                 .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
 
         int start = (int) pageable.getOffset();

@@ -101,7 +101,7 @@ class CommunityServiceImplTest {
     // Allows explorers to create communities and defaults member count to 1.
     @Test
     void createCommunity_withExplorerBadge_createsAndDefaultsMembers() {
-        owner.getBadges().add(new Badge(owner, 1L, BadgeType.EXPLORER));
+        owner.getBadges().add(new Badge(owner, 1L, BadgeType.EXPLORER,LocalDateTime.now()));
         CommunityReqDto req = new CommunityReqDto("Title", "Desc", 0, "cat");
         Community mapped = buildCommunity(null, owner, 0);
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(owner);
