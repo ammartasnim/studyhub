@@ -45,6 +45,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -424,7 +425,6 @@ class PostServiceImplTest {
     void approvePost_noCommunity_throwsForbidden() {
         testPost.setCommunity(null);
         when(postRepository.findById(10L)).thenReturn(Optional.of(testPost));
-        when(authenticatedUserService.getAuthenticatedUser()).thenReturn(testUser);
 
         assertThatThrownBy(() -> postService.approvePost(10L))
                 .isInstanceOf(ForbiddenException.class);
@@ -448,7 +448,6 @@ class PostServiceImplTest {
     void rejectPost_noCommunity_throwsForbidden() {
         testPost.setCommunity(null);
         when(postRepository.findById(10L)).thenReturn(Optional.of(testPost));
-        when(authenticatedUserService.getAuthenticatedUser()).thenReturn(testUser);
 
         assertThatThrownBy(() -> postService.rejectPost(10L))
                 .isInstanceOf(ForbiddenException.class);
@@ -472,7 +471,6 @@ class PostServiceImplTest {
     void moderatorDeletePost_noCommunity_throwsForbidden() {
         testPost.setCommunity(null);
         when(postRepository.findById(10L)).thenReturn(Optional.of(testPost));
-        when(authenticatedUserService.getAuthenticatedUser()).thenReturn(testUser);
 
         assertThatThrownBy(() -> postService.moderatorDeletePost(10L))
                 .isInstanceOf(ForbiddenException.class);
@@ -524,7 +522,7 @@ class PostServiceImplTest {
 
         postService.toggleLike(10L);
 
-        verify(gamificationService, never()).awardXp(anyLong(), any());
+        verify(gamificationService, never()).awardXp(anyLong(), anyInt());
         verify(notificationService, never()).createNotification(any(), any(), any(), any(), any());
     }
 
@@ -591,7 +589,6 @@ class PostServiceImplTest {
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(testUser);
         when(seenPostRepository.findSeenPostIdsByUserId(testUser.getId())).thenReturn(Set.of());
         when(postRepository.findCommunityFeedPosts(testUser.getId())).thenReturn(List.of(testPost));
-        when(postRepository.findDiscoveryPostsByCategories(eq(testUser.getId()), any())).thenReturn(List.of());
         when(postRepository.findAllApprovedExcludingUser(testUser.getId())).thenReturn(List.of());
         when(postRepository.findPostsByFriendsAsRequester(testUser.getId())).thenReturn(List.of());
         when(postRepository.findPostsByFriendsAsAddressee(testUser.getId())).thenReturn(List.of());
@@ -610,7 +607,6 @@ class PostServiceImplTest {
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(testUser);
         when(seenPostRepository.findSeenPostIdsByUserId(testUser.getId())).thenReturn(Set.of());
         when(postRepository.findCommunityFeedPosts(testUser.getId())).thenReturn(List.of());
-        when(postRepository.findDiscoveryPostsByCategories(eq(testUser.getId()), any())).thenReturn(List.of());
         when(postRepository.findAllApprovedExcludingUser(testUser.getId())).thenReturn(List.of());
         when(postRepository.findPostsByFriendsAsRequester(testUser.getId())).thenReturn(List.of());
         when(postRepository.findPostsByFriendsAsAddressee(testUser.getId())).thenReturn(List.of());

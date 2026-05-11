@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -146,13 +147,14 @@ class MessageServiceImplTest {
         when(messageRepository.save(any(Message.class))).thenAnswer(invocation -> {
             Message saved = invocation.getArgument(0);
             saved.setId(message.getId());
+            saved.setCreatedAt(LocalDateTime.now());
             return saved;
         });
 
         MessageResDto result = messageService.sendMessage(req);
 
         assertThat(result.conversationId()).isEqualTo(11L);
-        verify(conversationRepository).save(any(Conversation.class));
+        verify(conversationRepository, times(2)).save(any(Conversation.class));
     }
 
     // Rejects access to conversations the user is not part of.

@@ -5,6 +5,7 @@ import com.dsi.studyhub.dtos.PostReportGroupDto;
 import com.dsi.studyhub.dtos.ReportReqDto;
 import com.dsi.studyhub.dtos.ReportResDto;
 import com.dsi.studyhub.entities.Comment;
+import com.dsi.studyhub.entities.Community;
 import com.dsi.studyhub.entities.Post;
 import com.dsi.studyhub.entities.Report;
 import com.dsi.studyhub.entities.User;
@@ -66,10 +67,15 @@ class ReportServiceImplTest {
         reporter = buildUser(1L, "reporter");
         author = buildUser(2L, "author");
 
+        Community community = new Community();
+        community.setId(1L);
+        community.setTitle("Test Community");
+
         post = new Post();
         post.setId(10L);
         post.setTitle("Post Title");
         post.setUser(author);
+        post.setCommunity(community);
         post.setStatus(PostStatus.Approved);
 
         comment = new Comment();
@@ -313,7 +319,7 @@ class ReportServiceImplTest {
     // Groups post reports and filters out deleted posts.
     @Test
     void getGroupedPostReports_filtersMissingPosts() {
-        when(reportRepository.groupPostReports()).thenReturn(List.of(new Object[] {post.getId(), 2L, 1L}));
+        when(reportRepository.groupPostReports()).thenReturn(List.<Object[]>of(new Object[] {post.getId(), 2L, 1L}));
         when(postRepository.findById(post.getId())).thenReturn(Optional.empty());
 
         List<PostReportGroupDto> result = reportService.getGroupedPostReports();
@@ -324,7 +330,7 @@ class ReportServiceImplTest {
     // Builds grouped post report summaries with reason breakdowns.
     @Test
     void getGroupedPostReports_buildsSummary() {
-        when(reportRepository.groupPostReports()).thenReturn(List.of(new Object[] {post.getId(), 2L, 1L}));
+        when(reportRepository.groupPostReports()).thenReturn(List.<Object[]>of(new Object[] {post.getId(), 2L, 1L}));
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
         when(reportRepository.countByTargetTypeAndTargetIdAndStatus(ReportTargetType.POST, post.getId(), ReportStatus.PENDING))
                 .thenReturn(1L);
@@ -336,13 +342,13 @@ class ReportServiceImplTest {
         List<PostReportGroupDto> result = reportService.getGroupedPostReports();
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).hasPendingReports()).isTrue();
+        assertThat(result.get(0).isHasPendingReports()).isTrue();
     }
 
     // Groups comment reports and filters out deleted comments.
     @Test
     void getGroupedCommentReports_filtersMissingComments() {
-        when(reportRepository.groupCommentReports()).thenReturn(List.of(new Object[] {comment.getId(), 2L, 1L}));
+        when(reportRepository.groupCommentReports()).thenReturn(List.<Object[]>of(new Object[] {comment.getId(), 2L, 1L}));
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.empty());
 
         List<CommentReportGroupDto> result = reportService.getGroupedCommentReports();
@@ -353,7 +359,7 @@ class ReportServiceImplTest {
     // Builds grouped comment report summaries with previews and reason breakdowns.
     @Test
     void getGroupedCommentReports_buildsSummary() {
-        when(reportRepository.groupCommentReports()).thenReturn(List.of(new Object[] {comment.getId(), 2L, 1L}));
+        when(reportRepository.groupCommentReports()).thenReturn(List.<Object[]>of(new Object[] {comment.getId(), 2L, 1L}));
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
         when(reportRepository.countByTargetTypeAndTargetIdAndStatus(ReportTargetType.COMMENT, comment.getId(), ReportStatus.PENDING))
                 .thenReturn(1L);
@@ -365,7 +371,7 @@ class ReportServiceImplTest {
         List<CommentReportGroupDto> result = reportService.getGroupedCommentReports();
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).hasPendingReports()).isTrue();
+        assertThat(result.get(0).isHasPendingReports()).isTrue();
     }
 
     // Returns reports for a specific post with resolved previews.

@@ -41,10 +41,12 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -146,9 +148,10 @@ class CommentServiceImplTest {
     // Bubbles up missing post errors for invalid requests.
     @Test
     void createComment_postNotFound_throwsRuntimeException() {
-        CommentReqDto req = new CommentReqDto(999L, "Hi");
+        Long missingPostId = 999L;
+        CommentReqDto req = new CommentReqDto(missingPostId, "Hi");
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(author);
-        when(postRepository.findById(999L)).thenReturn(Optional.empty());
+        when(postRepository.findById(missingPostId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> commentService.createComment(req))
                 .isInstanceOf(RuntimeException.class)
@@ -159,7 +162,7 @@ class CommentServiceImplTest {
     @Test
     void createComment_mentions_notifyMentionedUsers() {
         CommentReqDto req = new CommentReqDto(post.getId(), "hey @mark and @owner");
-        User mentioned = buildUser(4L, "mark", UserRole.Client);
+        User mentioned = buildUser(5L, "mark", UserRole.Client);
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(author);
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
         when(aiService.isContentSafe(req.content())).thenReturn(true);
@@ -223,7 +226,7 @@ class CommentServiceImplTest {
 
         commentService.createReply(ownParent.getId(), req);
 
-        verify(gamificationService, never()).awardXp(anyLong(), any());
+        verify(gamificationService, never()).awardXp(anyLong(), anyInt());
     }
 
     // Blocks replies with unsafe content.
@@ -254,7 +257,7 @@ class CommentServiceImplTest {
     @Test
     void createReply_mentions_notifyMentionedUsers() {
         CommentReqDto req = new CommentReqDto(post.getId(), "hi @mark");
-        User mentioned = buildUser(4L, "mark", UserRole.Client);
+        User mentioned = buildUser(5L, "mark", UserRole.Client);
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(replyAuthor);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
         when(aiService.isContentSafe(req.content())).thenReturn(true);
@@ -335,7 +338,7 @@ class CommentServiceImplTest {
 
         commentService.deleteComment(comment.getId());
 
-        verify(userRepository).save(liker);
+        verify(userRepository, times(2)).save(liker);
         verify(commentRepository).save(reply);
         verify(commentRepository).save(comment);
         verify(commentRepository).deleteById(comment.getId());
@@ -440,7 +443,7 @@ class CommentServiceImplTest {
 
         commentService.toggleLike(comment.getId());
 
-        verify(gamificationService, never()).awardXp(anyLong(), any());
+        verify(gamificationService, never()).awardXp(anyLong(), anyInt());
         verify(notificationService, never()).createNotification(any(), any(), any(), any(), any());
     }
 

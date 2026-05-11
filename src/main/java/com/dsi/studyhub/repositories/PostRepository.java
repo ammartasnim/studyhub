@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Optional<Post> findById(long id);
     Page<Post> findAll(Pageable pageable);
     Page<Post> findByCommunityId(Long communityId, Pageable pageable);
     @Query("SELECT p FROM Post p WHERE p.user.id = :userId AND p.status != com.dsi.studyhub.enums.PostStatus.Flagged")

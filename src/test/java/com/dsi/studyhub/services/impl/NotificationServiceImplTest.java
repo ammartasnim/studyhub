@@ -71,7 +71,7 @@ class NotificationServiceImplTest {
         NotificationResDto result = notificationService.createNotification(
                 recipient.getId(), "LIKE", "Alice liked your post", null, 100L);
 
-        assertThat(result.getId()).isEqualTo(notification.getId());
+        assertThat(result.id()).isEqualTo(notification.getId());
         verify(messagingTemplate).convertAndSendToUser(
                 eq(recipient.getUsername()), eq("/queue/notifications"), any(NotificationResDto.class));
     }

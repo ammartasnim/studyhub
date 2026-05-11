@@ -33,6 +33,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,7 +77,15 @@ class CommunityServiceImplTest {
         owner = buildUser(1L, "owner", "Owner", "One");
         member = buildUser(2L, "member", "Member", "Two");
         community = buildCommunity(10L, owner, 3);
+        community.getMembers().add(owner);
         community.getMembers().add(member);
+
+        ReflectionTestUtils.setField(communityService, "communityBanRepository", communityBanRepository);
+        ReflectionTestUtils.setField(communityService, "communityWarningRepository", communityWarningRepository);
+        ReflectionTestUtils.setField(communityService, "communityAuthService", communityAuthService);
+        ReflectionTestUtils.setField(communityService, "userRepository", userRepository);
+        ReflectionTestUtils.setField(communityService, "communityModeratorRepository", communityModeratorRepository);
+        ReflectionTestUtils.setField(communityService, "notificationService", notificationService);
     }
 
     // Enforces the explorer badge requirement for creating new communities.
@@ -405,8 +414,6 @@ class CommunityServiceImplTest {
     void getMembers_offsetBeyondSize_returnsEmpty() {
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(owner);
         when(communityRepository.findById(10L)).thenReturn(Optional.of(community));
-        when(communityModeratorRepository.existsByUserIdAndCommunityId(anyLong(), eq(10L))).thenReturn(false);
-        when(communityWarningRepository.countByUserIdAndCommunityId(anyLong(), eq(10L))).thenReturn(0L);
 
         Page<CommunityMemberResDto> result = communityService.getMembers(10L, PageRequest.of(5, 2));
 
@@ -455,7 +462,6 @@ class CommunityServiceImplTest {
     // Aggregates bans and warnings into a moderation summary.
     @Test
     void getCommunityModeration_returnsBansAndWarnings() {
-        when(communityRepository.findById(10L)).thenReturn(Optional.of(community));
         CommunityBan ban = new CommunityBan(member, community, "spam");
         ban.setId(1L);
         ban.setBannedAt(LocalDateTime.now());
