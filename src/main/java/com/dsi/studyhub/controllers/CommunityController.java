@@ -216,4 +216,12 @@ public class CommunityController {
             @PathVariable Long communityId) {
         return ResponseEntity.ok(communityService.getCommunityModeration(communityId));
     }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<CommunityResDto>> getCommunitiesByUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(communityService.getCommunitiesByUser(userId, PageRequest.of(page, size)));
+    }
 }

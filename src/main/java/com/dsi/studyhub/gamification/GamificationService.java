@@ -12,6 +12,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class GamificationService {
@@ -49,6 +51,7 @@ public class GamificationService {
             Badge badgeEntity = new Badge();
             badgeEntity.setType(newBadgeType);
             badgeEntity.setUser(user);
+            badgeEntity.setEarnedAt(LocalDateTime.now());
 
             user.getBadges().add(badgeEntity);
 

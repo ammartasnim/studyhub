@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(indexes = {
         @Index(name = "idx_badge_user_id", columnList = "user_id")
@@ -28,4 +30,7 @@ public class Badge {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BadgeType type;
+
+    @Column(name = "earned_at")
+    private LocalDateTime earnedAt;
 }

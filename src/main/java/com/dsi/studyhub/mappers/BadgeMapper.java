@@ -12,10 +12,12 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
-public interface BadgeMapper {
+public abstract class BadgeMapper {
+
     @Mapping(source = "user.id", target = "userId")
-    BadgeResDto toDto(Badge badge);
+    @Mapping(source = "earnedAt", target = "earnedAt")
+    public abstract BadgeResDto toDto(Badge badge);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void partialUpdate(BadgeReqDto dto, @MappingTarget Badge badge);
+    public abstract void partialUpdate(BadgeReqDto dto, @MappingTarget Badge badge);
 }

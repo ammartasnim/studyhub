@@ -23,11 +23,12 @@ public abstract class PostMapper {
 
     @Mapping(target = "imgs", ignore = true)
     public abstract Post toEntity(PostReqDto postReqDto);
-
+    @Mapping(target = "userId",                  source = "user.id")
     @Mapping(target = "userUsername",            source = "user.username")
     @Mapping(target = "userFirstName",           source = "user.firstName")
     @Mapping(target = "userLastName",            source = "user.lastName")
     @Mapping(target = "userPfp",                 source = "user.pfp")
+    @Mapping(target = "communityId",          source = "community.id")
     @Mapping(target = "communityTitle",          source = "community.title")
     @Mapping(target = "likeCount",               ignore = true)
     @Mapping(target = "commentCount",            ignore = true)

@@ -16,10 +16,12 @@ public class PostResDto {
     private String title;
     private String content;
     private List<String> imgs;
+    private String userId;
     private String userUsername;
     private String userFirstName;
     private String userLastName;
     private String userPfp;
+    private String communityId;
     private String communityTitle;
     private PostStatus status;
     private int likeCount;

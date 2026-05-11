@@ -513,4 +513,12 @@ public class CommunityServiceImpl implements CommunityService {
                 .build();
     }
 
+    @Override
+    public Page<CommunityResDto> getCommunitiesByUser(Long userId,  Pageable pageable) {
+        return communityRepository.findByMembersId(userId, pageable)
+                .map(communityMapper::toDto);
+    }
+
+
+
 }

@@ -6,6 +6,7 @@ import com.dsi.studyhub.dtos.CommunityReqDto;
 import com.dsi.studyhub.dtos.CommunityResDto;
 import com.dsi.studyhub.entities.Community;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -37,4 +38,6 @@ public interface CommunityService {
     Page<CommunityMemberResDto> getMembersPublic(Long communityId, Pageable pageable);
 
     CommunityModerationDto getCommunityModeration(Long communityId);
+
+    Page<CommunityResDto> getCommunitiesByUser(Long userId,  Pageable pageable);
 }

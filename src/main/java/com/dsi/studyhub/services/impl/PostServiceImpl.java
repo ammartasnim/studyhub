@@ -391,13 +391,13 @@ public class PostServiceImpl implements PostService {
         for (Post p : bucketC) { if (addedIds.add(p.getId())) interleaved.add(p); }
         for (Post p : bucketD) { if (addedIds.add(p.getId())) interleaved.add(p); }
         for (Post p : bucketF) { if (addedIds.add(p.getId())) interleaved.add(p); }
-
+        
         if (interleaved.isEmpty()) {
-            sortByScore(postRepository.findAllApproved())
+            sortByScore(postRepository.findAllApprovedExcludingUser(userId))
                     .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
         }
 
-        sortByScore(postRepository.findAllApproved())
+        sortByScore(postRepository.findAllApprovedExcludingUser(userId))
                 .forEach(p -> { if (addedIds.add(p.getId())) interleaved.add(p); });
 
         int start = (int) pageable.getOffset();

@@ -1,5 +1,6 @@
 package com.dsi.studyhub.repositories;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.dsi.studyhub.entities.Community;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +35,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     @Query("SELECT c FROM Community c ORDER BY SIZE(c.members) DESC")
     List<Community> findTopByMemberCount(Pageable pageable);
+
+    Page<Community> findByMembersId(Long userId, Pageable pageable);
 }
