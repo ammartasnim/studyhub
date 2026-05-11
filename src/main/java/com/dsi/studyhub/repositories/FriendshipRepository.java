@@ -56,15 +56,17 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
     """)
     Page<Friendship> findBlockedByRequester(@Param("userId") Long userId,
                                             Pageable pageable);
-    @Query("""
-    SELECT f FROM Friendship f
-    WHERE (f.requester.id = :userId OR f.addressee.id = :userId)
-    AND f.status = 'ACCEPTED'
-    AND (
-        LOWER(f.requester.username) LIKE LOWER(CONCAT('%', :q, '%')) OR
-        LOWER(f.addressee.username) LIKE LOWER(CONCAT('%', :q, '%'))
-    )
-""")
+    @Query(value = """
+        SELECT f.* FROM friendships f
+        JOIN users u_req ON f.requester_id = u_req.id
+        JOIN users u_add ON f.addressee_id = u_add.id
+        WHERE (f.requester_id = :userId OR f.addressee_id = :userId)
+        AND f.status = 'ACCEPTED'
+        AND (
+            u_req.username ILIKE '%' || :q || '%' OR
+            u_add.username ILIKE '%' || :q || '%'
+        )
+    """, nativeQuery = true)
     List<Friendship> searchAcceptedFriends(@Param("userId") Long userId, @Param("q") String q);
 }
 

@@ -44,21 +44,37 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT b.type, COUNT(b) FROM User u JOIN u.badges b GROUP BY b.type")
     List<Object[]> countGroupedByBadgeRaw();
-    @Query("""
-    SELECT u FROM User u
-    WHERE u.id != :userId
-    AND u.role != 'Admin'
-    AND u.id NOT IN (
-        SELECT f.addressee.id FROM Friendship f WHERE f.requester.id = :userId
-        UNION
-        SELECT f.requester.id FROM Friendship f WHERE f.addressee.id = :userId
-    )
-    AND (
-        LOWER(COALESCE(u.username, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(COALESCE(u.firstName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(COALESCE(u.lastName, '')) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    )
-""")
+    @Query(value = """
+        SELECT u.* FROM users u
+        WHERE u.id != :userId
+        AND u.role != 'Admin'
+        AND u.id NOT IN (
+            SELECT f.addressee_id FROM friendships f WHERE f.requester_id = :userId
+            UNION
+            SELECT f.requester_id FROM friendships f WHERE f.addressee_id = :userId
+        )
+        AND (
+            u.username ILIKE '%' || :keyword || '%'
+            OR u.first_name ILIKE '%' || :keyword || '%'
+            OR u.last_name ILIKE '%' || :keyword || '%'
+        )
+    """,
+    countQuery = """
+        SELECT COUNT(u.id) FROM users u
+        WHERE u.id != :userId
+        AND u.role != 'Admin'
+        AND u.id NOT IN (
+            SELECT f.addressee_id FROM friendships f WHERE f.requester_id = :userId
+            UNION
+            SELECT f.requester_id FROM friendships f WHERE f.addressee_id = :userId
+        )
+        AND (
+            u.username ILIKE '%' || :keyword || '%'
+            OR u.first_name ILIKE '%' || :keyword || '%'
+            OR u.last_name ILIKE '%' || :keyword || '%'
+        )
+    """,
+    nativeQuery = true)
     Page<User> findSuggestedFriends(@Param("userId") Long userId,
                                     @Param("keyword") String keyword,
                                     Pageable pageable);
