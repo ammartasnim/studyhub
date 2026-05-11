@@ -117,6 +117,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("user not found with id: " + userId));
         user.setBanned(false);
         userRepository.save(user);
+        notificationService.createNotification(
+                userId,
+                "BAN",
+                "Your account has been unbanned.",
+                null,
+                userId
+        );
     }
 
     // Admin user retrieval and listing

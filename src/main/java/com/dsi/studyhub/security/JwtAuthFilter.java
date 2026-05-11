@@ -89,6 +89,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         jwtService.isTokenValid(token, userDetails);
 
                 if (isValid) {
+                    if (!userDetails.isAccountNonLocked()) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities()

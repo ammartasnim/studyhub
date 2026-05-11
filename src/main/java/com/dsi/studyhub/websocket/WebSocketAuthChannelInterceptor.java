@@ -61,6 +61,9 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                 String username = jwtService.extractUsername(token);
                 User user = userRepository.findByUsername(username).orElse(null);
                 if (user != null) {
+                    if (!user.isAccountNonLocked()) {
+                        return message;
+                    }
                     authentication = new UsernamePasswordAuthenticationToken(
                             user, null, user.getAuthorities());
                     accessor.setUser(authentication);

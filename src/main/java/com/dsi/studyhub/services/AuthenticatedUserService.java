@@ -1,6 +1,7 @@
 package com.dsi.studyhub.services;
 
 import com.dsi.studyhub.entities.User;
+import com.dsi.studyhub.exceptions.ForbiddenException;
 import com.dsi.studyhub.exceptions.UnauthorizedException;
 import com.dsi.studyhub.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,11 @@ public class AuthenticatedUserService {
         }
 
         String username = authentication.getName();
-        return userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UnauthorizedException("Authenticated user not found"));
+        if (user.isAccountNonLocked()) {
+            return user;
+        }
+        throw new ForbiddenException("User is banned");
     }
 }
