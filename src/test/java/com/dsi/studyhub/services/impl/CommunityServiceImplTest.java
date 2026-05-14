@@ -36,10 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -101,7 +98,7 @@ class CommunityServiceImplTest {
     // Allows explorers to create communities and defaults member count to 1.
     @Test
     void createCommunity_withExplorerBadge_createsAndDefaultsMembers() {
-        owner.getBadges().add(new Badge(owner, 1L, BadgeType.EXPLORER,LocalDateTime.now()));
+        owner.getBadges().add(new Badge(owner, 1L, BadgeType.EXPLORER, LocalDateTime.now()));
         CommunityReqDto req = new CommunityReqDto("Title", "Desc", 0, "cat");
         Community mapped = buildCommunity(null, owner, 0);
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(owner);
